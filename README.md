@@ -1,2 +1,2 @@
 # hpc-qaas
-High Performance Computing (HPC) qsub as a service (QaaS)
+High Performance Computing (HPC) qsub as a service (QaaS) library
