@@ -123,9 +123,9 @@ func (s *Webhook) List() ([]WebhookInfo, error) {
 }
 
 // putJSON makes a HTTP PUT request with provided JSON data.
-func (s *Webhook) putJSON(url string, reqData interface{}, response interface{}) (int, error) {
+func (s *Webhook) putJSON(url string, request interface{}, response interface{}) (int, error) {
 
-	data, err := json.Marshal(reqData)
+	data, err := json.Marshal(request)
 	if err != nil {
 		return 0, err
 	}
@@ -151,7 +151,7 @@ func (s *Webhook) putJSON(url string, reqData interface{}, response interface{})
 }
 
 // newHTTPSClient sets up the client instance ready for making HTTPs requests.
-func (s *Webhook) newHTTPSClient() (client *http.Client) {
+func (s *Webhook) newHTTPSClient() *http.Client {
 
 	rootCertPool := x509.NewCertPool()
 
@@ -170,10 +170,8 @@ func (s *Webhook) newHTTPSClient() (client *http.Client) {
 		},
 	}
 
-	client = &http.Client{
-		Timeout:   10 * time.Second,
-		Transport: transport,
-	}
-
-	return
+	return &http.Client{
+			Timeout:   10 * time.Second,
+			Transport: transport,
+		}
 }
