@@ -24,6 +24,7 @@ import (
 )
 
 type responseDataQaas struct {
+	Webhook string `json:"webhook"`
 }
 
 // WebhookInfo is a data structure containing the information (and/or attributes) of a webhook.
@@ -81,7 +82,7 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 	myURL := url.URL{
 		Scheme: "https",
 		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
-		Path:   path.Join(server.ConfigurationPath, id),
+		Path:   server.ConfigurationPath,
 	}
 	var response responseDataQaas
 	httpCode, err := s.putJSON(&myURL, server.Configuration{Username: user.Username, Hash: id}, response)
