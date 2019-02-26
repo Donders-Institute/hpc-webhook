@@ -116,7 +116,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
-			testDataFilename: "../../test/testdata/example-github-webhook.json",
+			testDataFilename: "../../../test/data/example-github-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
 				"x-hub-signature":   "someValue",
@@ -130,7 +130,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
-			testDataFilename: "../../test/testdata/example-ifttt-webhook.json",
+			testDataFilename: "../../../test/data/example-ifttt-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -141,7 +141,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
-			testDataFilename: "../../test/testdata/example-zapier-webhook.json",
+			testDataFilename: "../../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -152,7 +152,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651",
-			testDataFilename: "../../test/testdata/example-zapier-webhook.json",
+			testDataFilename: "../../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -163,7 +163,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/wwwhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
-			testDataFilename: "../../test/testdata/example-zapier-webhook.json",
+			testDataFilename: "../../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -174,7 +174,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "GET",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
-			testDataFilename: "../../test/testdata/example-zapier-webhook.json",
+			testDataFilename: "../../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},

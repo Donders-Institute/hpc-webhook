@@ -4,4 +4,4 @@ ADD . $SRC_DIR/
 WORKDIR $SRC_DIR
 RUN make
 EXPOSE 4444
-CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 && echo "Started" && go test
+CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 && echo "Started" && make test
