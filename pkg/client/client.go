@@ -18,7 +18,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Donders-Institute/hpc-qaas/pkg/server"
+	"github.com/Donders-Institute/hpc-qaas/internal/pkg/server"
 
 	log "github.com/sirupsen/logrus"
 )
