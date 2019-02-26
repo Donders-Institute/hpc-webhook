@@ -6,5 +6,5 @@ ECHO Change Windows to Unix line endings
 %CONVERT% "..\init\01-initialize-database.sh"
 %CONVERT% "wait-for-it.sh"
 
-docker-compose -f ..\docker-compose.yml build
+docker-compose -f ..\docker-compose.yml build --no-cache
 docker-compose -f ..\docker-compose.yml up
