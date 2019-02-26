@@ -1,9 +1,15 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 )
+
+// API is used to store the database pointer
+type API struct {
+	DB *sql.DB
+}
 
 // WebhookPath is the first part of the webhook payload URL
 const WebhookPath = "/webhook/"
@@ -13,7 +19,7 @@ const ConfigurationPath = "/configuration"
 
 // ConfigurationHandler handles a webhook registration HTTP PUT request
 // with the hash and username in its body
-func ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
+func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	configuration, err := parseConfigurationRequest(req)
 	if err != nil {
@@ -23,8 +29,14 @@ func ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO: Add a row to database
-	fmt.Printf("%+v\n", configuration)
+	// Add a row in the database
+	err = addRow(a.DB, configuration.Hash, configuration.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
 
 	// Succes
 	w.WriteHeader(http.StatusOK)
@@ -33,7 +45,7 @@ func ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 // WebhookHandler handles a HTTP POST request containing the webhook payload in its body
-func WebhookHandler(w http.ResponseWriter, req *http.Request) {
+func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	webhook, webhookID, err := parseWebhookRequest(req)
 	if err != nil {
