@@ -18,13 +18,10 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/Donders-Institute/hpc-qaas/pkg/server"
+
 	log "github.com/sirupsen/logrus"
 )
-
-type requestDataQaas struct {
-	Username string `json:"username"`
-	Hash     string `json:"hash"`
-}
 
 type responseDataQaas struct {
 }
@@ -81,17 +78,21 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 	}
 
 	// call QaaS to register the webhook
-	myURL := fmt.Sprintf("https://%s:%d/webhooks/%s", s.QaasHost, s.QaasPort, id)
-	var respData responseDataQaas
-	httpCode, err := s.putJSON(myURL, requestDataQaas{Username: user.Name, Hash: id}, respData)
+	myURL := url.URL{
+		Scheme: "https",
+		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+		Path:   path.Join(server.ConfigurationPath, id),
+	}
+	var response responseDataQaas
+	httpCode, err := s.putJSON(&myURL, server.Configuration{Username: user.Username, Hash: id}, response)
 
-	log.Debugf("response data: %+v", respData)
+	log.Debugf("response data: %+v", response)
 
 	if err != nil || httpCode != 200 {
 		return nil, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
 	}
 
-	return url.Parse(myURL)
+	return &myURL, nil
 }
 
 // List retrieves a list of webhooks of the current user.
@@ -123,7 +124,7 @@ func (s *Webhook) List() ([]WebhookInfo, error) {
 }
 
 // putJSON makes a HTTP PUT request with provided JSON data.
-func (s *Webhook) putJSON(url string, request interface{}, response interface{}) (int, error) {
+func (s *Webhook) putJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
 
 	data, err := json.Marshal(request)
 	if err != nil {
@@ -133,7 +134,7 @@ func (s *Webhook) putJSON(url string, request interface{}, response interface{})
 	log.Debugf("request data: %s", string(data))
 
 	c := s.newHTTPSClient()
-	req, err := http.NewRequest("PUT", url, bytes.NewReader(data))
+	req, err := http.NewRequest("PUT", url.String(), bytes.NewReader(data))
 	req.Header.Set("accept", "application/json")
 	req.Header.Set("content-type", "application/json")
 	if err != nil {
