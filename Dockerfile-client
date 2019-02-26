@@ -1,0 +1,11 @@
+FROM golang:1.12-rc-stretch
+ENV SRC_DIR=/go/src/github.com/Donders-Institute/hpc-qaas
+ADD . $SRC_DIR/
+WORKDIR $SRC_DIR
+RUN make
+
+RUN adduser --disabled-password --gecos '' dccnuser
+WORKDIR /home/dccnuser
+USER dccnuser
+
+CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 && echo "Started" && tail -f /dev/null

@@ -5,8 +5,8 @@ services:
     image: dccn/qaas-client
     container_name: qaas_client_container
     build:
-      context: ../cmd/client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile-client
     networks:
       - qaasnet
     depends_on:
@@ -15,8 +15,8 @@ services:
     image: dccn/qaas-server
     container_name: qaas_server_container
     build:
-      context: ../cmd/server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile-server
     ports:
       - 4444:4444
     networks:
@@ -26,9 +26,9 @@ services:
   db:
     image: postgres:11
     env_file:
-      - ../configs/qaas-database.env
+      - ./configs/qaas-database.env
     volumes:
-      - ../init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh.sh
+      - ./init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh.sh
     networks:
       - qaasnet
     ports:
