@@ -18,13 +18,10 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/Donders-Institute/hpc-qaas/pkg/server"
+
 	log "github.com/sirupsen/logrus"
 )
-
-type requestDataQaas struct {
-	Username string `json:"username"`
-	Hash     string `json:"hash"`
-}
 
 type responseDataQaas struct {
 }
@@ -81,11 +78,11 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 	}
 
 	// call QaaS to register the webhook
-	myURL := fmt.Sprintf("https://%s:%d/webhooks/%s", s.QaasHost, s.QaasPort, id)
-	var respData responseDataQaas
-	httpCode, err := s.putJSON(myURL, requestDataQaas{Username: user.Name, Hash: id}, respData)
+	myURL := fmt.Sprintf("https://%s:%d/webhook/%s", s.QaasHost, s.QaasPort, id)
+	var response responseDataQaas
+	httpCode, err := s.putJSON(myURL, server.Configuration{Username: user.Username, Hash: id}, response)
 
-	log.Debugf("response data: %+v", respData)
+	log.Debugf("response data: %+v", response)
 
 	if err != nil || httpCode != 200 {
 		return nil, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
@@ -171,7 +168,7 @@ func (s *Webhook) newHTTPSClient() *http.Client {
 	}
 
 	return &http.Client{
-			Timeout:   10 * time.Second,
-			Transport: transport,
-		}
+		Timeout:   10 * time.Second,
+		Transport: transport,
+	}
 }
