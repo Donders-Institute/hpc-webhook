@@ -20,7 +20,7 @@ func init() {
 
 	webhookCmd.AddCommand(createCmd, deleteCmd, infoCmd, triggerCmd)
 	qaasCmd.AddCommand(webhookCmd)
-	rootCmd.AddCommand(qaasCmd)
+	// rootCmd.AddCommand(qaasCmd)
 }
 
 var qaasCmd = &cobra.Command{
@@ -54,7 +54,7 @@ var createCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Warnf("Not implemented!!")
+		// logger.Warnf("Not implemented!!")
 	},
 }
 
@@ -64,7 +64,7 @@ var deleteCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Warnf("Not implemented!!")
+		// logger.Warnf("Not implemented!!")
 	},
 }
 
@@ -74,7 +74,7 @@ var infoCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Warnf("Not implemented!!")
+		// logger.Warnf("Not implemented!!")
 	},
 }
 
@@ -84,7 +84,7 @@ var triggerCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Warnf("Not implemented!!")
+		// logger.Warnf("Not implemented!!")
 	},
 }
 
