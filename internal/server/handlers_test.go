@@ -8,12 +8,15 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
 
 func TestConfigurationHandlerWebhook(t *testing.T) {
 	cases := []struct {
 		method         string
 		configURL      string
+		configuration  Configuration
 		testData       string
 		headerInfo     map[string]string
 		expectedStatus int
@@ -23,18 +26,11 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		{
 			method:    "PUT",
 			configURL: "/configuration",
-			testData:  `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
-			headerInfo: map[string]string{
-				"Content-Type": "application/json; charset=utf-8",
+			configuration: Configuration{
+				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+				Username: "username",
 			},
-			expectedStatus: 200,
-			expectedString: `Webhook added successfully`,
-			expectedResult: true, // No error
-		},
-		{
-			method:    "PUT",
-			configURL: "/configuration",
-			testData:  `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
+			testData: `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -45,7 +41,11 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		{
 			method:    "PUT",
 			configURL: "/configuration/nonexisting",
-			testData:  `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
+			configuration: Configuration{
+				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+				Username: "username",
+			},
+			testData: `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -56,7 +56,11 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		{
 			method:    "POST",
 			configURL: "/configuration",
-			testData:  `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
+			configuration: Configuration{
+				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+				Username: "username",
+			},
+			testData: `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -67,6 +71,15 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 	}
 
 	for _, c := range cases {
+
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		defer db.Close()
+
+		app := &API{db}
+
 		// Obtain the test data
 		b := bytes.NewBuffer([]byte(c.testData))
 
@@ -81,9 +94,15 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			req.Header.Set(key, value)
 		}
 
+		if c.expectedResult {
+			mock.ExpectBegin()
+			mock.ExpectExec("INSERT INTO qaas").WithArgs(c.configuration.Hash, c.configuration.Username).WillReturnResult(sqlmock.NewResult(1, 1))
+			mock.ExpectCommit()
+		}
+
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(ConfigurationHandler)
+		handler := http.HandlerFunc(app.ConfigurationHandler)
 
 		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 		// directly and pass in our Request and ResponseRecorder.
@@ -99,6 +118,13 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		if rr.Body.String() != c.expectedString {
 			t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), c.expectedString)
 			return
+		}
+
+		if c.expectedResult {
+			// we make sure that all expectations were met
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("there were unfulfilled expectations: %s", err)
+			}
 		}
 	}
 }
@@ -116,7 +142,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
-			testDataFilename: "../../../test/data/example-github-webhook.json",
+			testDataFilename: "../../test/data/example-github-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
 				"x-hub-signature":   "someValue",
@@ -130,7 +156,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
-			testDataFilename: "../../../test/data/example-ifttt-webhook.json",
+			testDataFilename: "../../test/data/example-ifttt-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -141,7 +167,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
-			testDataFilename: "../../../test/data/example-zapier-webhook.json",
+			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -152,7 +178,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651",
-			testDataFilename: "../../../test/data/example-zapier-webhook.json",
+			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -163,7 +189,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/wwwhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
-			testDataFilename: "../../../test/data/example-zapier-webhook.json",
+			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -174,7 +200,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "GET",
 			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
-			testDataFilename: "../../../test/data/example-zapier-webhook.json",
+			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -185,6 +211,14 @@ func TestHandlerWebhook(t *testing.T) {
 	}
 
 	for _, c := range cases {
+
+		db, mock, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		defer db.Close()
+
+		app := &API{DB: db}
 
 		// Obtain the body
 		file, err := os.Open(c.testDataFilename)
@@ -212,7 +246,7 @@ func TestHandlerWebhook(t *testing.T) {
 
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(WebhookHandler)
+		handler := http.HandlerFunc(app.WebhookHandler)
 
 		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 		// directly and pass in our Request and ResponseRecorder.
@@ -228,6 +262,11 @@ func TestHandlerWebhook(t *testing.T) {
 		if rr.Body.String() != c.expectedString {
 			t.Errorf("handler returned unexpected body: got %v want %v", rr.Body.String(), c.expectedString)
 			return
+		}
+
+		// we make sure that all expectations were met
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
 		}
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Donders-Institute/hpc-qaas/internal/pkg/server"
+	"github.com/Donders-Institute/hpc-qaas/internal/server"
 	_ "github.com/lib/pq"
 )
 
@@ -21,9 +21,15 @@ func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
-	server.InitDB(psqlInfo)
+	db, err := server.InitDB(psqlInfo)
+	if err != nil {
+		panic(err)
+	}
 
-	http.HandleFunc(server.WebhookPath, server.WebhookHandler)
-	http.HandleFunc(server.ConfigurationPath, server.ConfigurationHandler)
+	api := server.API{DB: db}
+	app := &api
+
+	http.HandleFunc(server.WebhookPath, app.WebhookHandler)
+	http.HandleFunc(server.ConfigurationPath, app.ConfigurationHandler)
 	log.Fatal(http.ListenAndServe("0.0.0.0:4444", nil))
 }
