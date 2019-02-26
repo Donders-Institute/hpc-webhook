@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  cli:
+    image: dccn/qaas-client-test
+    container_name: qaas_client_test_container
+    build:
+      context: ../../cmd/client
+      dockerfile: Dockerfile-test
+    networks:
+      - qaasnet
+    depends_on:
+      - db
+  server:
+    image: dccn/qaas-server-test
+    container_name: qaas_server_test_container
+    build:
+      context: ../../cmd/server
+      dockerfile: Dockerfile-test
+    ports:
+      - 4444:4444
+    networks:
+      - qaasnet
+    depends_on:
+      - db
+  db:
+    image: postgres:11
+    env_file:
+      - ../../configs/qaas-database.env
+    volumes:
+      - ../init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh
+      - ../init/02-fill-database.sh:/docker-entrypoint-initdb.d/02-fill-database.sh
+    networks:
+      - qaasnet
+    ports:
+      - "5432:5432"
+    restart: always
+
+networks:
+  qaasnet:
+
+volumes:
+  postgres:

@@ -1,0 +1,12 @@
+FROM golang:1.12-rc-stretch
+
+RUN go get -u github.com/lib/pq
+RUN adduser --disabled-password --gecos '' dccnuser
+
+ENV SRC_DIR=/go/src/github.com/Donders-Institute/hpc-qaas/cmd/client
+RUN mkdir -p $SRC_DIR
+
+ADD . $SRC_DIR
+WORKDIR $SRC_DIR
+
+CMD $SRC_DIR/wait-for-it.sh db:5432 && echo "Started" && go test

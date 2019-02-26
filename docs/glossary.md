@@ -1,25 +1,18 @@
-# Glossary
+# QaaS Glossary
 
 QaaS concepts are listed below in alphabetical order:
 
-* [TBW1](#tbw1-title)
-* [TBW2](#tbw2-title)
-* [TBW3](#tbw3-title)
+* [QaaS](#qaas)
+* [Webhook](#webhook)
 
-## TBW1 title
+## QaaS
 
-TBW
-
-[^](#glossary)
-
-## TBW2 title
-
-TBW
+Qsub as a Service (QaaS) is an infrastructure platform that allows the triggering of a qsub command on the High Performance Computing cluster by an external event.
 
 [^](#glossary)
 
-## TBW3 title
+## Webhook
 
-TBW
+A webhook causes events on one site to invoke behavior on another.
 
 [^](#glossary)
