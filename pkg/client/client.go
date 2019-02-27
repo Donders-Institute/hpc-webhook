@@ -85,7 +85,7 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 		Path:   server.ConfigurationPath,
 	}
 	var response responseDataQaas
-	httpCode, err := s.putJSON(&myURL, server.Configuration{Username: user.Username, Hash: id}, response)
+	httpCode, err := s.putJSON(&myURL, server.ConfigurationRequest{Username: user.Username, Hash: id}, response)
 
 	log.Debugf("response data: %+v", response)
 
