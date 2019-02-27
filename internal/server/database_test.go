@@ -7,7 +7,7 @@ import (
 )
 
 func TestAddRow(t *testing.T) {
-	configuration := Configuration{
+	configuration := ConfigurationRequest{
 		Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
 		Username: "dccnuser",
 	}

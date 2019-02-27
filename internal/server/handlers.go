@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -16,6 +17,12 @@ const WebhookPath = "/webhook/"
 
 // ConfigurationPath is the URL path to add a new webhook
 const ConfigurationPath = "/configuration"
+
+// QaasHost stores the hostname of the qaas server
+const QaasHost = "qaas.dccn.nl"
+
+// QaasPort stores the port of the qaas server
+const QaasPort = "4444"
 
 // ConfigurationHandler handles a webhook registration HTTP PUT request
 // with the hash and username in its body
@@ -81,7 +88,18 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Succes
+	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", QaasHost, QaasPort, webhookID)
+	configurationResponse := ConfigurationResponse{
+		Webhook: webhookPayloadURL,
+	}
+	js, err := json.Marshal(configurationResponse)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Webhook payload delivered successfully")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 	return
 }

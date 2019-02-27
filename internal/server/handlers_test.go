@@ -16,7 +16,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 	cases := []struct {
 		method         string
 		configURL      string
-		configuration  Configuration
+		configuration  ConfigurationRequest
 		testData       string
 		headerInfo     map[string]string
 		expectedStatus int
@@ -26,7 +26,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		{
 			method:    "PUT",
 			configURL: "/configuration",
-			configuration: Configuration{
+			configuration: ConfigurationRequest{
 				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
 				Username: "username",
 			},
@@ -41,7 +41,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		{
 			method:    "PUT",
 			configURL: "/configuration/nonexisting",
-			configuration: Configuration{
+			configuration: ConfigurationRequest{
 				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
 				Username: "username",
 			},
@@ -56,7 +56,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		{
 			method:    "POST",
 			configURL: "/configuration",
-			configuration: Configuration{
+			configuration: ConfigurationRequest{
 				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
 				Username: "username",
 			},
@@ -150,7 +150,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"x-github-delivery": "someValue",
 			},
 			expectedStatus: 200,
-			expectedString: `Webhook payload delivered successfully`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:4444/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492"}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -161,7 +161,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `Webhook payload delivered successfully`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:4444/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493"}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -172,7 +172,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `Webhook payload delivered successfully`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:4444/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494"}`,
 			expectedResult: true, // No error
 		},
 		{

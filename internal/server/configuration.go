@@ -7,15 +7,20 @@ import (
 	"strings"
 )
 
-// Configuration stores one row of webhook information
-type Configuration struct {
+// ConfigurationRequest stores one row of webhook information
+type ConfigurationRequest struct {
 	Hash     string `json:"hash"`
 	Username string `json:"username"`
 }
 
+// ConfigurationResponse contains the complet webhook payload URL
+type ConfigurationResponse struct {
+	Webhook string `json:"webhook"`
+}
+
 // Parse reads and verifies the add hook in an inbound request.
-func parseConfigurationRequest(req *http.Request) (Configuration, error) {
-	var configuration Configuration
+func parseConfigurationRequest(req *http.Request) (ConfigurationRequest, error) {
+	var configuration ConfigurationRequest
 	var err error
 
 	// Check method
