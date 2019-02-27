@@ -23,10 +23,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type responseDataQaas struct {
-	Webhook string `json:"webhook"`
-}
-
 // WebhookInfo is a data structure containing the information (and/or attributes) of a webhook.
 type WebhookInfo struct {
 	ID string
