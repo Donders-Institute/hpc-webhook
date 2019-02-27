@@ -84,7 +84,7 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
 		Path:   server.ConfigurationPath,
 	}
-	var response responseDataQaas
+	var response server.ConfigurationResponse
 	httpCode, err := s.putJSON(&myURL, server.ConfigurationRequest{Username: user.Username, Hash: id}, response)
 
 	log.Debugf("response data: %+v", response)
@@ -93,7 +93,12 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 		return nil, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
 	}
 
-	return &myURL, nil
+	webhookURL, err := url.Parse(response.Webhook)
+	if err != nil {
+		return nil, err
+	}
+
+	return webhookURL, nil
 }
 
 // List retrieves a list of webhooks of the current user.
