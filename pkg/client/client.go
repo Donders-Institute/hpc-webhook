@@ -114,10 +114,11 @@ func (s *Webhook) List() ([]WebhookInfo, error) {
 	// - the name of the item can be pased by uuid.Parse() function
 	if items, err := ioutil.ReadDir(path.Join(user.HomeDir, ".qaas")); err == nil {
 		for _, f := range items {
-			if f.IsDir() {
-				if _, err := uuid.Parse(f.Name()); err == nil {
-					webhooks = append(webhooks, WebhookInfo{ID: f.Name()})
-				}
+			if !f.IsDir() {
+				continue
+			}
+			if _, err := uuid.Parse(f.Name()); err == nil {
+				webhooks = append(webhooks, WebhookInfo{ID: f.Name()})
 			}
 		}
 	}
