@@ -32,16 +32,16 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 	return webhookID, nil
 }
 
-// Check if the webhook id exists
-func checkWebhookID(db *sql.DB, webhookID string) error {
+// Check if the webhook id exists. Return the unsername
+func checkWebhookID(db *sql.DB, webhookID string) (string, error) {
 	list, err := getRow(db, webhookID)
 	if err != nil || len(list) == 0 {
-		return fmt.Errorf("Invalid webhook ID '%s'", webhookID)
+		return "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
 	}
 	if len(list) > 1 {
-		return fmt.Errorf("Invalid database; found multiple webhook with webhook ID '%s'", webhookID)
+		return "", fmt.Errorf("Invalid database; found multiple webhook with webhook ID '%s'", webhookID)
 	}
-	return nil
+	return list[0].Username, nil
 }
 
 func parseWebhookPayload(req *http.Request) ([]byte, error) {

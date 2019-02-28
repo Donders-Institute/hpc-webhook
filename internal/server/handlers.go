@@ -63,7 +63,8 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if webhookID exists
-	if err := checkWebhookID(a.DB, webhookID); err != nil {
+	username, err := checkWebhookID(a.DB, webhookID)
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
@@ -80,7 +81,8 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Execute the script
-	if err := ExecuteScript(webhook, payload); err != nil {
+	fmt.Printf("Webhook: %+v\n", webhook)
+	if err := ExecuteScript(webhookID, payload, username); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return
