@@ -4,4 +4,4 @@ ADD . $SRC_DIR/
 WORKDIR $SRC_DIR
 RUN make
 EXPOSE 5111
-CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 && echo "Started" && server
+CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 --timeout=0 && echo "Started" && server

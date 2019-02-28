@@ -8,4 +8,4 @@ RUN adduser --disabled-password --gecos '' dccnuser
 WORKDIR /home/dccnuser
 USER dccnuser
 
-CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 && echo "Started" && tail -f /dev/null
+CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 --timeout=0 && echo "Started" && tail -f /dev/null
