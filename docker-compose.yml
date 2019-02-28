@@ -18,7 +18,7 @@ services:
       context: .
       dockerfile: Dockerfile-server
     ports:
-      - 4444:4444
+      - 5111:5111
     networks:
       - qaasnet
     depends_on:
@@ -32,7 +32,7 @@ services:
     networks:
       - qaasnet
     ports:
-      - "5432:5432"
+      - 5432:5432
     restart: always
 
 networks:

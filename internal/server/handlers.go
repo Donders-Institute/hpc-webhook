@@ -22,7 +22,7 @@ const ConfigurationPath = "/configuration"
 const QaasHost = "qaas.dccn.nl"
 
 // QaasPort stores the port of the qaas server
-const QaasPort = "4444"
+const QaasPort = "5111"
 
 // ConfigurationHandler handles a webhook registration HTTP PUT request
 // with the hash and username in its body

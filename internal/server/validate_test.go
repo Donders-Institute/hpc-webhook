@@ -45,7 +45,7 @@ func TestValidURLPath(t *testing.T) {
 		expectedResult bool
 	}{
 		{
-			urlPath:        "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
+			urlPath:        "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			expectedResult: true, // Valid url path, no error
 		},
 		{
@@ -57,7 +57,7 @@ func TestValidURLPath(t *testing.T) {
 			expectedResult: false, // Invalid url path
 		},
 		{
-			urlPath:        "/nonexisting/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
+			urlPath:        "/nonexisting/550e8400-e29b-41d4-a716-446655440001",
 			expectedResult: false, // Invalid url path
 		},
 	}
@@ -80,16 +80,16 @@ func TestValidWebhookID(t *testing.T) {
 		expectedResult bool
 	}{
 		{
-			webhookID:      "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
-			expectedResult: true, // valid, no error
+			webhookID:      "550e8400-e29b-41d4-a716-446655440001",
+			expectedResult: true, // valid, no error (i.e. 36 characters with 4 hyphens)
 		},
 		{
-			webhookID:      "E66D248B67C0442FE2CBAD7E248651FD4569EE8ECC72EE5A19B0E55AC1EF4492",
-			expectedResult: false, // Invalid hash (capitals A-F instead of a-f)
+			webhookID:      "550E8400-E29b-41D4-A716-446655440001",
+			expectedResult: false, // Invalid hash (i.e. capitals A-F instead of a-f)
 		},
 		{
-			webhookID:      "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef449",
-			expectedResult: false, // Invalid hash (63 characters)
+			webhookID:      "550e8400-e29b-41d4-a716-44665544000",
+			expectedResult: false, // Invalid hash (i.e. 35 characters with 4 hyphens)
 		},
 	}
 

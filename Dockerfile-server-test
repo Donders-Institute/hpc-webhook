@@ -3,5 +3,5 @@ ENV SRC_DIR=/go/src/github.com/Donders-Institute/hpc-qaas
 ADD . $SRC_DIR/
 WORKDIR $SRC_DIR
 RUN make
-EXPOSE 4444
+EXPOSE 5111
 CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 && echo "Started" && make test

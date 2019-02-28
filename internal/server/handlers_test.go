@@ -27,10 +27,10 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			method:    "PUT",
 			configURL: "/configuration",
 			configuration: ConfigurationRequest{
-				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+				Hash:     "550e8400-e29b-41d4-a716-446655440001",
 				Username: "username",
 			},
-			testData: `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -42,10 +42,10 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			method:    "PUT",
 			configURL: "/configuration/nonexisting",
 			configuration: ConfigurationRequest{
-				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+				Hash:     "550e8400-e29b-41d4-a716-446655440001",
 				Username: "username",
 			},
-			testData: `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -57,10 +57,10 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			method:    "POST",
 			configURL: "/configuration",
 			configuration: ConfigurationRequest{
-				Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+				Hash:     "550e8400-e29b-41d4-a716-446655440001",
 				Username: "username",
 			},
-			testData: `{"hash": "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -141,7 +141,7 @@ func TestHandlerWebhook(t *testing.T) {
 	}{
 		{
 			method:           "POST",
-			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			testDataFilename: "../../test/data/example-github-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
@@ -150,56 +150,56 @@ func TestHandlerWebhook(t *testing.T) {
 				"x-github-delivery": "someValue",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:4444/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492"}`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
 			expectedResult: true, // No error
 		},
 		{
 			method:           "POST",
-			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440002",
 			testDataFilename: "../../test/data/example-ifttt-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:4444/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4493"}`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440002"}`,
 			expectedResult: true, // No error
 		},
 		{
 			method:           "POST",
-			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440003",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:4444/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494"}`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440003"}`,
 			expectedResult: true, // No error
 		},
 		{
 			method:           "POST",
-			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
 			expectedString: `Error 404 - Not found: invalid URL path`,
-			expectedResult: false, // Invalid method
+			expectedResult: false, // Invalid webhook id
 		},
 		{
 			method:           "POST",
-			payloadURL:       "/wwwhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
+			payloadURL:       "/wwwhook/550e8400-e29b-41d4-a716-446655440001",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
 			expectedString: `Error 404 - Not found: invalid URL path`,
-			expectedResult: false, // Invalid method
+			expectedResult: false, // Invalid URL path
 		},
 		{
 			method:           "GET",
-			payloadURL:       "/webhook/e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4494",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",

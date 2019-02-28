@@ -31,5 +31,5 @@ func main() {
 
 	http.HandleFunc(server.WebhookPath, app.WebhookHandler)
 	http.HandleFunc(server.ConfigurationPath, app.ConfigurationHandler)
-	log.Fatal(http.ListenAndServe("0.0.0.0:4444", nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:5111", nil))
 }
