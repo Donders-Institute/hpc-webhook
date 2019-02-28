@@ -1,12 +1,9 @@
 package server
 
-import (
-	"fmt"
-)
+const relayName = "client"
 
-// ExecuteScript triggers a qsub command on the Torque cluster
-func ExecuteScript(webhook *Webhook) error {
+// ExecuteScript triggers a qsub command on the HPC cluster
+func ExecuteScript(webhook *Webhook, payload []byte) error {
 	var err error
-	fmt.Printf("Execute: '%+v'\n", webhook)
 	return err
 }

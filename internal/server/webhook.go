@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -32,9 +33,14 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 }
 
 // Check if the webhook id exists
-func checkWebhookID(webhookID string) error {
-	fmt.Printf("Check if webhook id '%s' exists\n", webhookID)
-
+func checkWebhookID(db *sql.DB, webhookID string) error {
+	list, err := getRow(db, webhookID)
+	if err != nil || len(list) == 0 {
+		return fmt.Errorf("Invalid webhook ID '%s'", webhookID)
+	}
+	if len(list) > 1 {
+		return fmt.Errorf("Invalid database; found multiple webhook with webhook ID '%s'", webhookID)
+	}
 	return nil
 }
 

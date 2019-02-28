@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  cli:
+  client:
     image: dccn/qaas-client-test
     container_name: qaas_client_test_container
     build:
@@ -9,6 +9,8 @@ services:
       dockerfile: Dockerfile-client-test
     networks:
       - qaasnet
+    volumes:
+      - data:/data
     depends_on:
       - db
   server:
@@ -19,6 +21,8 @@ services:
       dockerfile: Dockerfile-server-test
     ports:
       - 5111:5111
+    volumes:
+      - data:/data
     networks:
       - qaasnet
     depends_on:
@@ -41,3 +45,4 @@ networks:
 
 volumes:
   postgres:
+  data:

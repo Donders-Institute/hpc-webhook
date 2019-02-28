@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-client
+    volumes:
+      - data:/data
     networks:
       - qaasnet
     depends_on:
@@ -19,6 +21,8 @@ services:
       dockerfile: Dockerfile-server
     ports:
       - 5111:5111
+    volumes:
+      - data:/data
     networks:
       - qaasnet
     depends_on:
@@ -40,3 +44,4 @@ networks:
 
 volumes:
   postgres:
+  data:

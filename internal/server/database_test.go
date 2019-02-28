@@ -1,6 +1,7 @@
 package server
 
 import (
+	"reflect"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -8,7 +9,7 @@ import (
 
 func TestAddRow(t *testing.T) {
 	configuration := ConfigurationRequest{
-		Hash:     "e66d248b67c0442fe2cbad7e248651fd4569ee8ecc72ee5a19b0e55ac1ef4492",
+		Hash:     "550e8400-e29b-41d4-a716-446655440001",
 		Username: "dccnuser",
 	}
 
@@ -25,6 +26,44 @@ func TestAddRow(t *testing.T) {
 	// now we execute our method
 	if err = addRow(db, configuration.Hash, configuration.Username); err != nil {
 		t.Errorf("error was not expected while adding row: %s", err)
+	}
+
+	// we make sure that all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestGetRow(t *testing.T) {
+	var list []item
+	var err error
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	hash := "550e8400-e29b-41d4-a716-446655440001"
+
+	expectedUsername := "dccnuser"
+	expectedRows := sqlmock.NewRows([]string{"id", "hash", "username"}).AddRow(1, hash, expectedUsername)
+	mock.ExpectQuery("^SELECT id, hash, username FROM qaas").WithArgs(hash).WillReturnRows(expectedRows)
+
+	listExpected := []item{
+		item{
+			ID:       1,
+			Hash:     hash,
+			Username: expectedUsername,
+		},
+	}
+
+	list, err = getRow(db, hash)
+	if err != nil {
+		t.Errorf("error was not expected while getting row: %s", err)
+	}
+
+	if !reflect.DeepEqual(list, listExpected) {
+		t.Errorf("Lists are not equal: found length %d, but has %d", len(list), len(listExpected))
 	}
 
 	// we make sure that all expectations were met

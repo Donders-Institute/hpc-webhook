@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -24,6 +25,10 @@ func InitDB(dataSourceName string) (*sql.DB, error) {
 }
 
 func addRow(db *sql.DB, hash string, username string) error {
+	if !isValidWebhookID(hash) {
+		return errors.New("invalid webhook id")
+	}
+
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -45,4 +50,32 @@ func addRow(db *sql.DB, hash string, username string) error {
 	}
 
 	return err
+}
+
+type item struct {
+	ID       int
+	Hash     string
+	Username string
+}
+
+func getRow(db *sql.DB, hash string) ([]item, error) {
+	rows, err := db.Query("SELECT id, hash, username FROM qaas WHERE hash = ?", hash)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []item
+	for rows.Next() {
+		p := item{}
+		if err := rows.Scan(&p.ID, &p.Hash, &p.Username); err != nil {
+			return nil, err
+		}
+		list = append(list, p)
+	}
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return list, nil
 }

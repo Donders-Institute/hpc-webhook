@@ -133,6 +133,7 @@ func TestHandlerWebhook(t *testing.T) {
 	cases := []struct {
 		method           string
 		payloadURL       string
+		hash             string
 		testDataFilename string
 		headerInfo       map[string]string
 		expectedStatus   int
@@ -142,6 +143,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
+			hash:             "550e8400-e29b-41d4-a716-446655440001",
 			testDataFilename: "../../test/data/example-github-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
@@ -156,6 +158,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440002",
+			hash:             "550e8400-e29b-41d4-a716-446655440002",
 			testDataFilename: "../../test/data/example-ifttt-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -167,6 +170,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440003",
+			hash:             "550e8400-e29b-41d4-a716-446655440003",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -178,6 +182,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716",
+			hash:             "550e8400-e29b-41d4-a716",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -189,6 +194,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "POST",
 			payloadURL:       "/wwwhook/550e8400-e29b-41d4-a716-446655440001",
+			hash:             "550e8400-e29b-41d4-a716-446655440001",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -200,6 +206,7 @@ func TestHandlerWebhook(t *testing.T) {
 		{
 			method:           "GET",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
+			hash:             "550e8400-e29b-41d4-a716-446655440001",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -244,6 +251,12 @@ func TestHandlerWebhook(t *testing.T) {
 			req.Header.Set(key, value)
 		}
 
+		if c.expectedResult {
+			expectedUsername := "dccnuser"
+			expectedRows := sqlmock.NewRows([]string{"id", "hash", "username"}).AddRow(1, c.hash, expectedUsername)
+			mock.ExpectQuery("^SELECT id, hash, username FROM qaas").WithArgs(c.hash).WillReturnRows(expectedRows)
+		}
+
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(app.WebhookHandler)
@@ -264,9 +277,11 @@ func TestHandlerWebhook(t *testing.T) {
 			return
 		}
 
-		// we make sure that all expectations were met
-		if err := mock.ExpectationsWereMet(); err != nil {
-			t.Errorf("there were unfulfilled expectations: %s", err)
+		if c.expectedResult {
+			// we make sure that all expectations were met
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("there were unfulfilled expectations: %s", err)
+			}
 		}
 	}
 }
