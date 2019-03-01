@@ -36,7 +36,7 @@ services:
     env_file:
       - ./configs/qaas-database.env
     volumes:
-      - ./init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh.sh
+      - ./init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh
     networks:
       - qaasnet
     ports:
