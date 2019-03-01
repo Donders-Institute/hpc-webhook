@@ -7,8 +7,8 @@ import (
 
 // ExecuteScript triggers a qsub command on the HPC cluster
 func ExecuteScript(relayNodeName string, dataDir string, webhookID string, payload []byte, username string) error {
-	privateKeyFilename := path.Join(dataDir, "keys", "username", "id_rsa")
-	payloadFilename := path.Join(dataDir, "payloads", "username", "payload")
+	privateKeyFilename := path.Join(dataDir, "keys", username, "id_rsa")
+	payloadFilename := path.Join(dataDir, "payloads", username, "payload")
 
 	fmt.Printf("Execute: %+v\n", webhookID)
 	fmt.Printf("Execute: %+v\n", string(payload))
