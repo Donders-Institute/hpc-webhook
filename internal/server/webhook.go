@@ -51,8 +51,8 @@ func parseWebhookPayload(req *http.Request) ([]byte, error) {
 }
 
 // Write the payload to a file
-func writeWebhookPayloadToFile(dataDir string, payload []byte, username string) error {
-	payloadFilename := path.Join(dataDir, "payloads", username, "payload")
+func writeWebhookPayloadToFile(payloadDir string, payload []byte, username string) error {
+	payloadFilename := path.Join(payloadDir, "payload")
 	err := ioutil.WriteFile(payloadFilename, payload, 0600)
 	if err != nil {
 		return err

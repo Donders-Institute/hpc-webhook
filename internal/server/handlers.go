@@ -53,7 +53,7 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Generate a key pair
+	// Create the key dir
 	keyDir := path.Join(a.DataDir, "keys", configuration.Username)
 	err = os.MkdirAll(keyDir, os.ModePerm)
 	if err != nil {
@@ -122,8 +122,18 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Create the payload dir
+	payloadDir := path.Join(a.DataDir, "payloads", configuration.Username)
+	err = os.MkdirAll(payloadDir, os.ModePerm)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
 	// Write the payload to file
-	err = writeWebhookPayloadToFile(a.DataDir, payload, username)
+	err = writeWebhookPayloadToFile(payloadDir, payload, username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
