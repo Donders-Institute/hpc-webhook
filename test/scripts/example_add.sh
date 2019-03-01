@@ -1,5 +1,5 @@
 #!/bin/bash
-curl -X PPUT \
+curl -X PUT \
   http://localhost:5111/configuration \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \

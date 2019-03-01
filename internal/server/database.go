@@ -43,7 +43,7 @@ func addRow(db *sql.DB, hash string, username string) error {
 		}
 	}()
 
-	sqlStatement := fmt.Sprintf("INSERT INTO qaas (hash, username) VALUES (?, ?)")
+	sqlStatement := fmt.Sprintf("INSERT INTO qaas (hash, username) VALUES ($1, $2)")
 
 	if _, err = tx.Exec(sqlStatement, hash, username); err != nil {
 		return err
@@ -59,7 +59,7 @@ type item struct {
 }
 
 func getRow(db *sql.DB, hash string) ([]item, error) {
-	rows, err := db.Query("SELECT id, hash, username FROM qaas WHERE hash = ?", hash)
+	rows, err := db.Query("SELECT id, hash, username FROM qaas WHERE hash = $1", hash)
 	if err != nil {
 		return nil, err
 	}
