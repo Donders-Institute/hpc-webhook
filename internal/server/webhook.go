@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 )
 
@@ -43,9 +44,20 @@ func checkWebhookID(db *sql.DB, webhookID string) (string, error) {
 	return list[0].Username, nil
 }
 
+// Read the payload from the request body
 func parseWebhookPayload(req *http.Request) ([]byte, error) {
 	payload, err := ioutil.ReadAll(req.Body)
 	return payload, err
+}
+
+// Write the payload to a file
+func writeWebhookPayloadToFile(dataDir string, payload []byte, username string) error {
+	payloadFilename := path.Join(dataDir, "payloads", username, "payload")
+	err := ioutil.WriteFile(payloadFilename, payload, 0600)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func parseWebhookRequest(req *http.Request) (*Webhook, string, error) {

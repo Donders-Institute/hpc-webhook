@@ -122,6 +122,14 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Write the payload to file
+	err = writeWebhookPayloadToFile(a.DataDir, payload, username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
 	// Execute the script
 	fmt.Printf("Webhook: %+v\n", webhook)
 	if err := ExecuteScript(a.RelayNode, a.DataDir, webhookID, payload, username); err != nil {
