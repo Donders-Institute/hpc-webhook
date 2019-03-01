@@ -2,7 +2,6 @@ package server
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -56,21 +55,21 @@ func parseWebhookRequest(req *http.Request) (*Webhook, string, error) {
 
 	// Check the method
 	if !strings.EqualFold(req.Method, "POST") {
-		return webhook, "", errors.New("invalid method")
+		return webhook, "", fmt.Errorf("invalid method '%s'", req.Method)
 	}
 
 	// Check the URL path
 	if !isValidURLPath(req.URL.Path) {
-		return webhook, "", errors.New("invalid URL path")
+		return webhook, "", fmt.Errorf("invalid URL path '%s'", req.URL.Path)
 	}
 
 	// Derive the webhook id (if possible)
 	webhookID, err = extractWebhookID(req.URL, WebhookPath)
 	if err != nil {
-		return webhook, "", errors.New("invalid webhook id in URL path")
+		return webhook, "", fmt.Errorf("invalid webhook id '%s' in URL path", webhookID)
 	}
 	if !isValidWebhookID(webhookID) {
-		return webhook, "", errors.New("invalid webhook id in URL path")
+		return webhook, "", fmt.Errorf("invalid webhook id '%s' in URL path", webhookID)
 	}
 
 	return webhook, webhookID, err

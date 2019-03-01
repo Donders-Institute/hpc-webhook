@@ -50,7 +50,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid URL path`,
+			expectedString: `Error 404 - Not found: invalid URL path '/configuration/nonexisting'`,
 			expectedResult: false, // No error
 		},
 		{
@@ -65,7 +65,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method`,
+			expectedString: `Error 404 - Not found: invalid method 'POST'`,
 			expectedResult: false, // Invalid method
 		},
 	}
@@ -205,7 +205,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid URL path`,
+			expectedString: `Error 404 - Not found: invalid URL path '/webhook/550e8400-e29b-41d4-a716'`,
 			expectedResult: false, // Invalid webhook id
 		},
 		{
@@ -217,7 +217,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid URL path`,
+			expectedString: `Error 404 - Not found: invalid URL path '/wwwhook/550e8400-e29b-41d4-a716-446655440001'`,
 			expectedResult: false, // Invalid URL path
 		},
 		{
@@ -229,7 +229,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method`,
+			expectedString: `Error 404 - Not found: invalid method 'GET'`,
 			expectedResult: false, // Invalid method
 		},
 	}

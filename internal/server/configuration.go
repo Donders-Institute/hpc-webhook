@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -25,12 +26,12 @@ func parseConfigurationRequest(req *http.Request) (ConfigurationRequest, error) 
 
 	// Check method
 	if !strings.EqualFold(req.Method, "PUT") {
-		return configuration, errors.New("invalid method")
+		return configuration, fmt.Errorf("invalid method '%s'", req.Method)
 	}
 
 	// Check the URL path
 	if !isValidConfigurationURLPath(req.URL.Path) {
-		return configuration, errors.New("invalid URL path")
+		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
 	}
 
 	// Obtain the configuration
