@@ -11,30 +11,32 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func generatePair(savePrivateFileTo string, savePublicFileTo string) {
+func generatePair(savePrivateFileTo string, savePublicFileTo string) error {
 	bitSize := 4096
 
 	privateKey, err := generatePrivateKey(bitSize)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	privateKeyBytes := encodePrivateKeyToPEM(privateKey)
 
 	err = writeKeyToFile(privateKeyBytes, savePrivateFileTo)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
 
 	err = writeKeyToFile([]byte(publicKeyBytes), savePublicFileTo)
 	if err != nil {
-		log.Fatal(err.Error())
+		return err
 	}
+
+	return err
 }
 
 // generatePrivateKey creates a RSA Private Key of specified byte size

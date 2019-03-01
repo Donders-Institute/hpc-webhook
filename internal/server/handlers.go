@@ -3,11 +3,11 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -41,29 +41,31 @@ func (a *API) SetDataDir(elem ...string) {
 	a.DataDir = filepath.Join(elem...)
 }
 
-// MakeDataDir creates the folder for the qaas data files
-func (a *API) MakeDataDir() error {
-	err := os.MkdirAll(a.DataDir, os.ModePerm)
-	if err != nil {
-		return errors.New("error writing data dir")
-	}
-	return err
-}
-
-// CleanDataDir removes the folder with qaas data files
-func (a *API) CleanDataDir() error {
-	err := os.RemoveAll(a.DataDir)
-	if err != nil {
-		return errors.New("error removing data dir contents")
-	}
-	return err
-}
-
 // ConfigurationHandler handles a webhook registration HTTP PUT request
 // with the hash and username in its body
 func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	configuration, err := parseConfigurationRequest(req)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Generate a key pair
+	keyDir := path.Join(a.DataDir, "keys", configuration.Username)
+	err = os.MkdirAll(keyDir, os.ModePerm)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	privateKeyFilename := path.Join(keyDir, "id_rsa")
+	publicKeyFilename := path.Join(keyDir, "id_rsa.pub")
+	err = generatePair(privateKeyFilename, publicKeyFilename)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)

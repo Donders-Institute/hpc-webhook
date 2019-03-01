@@ -14,19 +14,23 @@ func main() {
 	// Set Qaas server variables
 	qaasHost := os.Getenv("QAAS_HOST")
 	qaasPort := os.Getenv("QAAS_PORT")
+	address := fmt.Sprintf("%s:%s", qaasHost, qaasPort)
 
 	// Set target computer variables
 	relayNode := os.Getenv("RELAY_NODE")
 
 	// Set the database variables
 	host := os.Getenv("POSTGRES_HOST")
-	if server.RunsWithinContainer() {
-		host = "db"
-	}
 	port := os.Getenv("POSTGRES_PORT")
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DATABASE")
+
+	// Override settings if we run the server in a Docker container
+	if server.RunsWithinContainer() {
+		host = "db"
+		address = fmt.Sprintf("0.0.0.0:%s", qaasPort)
+	}
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -45,7 +49,10 @@ func main() {
 		QaasPort:  qaasPort,
 	}
 	api.SetDataDir("..", "..", "data")
-	api.MakeDataDir()
+	err = os.MkdirAll(api.DataDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
 	app := &api
 
 	// Handle external webhook payloads
@@ -54,5 +61,5 @@ func main() {
 	// Handle internal webhook configuration payloads
 	http.HandleFunc(server.ConfigurationPath, app.ConfigurationHandler)
 
-	log.Fatal(http.ListenAndServe("0.0.0.0:5111", nil))
+	log.Fatal(http.ListenAndServe(address, nil))
 }

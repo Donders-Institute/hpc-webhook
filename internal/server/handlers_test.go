@@ -85,7 +85,10 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			QaasPort:  "5111",
 		}
 		api.SetDataDir("..", "..", "test", "results")
-		api.MakeDataDir()
+		err = os.MkdirAll(api.DataDir, os.ModePerm)
+		if err != nil {
+			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
+		}
 		app := &api
 
 		// Obtain the test data
@@ -240,7 +243,10 @@ func TestHandlerWebhook(t *testing.T) {
 			QaasPort:  "5111",
 		}
 		api.SetDataDir("..", "..", "test", "results")
-		api.MakeDataDir()
+		err = os.MkdirAll(api.DataDir, os.ModePerm)
+		if err != nil {
+			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
+		}
 		app := &api
 
 		// Obtain the body
