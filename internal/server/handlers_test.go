@@ -78,7 +78,15 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		}
 		defer db.Close()
 
-		app := &API{db}
+		api := API{
+			DB:        db,
+			RelayNode: "relaynode.dccn.nl",
+			QaasHost:  "qaas.dccn.nl",
+			QaasPort:  "5111",
+		}
+		api.SetDataDir("..", "..", "test", "results")
+		api.MakeDataDir()
+		app := &api
 
 		// Obtain the test data
 		b := bytes.NewBuffer([]byte(c.testData))
@@ -225,7 +233,15 @@ func TestHandlerWebhook(t *testing.T) {
 		}
 		defer db.Close()
 
-		app := &API{DB: db}
+		api := API{
+			DB:        db,
+			RelayNode: "relaynode.dccn.nl",
+			QaasHost:  "qaas.dccn.nl",
+			QaasPort:  "5111",
+		}
+		api.SetDataDir("..", "..", "test", "results")
+		api.MakeDataDir()
+		app := &api
 
 		// Obtain the body
 		file, err := os.Open(c.testDataFilename)

@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-client-test
+    env_file:
+      - ./configs/qaas-database.env
     networks:
       - qaasnet
     volumes:
@@ -19,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-server-test
+    env_file:
+      - ./configs/qaas-database.env
     ports:
       - 5111:5111
     volumes:

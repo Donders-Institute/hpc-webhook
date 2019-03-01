@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-client
+    env_file:
+      - ./configs/qaas-database.env
     volumes:
       - data:/data
     networks:
@@ -19,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-server
+    env_file:
+      - ./configs/qaas-database.env
     ports:
       - 5111:5111
     volumes:

@@ -3,13 +3,22 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 // API is used to store the database pointer
 type API struct {
-	DB *sql.DB
+	DB        *sql.DB
+	DataDir   string
+	RelayNode string
+	QaasHost  string
+	QaasPort  string
 }
 
 // WebhookPath is the first part of the webhook payload URL
@@ -18,11 +27,37 @@ const WebhookPath = "/webhook/"
 // ConfigurationPath is the URL path to add a new webhook
 const ConfigurationPath = "/configuration"
 
-// QaasHost stores the hostname of the qaas server
-const QaasHost = "qaas.dccn.nl"
+// RunsWithinContainer checks if the program runs in a Docker container or not
+func RunsWithinContainer() bool {
+	file, err := ioutil.ReadFile("/proc/1/cgroup")
+	if err != nil {
+		return false
+	}
+	return strings.Contains(string(file), "docker")
+}
 
-// QaasPort stores the port of the qaas server
-const QaasPort = "5111"
+// SetDataDir sets the filepath of the qaas data files
+func (a *API) SetDataDir(elem ...string) {
+	a.DataDir = filepath.Join(elem...)
+}
+
+// MakeDataDir creates the folder for the qaas data files
+func (a *API) MakeDataDir() error {
+	err := os.MkdirAll(a.DataDir, os.ModePerm)
+	if err != nil {
+		return errors.New("error writing data dir")
+	}
+	return err
+}
+
+// CleanDataDir removes the folder with qaas data files
+func (a *API) CleanDataDir() error {
+	err := os.RemoveAll(a.DataDir)
+	if err != nil {
+		return errors.New("error removing data dir contents")
+	}
+	return err
+}
 
 // ConfigurationHandler handles a webhook registration HTTP PUT request
 // with the hash and username in its body
@@ -82,14 +117,14 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Execute the script
 	fmt.Printf("Webhook: %+v\n", webhook)
-	if err := ExecuteScript(webhookID, payload, username); err != nil {
+	if err := ExecuteScript(a.RelayNode, a.DataDir, webhookID, payload, username); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return
 	}
 
 	// Succes
-	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", QaasHost, QaasPort, webhookID)
+	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.QaasHost, a.QaasPort, webhookID)
 	configurationResponse := ConfigurationResponse{
 		Webhook: webhookPayloadURL,
 	}

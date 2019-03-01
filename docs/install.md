@@ -24,6 +24,13 @@ copy the `qaas-database.env.example` file to `qaas-database.env`,
 and change the contents:
 
 ```
+# Qaas server settings
+QAAS_HOST=qaas.dccn.nl
+QAAS_PORT=5111
+
+# Target computer settings
+RELAY_NODE=relaynode.dccn.nl
+
 # Database settings
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
