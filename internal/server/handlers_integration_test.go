@@ -89,6 +89,12 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
 		}
+		defer func() {
+			err = os.RemoveAll(api.DataDir) // cleanup when done
+			if err != nil {
+				t.Fatalf("error %s when removing %s dir", err, api.DataDir)
+			}
+		}()
 		app := &api
 
 		// Obtain the test data
@@ -247,6 +253,12 @@ func TestHandlerWebhook(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
 		}
+		defer func() {
+			err = os.RemoveAll(api.DataDir) // cleanup when done
+			if err != nil {
+				t.Fatalf("error %s when removing %s dir", err, api.DataDir)
+			}
+		}()
 		app := &api
 
 		// Obtain the body

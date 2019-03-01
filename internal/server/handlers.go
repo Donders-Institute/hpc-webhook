@@ -63,14 +63,19 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Check if key pair exists for user
 	privateKeyFilename := path.Join(keyDir, "id_rsa")
 	publicKeyFilename := path.Join(keyDir, "id_rsa.pub")
-	err = generatePair(privateKeyFilename, publicKeyFilename)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Println(err)
-		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		return
+	hasPrivateKeyFilename, _ := checkFile(privateKeyFilename)
+	hasPublicKeyFilename, _ := checkFile(publicKeyFilename)
+	if !hasPrivateKeyFilename || !hasPublicKeyFilename {
+		err = generateKeyPair(privateKeyFilename, publicKeyFilename)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Println(err)
+			fmt.Fprint(w, "Error 404 - Not found: ", err)
+			return
+		}
 	}
 
 	// Add a row in the database

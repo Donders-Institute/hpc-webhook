@@ -5,13 +5,22 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"golang.org/x/crypto/ssh"
 )
 
-func generatePair(savePrivateFileTo string, savePublicFileTo string) error {
+func checkFile(filename string) (bool, error) {
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		return false, fmt.Errorf("file '%s' does not exist", filename)
+	}
+	return true, nil
+}
+
+func generateKeyPair(savePrivateFileTo string, savePublicFileTo string) error {
 	bitSize := 4096
 
 	privateKey, err := generatePrivateKey(bitSize)
