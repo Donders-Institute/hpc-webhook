@@ -3,18 +3,18 @@
 ## Obtain the source code
 
 Change to your `GOPATH`, for example on Windows:
-```
-cd C:\Users\YOURUSERNAME\go\src\github.com\Donders-Institute
+```console
+$ cd C:\Users\YOURUSERNAME\go\src\github.com\Donders-Institute
 ```
 
 Obtain the source code:
-```
-git clone https://github.com/Donders-Institute/hpc-qaas.git
+```console
+$ git clone https://github.com/Donders-Institute/hpc-qaas.git
 ```
 
 Go into the directory:
-```
-cd hpc-qaas
+```console
+$ cd hpc-qaas
 ```
 
 ## Configuration
