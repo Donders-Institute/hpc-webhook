@@ -10,7 +10,7 @@ services:
     env_file:
       - ./configs/qaas-database.env
     volumes:
-      - data:/data
+      - ./data:/data
     networks:
       - qaasnet
     depends_on:
@@ -26,7 +26,7 @@ services:
     ports:
       - 5111:5111
     volumes:
-      - data:/data
+      - ./data:/data
     networks:
       - qaasnet
     depends_on:
@@ -48,4 +48,3 @@ networks:
 
 volumes:
   postgres:
-  data:

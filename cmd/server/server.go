@@ -48,7 +48,7 @@ func main() {
 		QaasHost:  qaasHost,
 		QaasPort:  qaasPort,
 	}
-	api.SetDataDir("..", "..", "data")
+	api.SetDataDir("/data")
 	err = os.MkdirAll(api.DataDir, os.ModePerm)
 	if err != nil {
 		panic(err)
