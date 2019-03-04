@@ -152,7 +152,10 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Execute the script
 	fmt.Printf("Webhook: %+v\n", webhook)
-	if err := ExecuteScript(a.RelayNode, a.DataDir, webhookID, payload, username, a.RelayNodeTestUserPassword); err != nil {
+	sc := SSHConnector{
+		description: "SSH connection",
+	}
+	if err := ExecuteScript(sc, a.RelayNode, a.DataDir, webhookID, payload, username, a.RelayNodeTestUserPassword); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return
