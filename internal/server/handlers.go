@@ -14,11 +14,13 @@ import (
 
 // API is used to store the database pointer
 type API struct {
-	DB        *sql.DB
-	DataDir   string
-	RelayNode string
-	QaasHost  string
-	QaasPort  string
+	DB                        *sql.DB
+	DataDir                   string
+	RelayNode                 string
+	RelayNodeTestUser         string
+	RelayNodeTestUserPassword string
+	QaasHost                  string
+	QaasPort                  string
 }
 
 // WebhookPath is the first part of the webhook payload URL
@@ -70,6 +72,14 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	hasPublicKeyFilename, _ := checkFile(publicKeyFilename)
 	if !hasPrivateKeyFilename || !hasPublicKeyFilename {
 		err = generateKeyPair(privateKeyFilename, publicKeyFilename)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Println(err)
+			fmt.Fprint(w, "Error 404 - Not found: ", err)
+			return
+		}
+
+		err = addAuthorizedPublicKey(privateKeyFilename, publicKeyFilename, a.RelayNodeTestUser, a.RelayNodeTestUserPassword, a.RelayNode)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			fmt.Println(err)
@@ -142,7 +152,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Execute the script
 	fmt.Printf("Webhook: %+v\n", webhook)
-	if err := ExecuteScript(a.RelayNode, a.DataDir, webhookID, payload, username); err != nil {
+	if err := ExecuteScript(a.RelayNode, a.DataDir, webhookID, payload, username, a.RelayNodeTestUserPassword); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return

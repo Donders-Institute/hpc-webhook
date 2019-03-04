@@ -18,6 +18,8 @@ func main() {
 
 	// Set target computer variables
 	relayNode := os.Getenv("RELAY_NODE")
+	relayNodeTestUser := os.Getenv("RELAY_NODE_TEST_USER")
+	relayNodeTestUserPassword := os.Getenv("RELAY_NODE_TEST_USER_PASSWORD")
 
 	// Set the database variables
 	host := os.Getenv("POSTGRES_HOST")
@@ -43,10 +45,12 @@ func main() {
 
 	// Setup the app
 	api := server.API{
-		DB:        db,
-		RelayNode: relayNode,
-		QaasHost:  qaasHost,
-		QaasPort:  qaasPort,
+		DB:                        db,
+		RelayNode:                 relayNode,
+		RelayNodeTestUser:         relayNodeTestUser,
+		RelayNodeTestUserPassword: relayNodeTestUserPassword,
+		QaasHost:                  qaasHost,
+		QaasPort:                  qaasPort,
 	}
 	api.SetDataDir("/data")
 	err = os.MkdirAll(api.DataDir, os.ModePerm)

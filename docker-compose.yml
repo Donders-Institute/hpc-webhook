@@ -1,20 +1,6 @@
 version: "3.7"
 
 services:
-  client:
-    image: dccn/qaas-client
-    container_name: qaas_client_container
-    build:
-      context: .
-      dockerfile: Dockerfile-client
-    env_file:
-      - ./configs/qaas-database.env
-    volumes:
-      - ./data:/data
-    networks:
-      - qaasnet
-    depends_on:
-      - db
   server:
     image: dccn/qaas-server
     container_name: qaas_server_container
