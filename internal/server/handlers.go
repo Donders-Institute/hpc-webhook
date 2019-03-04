@@ -123,7 +123,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Create the payload dir
-	payloadDir := path.Join(a.DataDir, "payloads", configuration.Username)
+	payloadDir := path.Join(a.DataDir, "payloads", username)
 	err = os.MkdirAll(payloadDir, os.ModePerm)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
