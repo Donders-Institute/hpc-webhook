@@ -26,8 +26,6 @@ services:
       - ./test/init/02-fill-database.sh:/docker-entrypoint-initdb.d/02-fill-database.sh
     networks:
       - qaasnet
-    ports:
-      - 5432:5432
     restart: always
 
 networks:

@@ -68,6 +68,7 @@ func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfigurati
 	defer c.CloseSession(session)
 
 	command := fmt.Sprintf("cd ~/.qaas/%s/ && cat ~/.qaas/%s/script.sh payload | qsub", conf.webhookID, conf.webhookID)
+	fmt.Println(command)
 	err = c.Run(session, command)
 	if err != nil {
 		return err
