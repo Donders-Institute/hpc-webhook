@@ -17,6 +17,8 @@ type API struct {
 	DB                        *sql.DB
 	Connector                 Connector
 	DataDir                   string
+	VaultDir                  string
+	HomeDir                   string
 	RelayNode                 string
 	RelayNodeTestUser         string
 	RelayNodeTestUserPassword string
@@ -42,6 +44,16 @@ func RunsWithinContainer() bool {
 // SetDataDir sets the filepath of the qaas data files
 func (a *API) SetDataDir(elem ...string) {
 	a.DataDir = filepath.Join(elem...)
+}
+
+// SetVaultDir sets the filepath of the private key files with root read and write file permissions
+func (a *API) SetVaultDir(elem ...string) {
+	a.VaultDir = filepath.Join(elem...)
+}
+
+// SetHomeDir sets the filepath to the mounted /home dir
+func (a *API) SetHomeDir(elem ...string) {
+	a.HomeDir = filepath.Join(elem...)
 }
 
 // ConfigurationHandler handles a webhook registration HTTP PUT request
@@ -107,7 +119,7 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 // WebhookHandler handles a HTTP POST request containing the webhook payload in its body
 func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
-	webhook, webhookID, err := parseWebhookRequest(req)
+	_, webhookID, err := parseWebhookRequest(req)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -151,9 +163,37 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Prepare the execution of the script
+	groupname := "tg"
+	privateKeyFilename := path.Join(a.DataDir, "keys", username, "id_rsa")
+	payloadFilename := path.Join(a.DataDir, "payloads", username, "payload")
+	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID)
+	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
+	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID, "script.sh")
+	tempPrivateKeyDir := path.Join(a.VaultDir, username)
+	tempPrivateKeyFilename := path.Join(tempPrivateKeyDir, "id_rsa")
+
+	executeConfig := executeConfiguration{
+		privateKeyFilename:     privateKeyFilename,
+		tempPrivateKeyDir:      tempPrivateKeyDir,
+		tempPrivateKeyFilename: tempPrivateKeyFilename,
+		payloadFilename:        payloadFilename,
+		targetPayloadDir:       targetPayloadDir,
+		targetPayloadFilename:  targetPayloadFilename,
+		userScriptPathFilename: userScriptPathFilename,
+		username:               username,
+		groupname:              groupname,
+		password:               a.RelayNodeTestUserPassword,
+		relayNodeName:          a.RelayNode,
+		dataDir:                a.DataDir,
+		vaultDir:               a.VaultDir,
+		homeDir:                a.HomeDir,
+		webhookID:              webhookID,
+		payload:                payload,
+	}
+
 	// Execute the script
-	fmt.Printf("Webhook: %+v\n", webhook)
-	if err := ExecuteScript(a.Connector, a.RelayNode, a.DataDir, webhookID, payload, username, a.RelayNodeTestUserPassword); err != nil {
+	if err := ExecuteScript(a.Connector, executeConfig); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return

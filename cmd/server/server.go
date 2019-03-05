@@ -49,17 +49,33 @@ func main() {
 		Connector: server.SSHConnector{
 			Description: "SSH connection to relay node",
 		},
+		DataDir:                   "",
+		VaultDir:                  "",
+		HomeDir:                   "",
 		RelayNode:                 relayNode,
 		RelayNodeTestUser:         relayNodeTestUser,
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
 		QaasHost:                  qaasHost,
 		QaasPort:                  qaasPort,
 	}
+
+	// Set the data dir and create it
 	api.SetDataDir("/data")
 	err = os.MkdirAll(api.DataDir, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
+
+	// Set the vault dir and create it
+	api.SetVaultDir("/vault")
+	err = os.MkdirAll(api.VaultDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	// Set the /home dir
+	api.SetHomeDir("/home")
+
 	app := &api
 
 	// Handle external webhook payloads
