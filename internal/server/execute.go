@@ -54,7 +54,7 @@ func copyPayload(c Connector, session *ssh.Session, conf executeConfiguration) e
 }
 
 func triggerQsubCommand(c Connector, session *ssh.Session, conf executeConfiguration) error {
-	command := fmt.Sprintf("cd ~/.qaas/%s/ && echo ~/.qaas/%s/script.sh payload | qsub", conf.webhookID, conf.webhookID)
+	command := fmt.Sprintf("cd ~/.qaas/%s/ && cat ~/.qaas/%s/script.sh payload | qsub", conf.webhookID, conf.webhookID)
 	out, err := c.CombinedOutput(session, command)
 	if err != nil {
 		return err
