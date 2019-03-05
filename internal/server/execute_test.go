@@ -11,8 +11,6 @@ import (
 )
 
 func TestCopyPayload(t *testing.T) {
-	var session *ssh.Session
-
 	relayNodeName := "relaynode.dccn.nl"
 	remote := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
@@ -50,21 +48,13 @@ func TestCopyPayload(t *testing.T) {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
 
-	session, err = fc.NewSession(client)
-	if err != nil {
-		t.Errorf("Expected no error, but got '%+v'", err.Error())
-	}
-	defer fc.CloseSession(session)
-
-	err = copyPayload(fc, session, executeConfig)
+	err = copyPayload(fc, client, executeConfig)
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
 }
 
 func TestTriggerQsubCommand(t *testing.T) {
-	var session *ssh.Session
-
 	relayNodeName := "relaynode.dccn.nl"
 	remote := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
@@ -102,13 +92,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
 
-	session, err = fc.NewSession(client)
-	if err != nil {
-		t.Errorf("Expected no error, but got '%+v'", err.Error())
-	}
-	defer fc.CloseSession(session)
-
-	err = triggerQsubCommand(fc, session, executeConfig)
+	err = triggerQsubCommand(fc, client, executeConfig)
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
@@ -129,7 +113,7 @@ func TestExecuteScript(t *testing.T) {
 		t.Errorf("Error writing test result dir")
 	}
 	defer func() {
-		err = os.RemoveAll(testDir) // cleanup when done
+		err = os.RemoveAll(testDir) // clean up when done
 		if err != nil {
 			t.Fatalf("error %s when removing %s dir", err, testDir)
 		}

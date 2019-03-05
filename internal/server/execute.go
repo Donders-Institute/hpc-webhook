@@ -41,25 +41,37 @@ func copyFile(src string, dst string) error {
 	return out.Close()
 }
 
-func copyPayload(c Connector, session *ssh.Session, conf executeConfiguration) error {
+func copyPayload(c Connector, client *ssh.Client, conf executeConfiguration) error {
+	session, err := c.NewSession(client)
+	if err != nil {
+		return err
+	}
+	defer c.CloseSession(session)
+
 	scpCommand := fmt.Sprintf(`scp -i %s %s %s@%s:~/.qaas/%s/payload`,
 		conf.tempPrivateKeyFilename, conf.payloadFilename, conf.username, conf.relayNodeName, conf.webhookID)
 	fmt.Println(scpCommand)
-	err := c.Run(session, scpCommand)
+	out, err := c.CombinedOutput(session, scpCommand)
 	if err != nil {
 		fmt.Println("Warning: something went wrong copying the payload. Skipping ...")
 		return nil
 	}
+	fmt.Println(string(out))
 	return err
 }
 
-func triggerQsubCommand(c Connector, session *ssh.Session, conf executeConfiguration) error {
-	command := fmt.Sprintf("cd ~/.qaas/%s/ && cat ~/.qaas/%s/script.sh payload | qsub", conf.webhookID, conf.webhookID)
-	out, err := c.CombinedOutput(session, command)
+func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfiguration) error {
+	session, err := c.NewSession(client)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(out))
+	defer c.CloseSession(session)
+
+	command := fmt.Sprintf("cd ~/.qaas/%s/ && cat ~/.qaas/%s/script.sh payload | qsub", conf.webhookID, conf.webhookID)
+	err = c.Run(session, command)
+	if err != nil {
+		return err
+	}
 	return err
 }
 
@@ -106,11 +118,6 @@ func ExecuteScript(c Connector, relayNodeName string, dataDir string, webhookID 
 	if err != nil {
 		return err
 	}
-	session, err := c.NewSession(client)
-	if err != nil {
-		return err
-	}
-	defer c.CloseSession(session)
 
 	// Combine the parameters
 	conf := executeConfiguration{
@@ -123,13 +130,13 @@ func ExecuteScript(c Connector, relayNodeName string, dataDir string, webhookID 
 	}
 
 	// Copy the payload to QaaS folder
-	err = copyPayload(c, session, conf)
+	err = copyPayload(c, client, conf)
 	if err != nil {
 		return err
 	}
 
 	// Trigger the qsub command
-	err = triggerQsubCommand(c, session, conf)
+	err = triggerQsubCommand(c, client, conf)
 	if err != nil {
 		return err
 	}
