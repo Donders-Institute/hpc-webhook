@@ -54,7 +54,7 @@ func TestCopyPayload(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
-	// TODO: replace with fc.CloseSession(session)
+	defer fc.CloseSession(session)
 
 	err = copyPayload(fc, session, executeConfig)
 	if err != nil {
@@ -106,7 +106,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
-	// TODO: replace with fc.CloseSession(session)
+	defer fc.CloseSession(session)
 
 	err = triggerQsubCommand(fc, session, executeConfig)
 	if err != nil {

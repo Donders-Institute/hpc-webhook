@@ -110,8 +110,7 @@ func ExecuteScript(c Connector, relayNodeName string, dataDir string, webhookID 
 	if err != nil {
 		return err
 	}
-	defer session.Close()
-	// TODO: replace with c.CloseSession(session)
+	defer c.CloseSession(session)
 
 	// Combine the parameters
 	conf := executeConfiguration{
