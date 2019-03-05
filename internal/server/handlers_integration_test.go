@@ -3,10 +3,10 @@ package server
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -154,6 +154,7 @@ func TestHandlerWebhook(t *testing.T) {
 		method           string
 		payloadURL       string
 		hash             string
+		username         string
 		testDataFilename string
 		headerInfo       map[string]string
 		expectedStatus   int
@@ -164,7 +165,8 @@ func TestHandlerWebhook(t *testing.T) {
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			hash:             "550e8400-e29b-41d4-a716-446655440001",
-			testDataFilename: "../../test/data/example-github-webhook.json",
+			username:         "dccnuser",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-github-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
 				"x-hub-signature":   "someValue",
@@ -179,7 +181,8 @@ func TestHandlerWebhook(t *testing.T) {
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440002",
 			hash:             "550e8400-e29b-41d4-a716-446655440002",
-			testDataFilename: "../../test/data/example-ifttt-webhook.json",
+			username:         "dccnuser",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-ifttt-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -191,6 +194,7 @@ func TestHandlerWebhook(t *testing.T) {
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440003",
 			hash:             "550e8400-e29b-41d4-a716-446655440003",
+			username:         "dccnuser",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -203,6 +207,7 @@ func TestHandlerWebhook(t *testing.T) {
 			method:           "POST",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716",
 			hash:             "550e8400-e29b-41d4-a716",
+			username:         "dccnuser",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -215,6 +220,7 @@ func TestHandlerWebhook(t *testing.T) {
 			method:           "POST",
 			payloadURL:       "/wwwhook/550e8400-e29b-41d4-a716-446655440001",
 			hash:             "550e8400-e29b-41d4-a716-446655440001",
+			username:         "dccnuser",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -227,6 +233,7 @@ func TestHandlerWebhook(t *testing.T) {
 			method:           "GET",
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			hash:             "550e8400-e29b-41d4-a716-446655440001",
+			username:         "dccnuser",
 			testDataFilename: "../../test/data/example-zapier-webhook.json",
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -245,14 +252,17 @@ func TestHandlerWebhook(t *testing.T) {
 		}
 		defer db.Close()
 
+		// Configure the application
 		api := API{
 			DB: db,
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			RelayNode: "relaynode.dccn.nl",
-			QaasHost:  "qaas.dccn.nl",
-			QaasPort:  "5111",
+			RelayNode:                 "relaynode.dccn.nl",
+			RelayNodeTestUser:         c.username,
+			RelayNodeTestUserPassword: "somepassword",
+			QaasHost:                  "qaas.dccn.nl",
+			QaasPort:                  "5111",
 		}
 		api.SetDataDir("..", "..", "test", "results")
 		err = os.MkdirAll(api.DataDir, os.ModePerm)
@@ -267,10 +277,24 @@ func TestHandlerWebhook(t *testing.T) {
 		}()
 		app := &api
 
+		// Setup some fake keys
+		keyDir := path.Join(api.DataDir, "keys", c.username)
+		err = os.MkdirAll(keyDir, os.ModePerm)
+		if err != nil {
+			t.Errorf("Expected no error, but got '%+v'", err.Error())
+		}
+		privateKeyFilename := path.Join(keyDir, "id_rsa")
+		publicKeyFilename := path.Join(keyDir, "id_rsa.pub")
+		err = generateKeyPair(privateKeyFilename, publicKeyFilename)
+		if err != nil {
+			t.Errorf("Expected no error, but got '%+v'", err.Error())
+			return
+		}
+
 		// Obtain the body
 		file, err := os.Open(c.testDataFilename)
 		if err != nil {
-			log.Fatal(err)
+			t.Errorf("Expected no error, but got '%+v'", err.Error())
 		}
 		defer file.Close()
 
@@ -292,7 +316,7 @@ func TestHandlerWebhook(t *testing.T) {
 		}
 
 		if c.expectedResult {
-			expectedUsername := "dccnuser"
+			expectedUsername := c.username
 			expectedRows := sqlmock.NewRows([]string{"id", "hash", "username"}).AddRow(1, c.hash, expectedUsername)
 			mock.ExpectQuery("^SELECT id, hash, username FROM qaas").WithArgs(c.hash).WillReturnRows(expectedRows)
 		}
