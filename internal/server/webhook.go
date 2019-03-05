@@ -33,15 +33,15 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 }
 
 // Check if the webhook id exists. Return the unsername
-func checkWebhookID(db *sql.DB, webhookID string) (string, error) {
+func checkWebhookID(db *sql.DB, webhookID string) (string, string, error) {
 	list, err := getRow(db, webhookID)
 	if err != nil || len(list) == 0 {
-		return "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
+		return "", "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
 	}
 	if len(list) > 1 {
-		return "", fmt.Errorf("Invalid database; found multiple webhook with webhook ID '%s'", webhookID)
+		return "", "", fmt.Errorf("Invalid database; found multiple webhook with webhook ID '%s'", webhookID)
 	}
-	return list[0].Username, nil
+	return list[0].Groupname, list[0].Username, nil
 }
 
 // Read the payload from the request body

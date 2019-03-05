@@ -24,7 +24,7 @@ func InitDB(dataSourceName string) (*sql.DB, error) {
 	return db, err
 }
 
-func addRow(db *sql.DB, hash string, username string) error {
+func addRow(db *sql.DB, hash string, groupname string, username string) error {
 	if !isValidWebhookID(hash) {
 		return errors.New("invalid webhook id")
 	}
@@ -43,9 +43,9 @@ func addRow(db *sql.DB, hash string, username string) error {
 		}
 	}()
 
-	sqlStatement := fmt.Sprintf("INSERT INTO qaas (hash, username) VALUES ($1, $2)")
+	sqlStatement := fmt.Sprintf("INSERT INTO qaas (hash, groupname, username) VALUES ($1, $2, $3)")
 
-	if _, err = tx.Exec(sqlStatement, hash, username); err != nil {
+	if _, err = tx.Exec(sqlStatement, hash, groupname, username); err != nil {
 		return err
 	}
 
@@ -53,13 +53,14 @@ func addRow(db *sql.DB, hash string, username string) error {
 }
 
 type item struct {
-	ID       int
-	Hash     string
-	Username string
+	ID        int
+	Hash      string
+	Groupname string
+	Username  string
 }
 
 func getRow(db *sql.DB, hash string) ([]item, error) {
-	rows, err := db.Query("SELECT id, hash, username FROM qaas WHERE hash = $1", hash)
+	rows, err := db.Query("SELECT id, hash, groupname, username FROM qaas WHERE hash = $1", hash)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func getRow(db *sql.DB, hash string) ([]item, error) {
 	var list []item
 	for rows.Next() {
 		p := item{}
-		if err := rows.Scan(&p.ID, &p.Hash, &p.Username); err != nil {
+		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username); err != nil {
 			return nil, err
 		}
 		list = append(list, p)

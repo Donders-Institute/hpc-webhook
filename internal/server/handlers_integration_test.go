@@ -145,7 +145,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 
 		if c.expectedResult {
 			mock.ExpectBegin()
-			mock.ExpectExec("INSERT INTO qaas").WithArgs(c.configuration.Hash, c.configuration.Username).WillReturnResult(sqlmock.NewResult(1, 1))
+			mock.ExpectExec("INSERT INTO qaas").WithArgs(c.configuration.Hash, c.configuration.Groupname, c.configuration.Username).WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()
 		}
 
@@ -394,8 +394,9 @@ func TestHandlerWebhook(t *testing.T) {
 
 		if c.expectedResult {
 			expectedUsername := c.username
-			expectedRows := sqlmock.NewRows([]string{"id", "hash", "username"}).AddRow(1, c.hash, expectedUsername)
-			mock.ExpectQuery("^SELECT id, hash, username FROM qaas").WithArgs(c.hash).WillReturnRows(expectedRows)
+			expectedGroupname := c.groupname
+			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).AddRow(1, c.hash, expectedGroupname, expectedUsername)
+			mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").WithArgs(c.hash).WillReturnRows(expectedRows)
 		}
 
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.

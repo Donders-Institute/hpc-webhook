@@ -102,7 +102,7 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Add a row in the database
-	err = addRow(a.DB, configuration.Hash, configuration.Username)
+	err = addRow(a.DB, configuration.Hash, configuration.Groupname, configuration.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -128,7 +128,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if webhookID exists
-	username, err := checkWebhookID(a.DB, webhookID)
+	groupname, username, err := checkWebhookID(a.DB, webhookID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -164,7 +164,6 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Prepare the execution of the script
-	groupname := "tg"
 	privateKeyFilename := path.Join(a.DataDir, "keys", username, "id_rsa")
 	payloadFilename := path.Join(a.DataDir, "payloads", username, "payload")
 	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID)

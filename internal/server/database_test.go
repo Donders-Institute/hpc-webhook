@@ -9,8 +9,9 @@ import (
 
 func TestAddRow(t *testing.T) {
 	configuration := ConfigurationRequest{
-		Hash:     "550e8400-e29b-41d4-a716-446655440001",
-		Username: "dccnuser",
+		Hash:      "550e8400-e29b-41d4-a716-446655440001",
+		Groupname: "dccngroup",
+		Username:  "dccnuser",
 	}
 
 	db, mock, err := sqlmock.New()
@@ -20,11 +21,11 @@ func TestAddRow(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO qaas").WithArgs(configuration.Hash, configuration.Username).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO qaas").WithArgs(configuration.Hash, configuration.Groupname, configuration.Username).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
 	// now we execute our method
-	if err = addRow(db, configuration.Hash, configuration.Username); err != nil {
+	if err = addRow(db, configuration.Hash, configuration.Groupname, configuration.Username); err != nil {
 		t.Errorf("error was not expected while adding row: %s", err)
 	}
 
@@ -45,15 +46,17 @@ func TestGetRow(t *testing.T) {
 
 	hash := "550e8400-e29b-41d4-a716-446655440001"
 
+	expectedGroupname := "dccngroup"
 	expectedUsername := "dccnuser"
-	expectedRows := sqlmock.NewRows([]string{"id", "hash", "username"}).AddRow(1, hash, expectedUsername)
-	mock.ExpectQuery("^SELECT id, hash, username FROM qaas").WithArgs(hash).WillReturnRows(expectedRows)
+	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).AddRow(1, hash, expectedGroupname, expectedUsername)
+	mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").WithArgs(hash).WillReturnRows(expectedRows)
 
 	listExpected := []item{
 		item{
-			ID:       1,
-			Hash:     hash,
-			Username: expectedUsername,
+			ID:        1,
+			Hash:      hash,
+			Groupname: expectedGroupname,
+			Username:  expectedUsername,
 		},
 	}
 

@@ -10,8 +10,9 @@ import (
 
 // ConfigurationRequest stores one row of webhook information
 type ConfigurationRequest struct {
-	Hash     string `json:"hash"`
-	Username string `json:"username"`
+	Hash      string `json:"hash"`
+	Groupname string `json:"groupname"`
+	Username  string `json:"username"`
 }
 
 // ConfigurationResponse contains the complet webhook payload URL
