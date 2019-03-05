@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net"
 	"os"
+	"path"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -110,28 +110,26 @@ func writeKeyToFile(keyBytes []byte, saveFileTo string) error {
 	return nil
 }
 
-func addAuthorizedPublicKey(c Connector, privateKeyFilename string, publicKeyFilename string, username string, password string, relayNodeName string) error {
-	clientConfig := &ssh.ClientConfig{
-		User: username,
-		Auth: []ssh.AuthMethod{ssh.Password(password)},
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
-		},
-	}
-	remoteServer := fmt.Sprintf("%s:22", relayNodeName)
-	client, err := c.NewClient(remoteServer, clientConfig)
+func addAuthorizedPublicKey(homeDir string, groupname string, username string, publicKeyFilename string) error {
+	sshDir := path.Join(homeDir, groupname, username, ".ssh")
+	err := os.MkdirAll(sshDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
-	session, err := c.NewSession(client)
-	if err != nil {
-		return err
-	}
-	defer c.CloseSession(session)
 
-	sshCommand := fmt.Sprintf(`cat %s | (ssh %s@%s "cat >> ~/.ssh/authorized_keys")`, publicKeyFilename, username, relayNodeName)
-	fmt.Println(sshCommand)
-	err = c.Run(session, sshCommand)
+	authorizedKeysFilename := path.Join(sshDir, "authorized_keys")
+	fp, err := os.OpenFile(authorizedKeysFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0655)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+
+	// Append the public key to the
+	publicKeyBytes, err := ioutil.ReadFile(publicKeyFilename)
+	if err != nil {
+		return err
+	}
+	_, err = fp.Write(publicKeyBytes)
 	if err != nil {
 		return err
 	}

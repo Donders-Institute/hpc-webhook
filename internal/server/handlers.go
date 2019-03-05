@@ -92,7 +92,7 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		err = addAuthorizedPublicKey(a.Connector, privateKeyFilename, publicKeyFilename, a.RelayNodeTestUser, a.RelayNodeTestUserPassword, a.RelayNode)
+		err = addAuthorizedPublicKey(a.HomeDir, configuration.Groupname, configuration.Username, publicKeyFilename)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			fmt.Println(err)
