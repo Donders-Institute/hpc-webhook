@@ -15,6 +15,7 @@ import (
 // API is used to store the database pointer
 type API struct {
 	DB                        *sql.DB
+	Connector                 Connector
 	DataDir                   string
 	RelayNode                 string
 	RelayNodeTestUser         string
@@ -79,7 +80,7 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		err = addAuthorizedPublicKey(privateKeyFilename, publicKeyFilename, a.RelayNodeTestUser, a.RelayNodeTestUserPassword, a.RelayNode)
+		err = addAuthorizedPublicKey(a.Connector, privateKeyFilename, publicKeyFilename, a.RelayNodeTestUser, a.RelayNodeTestUserPassword, a.RelayNode)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			fmt.Println(err)
@@ -152,10 +153,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Execute the script
 	fmt.Printf("Webhook: %+v\n", webhook)
-	sc := SSHConnector{
-		description: "SSH connection",
-	}
-	if err := ExecuteScript(sc, a.RelayNode, a.DataDir, webhookID, payload, username, a.RelayNodeTestUserPassword); err != nil {
+	if err := ExecuteScript(a.Connector, a.RelayNode, a.DataDir, webhookID, payload, username, a.RelayNodeTestUserPassword); err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return

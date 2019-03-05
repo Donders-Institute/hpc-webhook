@@ -6,7 +6,7 @@ import (
 
 // Connector is an interface to be able to mock SSH connections
 type Connector interface {
-	NewClient(remote string, clientConfig *ssh.ClientConfig) (*ssh.Client, error)
+	NewClient(remoteServer string, clientConfig *ssh.ClientConfig) (*ssh.Client, error)
 	NewSession(client *ssh.Client) (*ssh.Session, error)
 	Run(session *ssh.Session, command string) error
 	CombinedOutput(session *ssh.Session, command string) ([]byte, error)
@@ -15,12 +15,12 @@ type Connector interface {
 
 // SSHConnector is used tp replace the standard SSH library functions
 type SSHConnector struct {
-	description string
+	Description string
 }
 
 // NewClient makes it possible to mock SSH dial
-func (c SSHConnector) NewClient(remote string, clientConfig *ssh.ClientConfig) (*ssh.Client, error) {
-	return ssh.Dial("tcp", remote, clientConfig)
+func (c SSHConnector) NewClient(remoteServer string, clientConfig *ssh.ClientConfig) (*ssh.Client, error) {
+	return ssh.Dial("tcp", remoteServer, clientConfig)
 }
 
 // NewSession makes it possible to mock a SSH session

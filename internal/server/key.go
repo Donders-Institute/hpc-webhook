@@ -110,7 +110,7 @@ func writeKeyToFile(keyBytes []byte, saveFileTo string) error {
 	return nil
 }
 
-func addAuthorizedPublicKey(privateKeyFilename string, publicKeyFilename string, username string, password string, relayNodeName string) error {
+func addAuthorizedPublicKey(c Connector, privateKeyFilename string, publicKeyFilename string, username string, password string, relayNodeName string) error {
 	clientConfig := &ssh.ClientConfig{
 		User: username,
 		Auth: []ssh.AuthMethod{ssh.Password(password)},
@@ -118,20 +118,20 @@ func addAuthorizedPublicKey(privateKeyFilename string, publicKeyFilename string,
 			return nil
 		},
 	}
-	target := fmt.Sprintf("%s:22", relayNodeName)
-	client, err := ssh.Dial("tcp", target, clientConfig)
+	remoteServer := fmt.Sprintf("%s:22", relayNodeName)
+	client, err := c.NewClient(remoteServer, clientConfig)
 	if err != nil {
 		return err
 	}
-	session, err := client.NewSession()
+	session, err := c.NewSession(client)
 	if err != nil {
 		return err
 	}
-	defer session.Close()
+	defer c.CloseSession(session)
 
 	sshCommand := fmt.Sprintf(`cat %s | (ssh %s@%s "cat >> ~/.ssh/authorized_keys")`, publicKeyFilename, username, relayNodeName)
 	fmt.Println(sshCommand)
-	err = session.Run(sshCommand)
+	err = c.Run(session, sshCommand)
 	if err != nil {
 		return err
 	}

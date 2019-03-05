@@ -42,7 +42,7 @@ func TestCopyPayload(t *testing.T) {
 	}
 
 	fc := FakeConnector{
-		description: "fake SSH connection",
+		Description: "fake SSH connection",
 	}
 
 	client, err := fc.NewClient(remote, clientConfig)
@@ -94,7 +94,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 	}
 
 	fc := FakeConnector{
-		description: "fake SSH connection",
+		Description: "fake SSH connection",
 	}
 
 	client, err := fc.NewClient(remote, clientConfig)
@@ -157,7 +157,7 @@ func TestExecuteScript(t *testing.T) {
 
 	// Execute the script
 	fc := FakeConnector{
-		description: "fake SSH connection",
+		Description: "fake SSH connection",
 	}
 	err = ExecuteScript(fc, relayNode, testDir, webhookID, payload, username, password)
 	if err != nil {

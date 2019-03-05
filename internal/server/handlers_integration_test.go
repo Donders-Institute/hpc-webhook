@@ -79,7 +79,10 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 		defer db.Close()
 
 		api := API{
-			DB:        db,
+			DB: db,
+			Connector: FakeConnector{
+				Description: "fake SSH connection to relay node",
+			},
 			RelayNode: "relaynode.dccn.nl",
 			QaasHost:  "qaas.dccn.nl",
 			QaasPort:  "5111",
@@ -243,7 +246,10 @@ func TestHandlerWebhook(t *testing.T) {
 		defer db.Close()
 
 		api := API{
-			DB:        db,
+			DB: db,
+			Connector: FakeConnector{
+				Description: "fake SSH connection to relay node",
+			},
 			RelayNode: "relaynode.dccn.nl",
 			QaasHost:  "qaas.dccn.nl",
 			QaasPort:  "5111",

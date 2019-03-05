@@ -45,7 +45,10 @@ func main() {
 
 	// Setup the app
 	api := server.API{
-		DB:                        db,
+		DB: db,
+		Connector: server.SSHConnector{
+			Description: "SSH connection to relay node",
+		},
 		RelayNode:                 relayNode,
 		RelayNodeTestUser:         relayNodeTestUser,
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,

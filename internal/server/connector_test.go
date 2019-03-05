@@ -9,7 +9,7 @@ import (
 )
 
 type FakeConnector struct {
-	description string
+	Description string
 }
 
 func (fc FakeConnector) NewClient(remote string, clientConfig *ssh.ClientConfig) (*ssh.Client, error) {
@@ -35,7 +35,7 @@ func (fc FakeConnector) CloseSession(session *ssh.Session) error {
 
 func TestConnect(t *testing.T) {
 	fc := FakeConnector{
-		description: "fake SSH connection",
+		Description: "fake SSH connection",
 	}
 	var session *ssh.Session
 	var out []byte
