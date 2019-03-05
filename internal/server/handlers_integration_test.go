@@ -309,36 +309,36 @@ func TestHandlerWebhook(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
 		}
-		// defer func() {
-		// 	err = os.RemoveAll(api.DataDir) // cleanup when done
-		// 	if err != nil {
-		// 		t.Fatalf("error %s when removing %s dir", err, api.DataDir)
-		// 	}
-		// }()
+		defer func() {
+			err = os.RemoveAll(api.DataDir) // cleanup when done
+			if err != nil {
+				t.Fatalf("error %s when removing %s dir", err, api.DataDir)
+			}
+		}()
 
 		api.SetVaultDir("..", "..", "test", "results", "vault")
 		err = os.MkdirAll(api.VaultDir, os.ModePerm)
 		if err != nil {
 			t.Fatalf("error %s when creating %s dir", err, api.VaultDir)
 		}
-		// defer func() {
-		// 	err = os.RemoveAll(api.VaultDir) // cleanup when done
-		// 	if err != nil {
-		// 		t.Fatalf("error %s when removing %s dir", err, api.VaultDir)
-		// 	}
-		// }()
+		defer func() {
+			err = os.RemoveAll(api.VaultDir) // cleanup when done
+			if err != nil {
+				t.Fatalf("error %s when removing %s dir", err, api.VaultDir)
+			}
+		}()
 
 		api.SetHomeDir("..", "..", "test", "results", "home")
 		err = os.MkdirAll(api.HomeDir, os.ModePerm)
 		if err != nil {
 			t.Fatalf("error %s when creating %s dir", err, api.HomeDir)
 		}
-		// defer func() {
-		// 	err = os.RemoveAll(api.HomeDir) // cleanup when done
-		// 	if err != nil {
-		// 		t.Fatalf("error %s when removing %s dir", err, api.HomeDir)
-		// 	}
-		// }()
+		defer func() {
+			err = os.RemoveAll(api.HomeDir) // cleanup when done
+			if err != nil {
+				t.Fatalf("error %s when removing %s dir", err, api.HomeDir)
+			}
+		}()
 
 		app := &api
 
@@ -407,11 +407,11 @@ func TestHandlerWebhook(t *testing.T) {
 		// directly and pass in our Request and ResponseRecorder.
 		handler.ServeHTTP(rr, req)
 
-		// // Check the status code is what we expect.
-		// if status := rr.Code; status != c.expectedStatus {
-		// 	t.Errorf("handler returned wrong status code: got %v want %v", status, c.expectedStatus)
-		// 	return
-		// }
+		// Check the status code is what we expect.
+		if status := rr.Code; status != c.expectedStatus {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, c.expectedStatus)
+			return
+		}
 
 		// Check the expected string
 		if rr.Body.String() != c.expectedString {
