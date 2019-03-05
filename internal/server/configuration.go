@@ -37,7 +37,6 @@ func parseConfigurationRequest(req *http.Request) (ConfigurationRequest, error) 
 
 	// Obtain the configuration
 	decoder := json.NewDecoder(req.Body)
-	fmt.Println(req.Body)
 	err = decoder.Decode(&configuration)
 	if err != nil {
 		return configuration, errors.New("invalid JSON body")
