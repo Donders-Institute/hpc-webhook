@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 )
@@ -23,4 +24,17 @@ func isValidURLPath(urlPath string) bool {
 
 func isValidWebhookID(webhookID string) bool {
 	return validWebhookIDRegex.MatchString(webhookID)
+}
+
+func validateConfigurationRequest(conf ConfigurationRequest) error {
+	if !isValidWebhookID(conf.Hash) {
+		return errors.New("invalid configuration request: invalid hash")
+	}
+	if conf.Username == "" {
+		return errors.New("invalid configuration request: username missing")
+	}
+	if conf.Groupname == "" {
+		return errors.New("invalid configuration request: groupname missing")
+	}
+	return nil
 }

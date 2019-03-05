@@ -104,3 +104,64 @@ func TestValidWebhookID(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateConfigurationRequest(t *testing.T) {
+	cases := []struct {
+		conf           ConfigurationRequest
+		expectedResult bool
+	}{
+		{
+			conf: ConfigurationRequest{
+				Hash:      "550e8400-e29b-41d4-a716-446655440001",
+				Groupname: "dccngroup",
+				Username:  "dccnuser",
+			},
+			expectedResult: true, // valid, no error (i.e. 36 characters with 4 hyphens)
+		},
+		{
+			conf: ConfigurationRequest{
+				Hash:      "550E8400-E29b-41D4-A716-446655440001",
+				Groupname: "dccngroup",
+				Username:  "dccnuser",
+			},
+			expectedResult: false, // Invalid hash (i.e. capitals A-F instead of a-f)
+		},
+		{
+			conf: ConfigurationRequest{
+				Hash:      "550e8400-e29b-41d4-a716-44665544000",
+				Groupname: "dccngroup",
+				Username:  "dccnuser",
+			},
+			expectedResult: false, // Invalid hash (i.e. 35 characters with 4 hyphens)
+		},
+		{
+			conf: ConfigurationRequest{
+				Hash:      "550e8400-e29b-41d4-a716-446655440001",
+				Groupname: "dccngroup",
+				Username:  "",
+			},
+			expectedResult: false, // Invalid username
+		},
+		{
+			conf: ConfigurationRequest{
+				Hash:      "550e8400-e29b-41d4-a716-446655440001",
+				Groupname: "",
+				Username:  "dccnuser",
+			},
+			expectedResult: false, // Invalid groupname
+		},
+	}
+
+	for _, c := range cases {
+		err := validateConfigurationRequest(c.conf)
+		if c.expectedResult {
+			if err != nil {
+				t.Errorf("Expected valid configuration request '%s', but got invalid configuration request", c.conf)
+			}
+		} else {
+			if err == nil {
+				t.Errorf("Expected invalid configuration request '%s', but got valid configuration request", c.conf)
+			}
+		}
+	}
+}

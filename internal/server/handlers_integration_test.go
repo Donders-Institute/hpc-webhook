@@ -27,10 +27,11 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			method:    "PUT",
 			configURL: "/configuration",
 			configuration: ConfigurationRequest{
-				Hash:     "550e8400-e29b-41d4-a716-446655440001",
-				Username: "username",
+				Hash:      "550e8400-e29b-41d4-a716-446655440001",
+				Groupname: "groupname",
+				Username:  "username",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -42,10 +43,11 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			method:    "PUT",
 			configURL: "/configuration/nonexisting",
 			configuration: ConfigurationRequest{
-				Hash:     "550e8400-e29b-41d4-a716-446655440001",
-				Username: "username",
+				Hash:      "550e8400-e29b-41d4-a716-446655440001",
+				Groupname: "groupname",
+				Username:  "username",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -57,10 +59,11 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 			method:    "POST",
 			configURL: "/configuration",
 			configuration: ConfigurationRequest{
-				Hash:     "550e8400-e29b-41d4-a716-446655440001",
-				Username: "username",
+				Hash:      "550e8400-e29b-41d4-a716-446655440001",
+				Groupname: "groupname",
+				Username:  "username",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
