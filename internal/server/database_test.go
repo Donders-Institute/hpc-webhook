@@ -52,7 +52,7 @@ func TestGetRow(t *testing.T) {
 	mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").WithArgs(hash).WillReturnRows(expectedRows)
 
 	listExpected := []item{
-		item{
+		{
 			ID:        1,
 			Hash:      hash,
 			Groupname: expectedGroupname,
