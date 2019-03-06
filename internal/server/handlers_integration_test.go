@@ -36,7 +36,7 @@ func TestConfigurationHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `Webhook added successfully`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -208,7 +208,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"x-github-delivery": "someValue",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
+			expectedString: "Webhook handled successfully",
 			expectedResult: true, // No error
 		},
 		{
@@ -222,7 +222,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440002"}`,
+			expectedString: "Webhook handled successfully",
 			expectedResult: true, // No error
 		},
 		{
@@ -236,7 +236,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440003"}`,
+			expectedString: "Webhook handled successfully",
 			expectedResult: true, // No error
 		},
 		{

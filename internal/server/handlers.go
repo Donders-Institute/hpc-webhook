@@ -111,8 +111,19 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Succes
+	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.QaasHost, a.QaasPort, configuration.Hash)
+	configurationResponse := ConfigurationResponse{
+		Webhook: webhookPayloadURL,
+	}
+	js, err := json.Marshal(configurationResponse)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Webhook added successfully")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 	return
 }
 
@@ -199,18 +210,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Succes
-	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.QaasHost, a.QaasPort, webhookID)
-	configurationResponse := ConfigurationResponse{
-		Webhook: webhookPayloadURL,
-	}
-	js, err := json.Marshal(configurationResponse)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		return
-	}
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	fmt.Fprint(w, "Webhook handled successfully")
 	return
 }
