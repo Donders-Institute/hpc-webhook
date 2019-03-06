@@ -12,7 +12,7 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
 
-func TestConfigurationHandlerWebhook(t *testing.T) {
+func TestConfigurationHandler(t *testing.T) {
 	cases := []struct {
 		method         string
 		configURL      string
