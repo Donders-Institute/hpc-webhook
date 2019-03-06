@@ -38,7 +38,7 @@ type Webhook struct {
 // New provisions a new webhook for QaaS and registry the new webhook at the QaaS server.
 func (s *Webhook) New(script string) (*url.URL, error) {
 
-	// check existance of the script, and it's type.
+	// check existence of the script, and it's type.
 	scriptAbs, err := filepath.Abs(script)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (s *Webhook) List() ([]WebhookInfo, error) {
 	// add names of the items under $HOME/.gass into the list if:
 	//
 	// - the item is a directory
-	// - the name of the item can be pased by uuid.Parse() function
+	// - the name of the item can be passed by uuid.Parse() function
 	if items, err := ioutil.ReadDir(path.Join(user.HomeDir, ".qaas")); err == nil {
 		for _, f := range items {
 			if !f.IsDir() {
