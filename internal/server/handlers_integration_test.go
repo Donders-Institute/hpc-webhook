@@ -137,7 +137,6 @@ func TestConfigurationHandler(t *testing.T) {
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
 			QaasPort:           "5111",
-			KeyDir:             keyDir,
 			PrivateKeyFilename: publicKeyFilename,
 			PublicKeyFilename:  privateKeyFilename,
 		}
@@ -362,7 +361,6 @@ func TestHandlerWebhook(t *testing.T) {
 			RelayNodeTestUserPassword: "somepassword",
 			QaasHost:                  "qaas.dccn.nl",
 			QaasPort:                  "5111",
-			KeyDir:                    keyDir,
 			PrivateKeyFilename:        privateKeyFilename,
 			PublicKeyFilename:         publicKeyFilename,
 		}

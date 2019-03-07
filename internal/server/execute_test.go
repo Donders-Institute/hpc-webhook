@@ -118,7 +118,6 @@ func TestTriggerQsubCommand(t *testing.T) {
 		relayNodeName:          relayNodeName,
 		webhookID:              webhookID,
 		dataDir:                dataDir,
-		keyDir:                 keyDir,
 		homeDir:                homeDir,
 	}
 
@@ -225,7 +224,6 @@ func TestExecuteScript(t *testing.T) {
 		remoteServer:           remoteServer,
 		webhookID:              webhookID,
 		dataDir:                dataDir,
-		keyDir:                 keyDir,
 		homeDir:                homeDir,
 	}
 

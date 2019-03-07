@@ -19,7 +19,6 @@ type executeConfiguration struct {
 	relayNodeName          string
 	remoteServer           string
 	dataDir                string
-	keyDir                 string
 	homeDir                string
 	webhookID              string
 	payload                []byte

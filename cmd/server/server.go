@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 
 	"github.com/Donders-Institute/hpc-qaas/internal/server"
 	_ "github.com/lib/pq"
@@ -18,11 +17,8 @@ func main() {
 	address := fmt.Sprintf("%s:%s", qaasHost, qaasPort)
 	homeDir := os.Getenv("HOME_DIR")
 	dataDir := os.Getenv("DATA_DIR")
-	inputPrivateKeyFilename := os.Getenv("INPUT_PRIVATE_KEY_FILE")
-	inputPublicKeyFilename := os.Getenv("INPUT_PUBLIC_KEY_FILE")
-	keyDir := os.Getenv("KEY_DIR")
-	privateKeyFilename := path.Join(keyDir, os.Getenv("PRIVATE_KEY_FILE"))
-	publicKeyFilename := path.Join(keyDir, os.Getenv("PUBLIC_KEY_FILE"))
+	privateKeyFilename := os.Getenv("PRIVATE_KEY_FILE")
+	publicKeyFilename := os.Getenv("PUBLIC_KEY_FILE")
 
 	// Set target computer variables
 	relayNode := os.Getenv("RELAY_NODE")
@@ -64,28 +60,12 @@ func main() {
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
 		QaasHost:                  qaasHost,
 		QaasPort:                  qaasPort,
-		KeyDir:                    keyDir,
 		PrivateKeyFilename:        privateKeyFilename,
 		PublicKeyFilename:         publicKeyFilename,
 	}
 
 	// Set the data dir and create it
 	err = os.MkdirAll(api.DataDir, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-
-	// Copy the input keys
-	// Change the file permissions to root read and write for the private key file
-	err = server.CopyFile(inputPublicKeyFilename, api.PublicKeyFilename)
-	if err != nil {
-		panic(err)
-	}
-	err = server.CopyFile(inputPrivateKeyFilename, api.PrivateKeyFilename)
-	if err != nil {
-		panic(err)
-	}
-	err = os.Chmod(api.PrivateKeyFilename, 0600)
 	if err != nil {
 		panic(err)
 	}

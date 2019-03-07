@@ -22,7 +22,6 @@ type API struct {
 	RelayNodeTestUserPassword string
 	QaasHost                  string
 	QaasPort                  string
-	KeyDir                    string
 	PrivateKeyFilename        string
 	PublicKeyFilename         string
 }
@@ -47,16 +46,6 @@ func RunsWithinContainer() bool {
 func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	configuration, err := parseConfigurationRequest(req)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Println(err)
-		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		return
-	}
-
-	// Create the key dir
-	keyDir := path.Join(a.DataDir, "keys", configuration.Username)
-	err = os.MkdirAll(keyDir, os.ModePerm)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -163,7 +152,6 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		password:               a.RelayNodeTestUserPassword,
 		relayNodeName:          a.RelayNode,
 		dataDir:                a.DataDir,
-		keyDir:                 a.KeyDir,
 		homeDir:                a.HomeDir,
 		webhookID:              webhookID,
 		payload:                payload,
