@@ -82,7 +82,7 @@ func TestConfigurationHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:5111/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
+			expectedString: `{"webhook":"https://qaas.dccn.nl:443/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
 			expectedResult: true, // No error
 		},
 		{
