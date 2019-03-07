@@ -52,12 +52,12 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 	}
 
 	// get current user
-	user, err := user.Current()
+	cuser, err := user.Current()
 	if err != nil {
 		return nil, err
 	}
 	id := uuid.New().String()
-	workdir := path.Join(user.HomeDir, ".qaas", id)
+	workdir := path.Join(cuser.HomeDir, ".qaas", id)
 
 	if err := os.MkdirAll(workdir, 0700); err != nil {
 		return nil, err
@@ -81,7 +81,12 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 		Path:   server.ConfigurationPath,
 	}
 	var response server.ConfigurationResponse
-	httpCode, err := s.putJSON(&myURL, server.ConfigurationRequest{Username: user.Uid, Groupname: user.Gid, Hash: id}, response)
+
+	cgroup, err := user.LookupGroupId(cuser.Gid)
+	if err != nil {
+		return nil, err
+	}
+	httpCode, err := s.putJSON(&myURL, server.ConfigurationRequest{Username: cuser.Username, Groupname: cgroup.Name, Hash: id}, &response)
 
 	log.Debugf("response data: %+v", response)
 
