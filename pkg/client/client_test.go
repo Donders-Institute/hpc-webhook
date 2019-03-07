@@ -39,11 +39,11 @@ func TestListWebhook(t *testing.T) {
 		QaasCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/cert/TestServer.crt"),
 	}
 
-	webhooks, err := c.List()
+	chanWebhook, err := c.List()
 	if err != nil {
 		t.Errorf("test failed: %+v\n", err)
 	} else {
-		for _, webhook := range webhooks {
+		for webhook := range chanWebhook {
 			t.Logf("webhook: %+v\n", webhook)
 		}
 	}
