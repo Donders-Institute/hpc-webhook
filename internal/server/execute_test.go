@@ -29,30 +29,6 @@ func TestTriggerQsubCommand(t *testing.T) {
 	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
 	userScriptPathFilename := path.Join(userScriptDir, "script.sh")
 
-	executeConfig := executeConfiguration{
-		privateKeyFilename:     privateKeyFilename,
-		payloadFilename:        payloadFilename,
-		targetPayloadDir:       targetPayloadDir,
-		targetPayloadFilename:  targetPayloadFilename,
-		userScriptPathFilename: userScriptPathFilename,
-		username:               username,
-		groupname:              groupname,
-		password:               password,
-		relayNodeName:          relayNodeName,
-		webhookID:              webhookID,
-		dataDir:                dataDir,
-		keyDir:                 keyDir,
-		homeDir:                homeDir,
-	}
-
-	clientConfig := &ssh.ClientConfig{
-		User: username,
-		Auth: []ssh.AuthMethod{ssh.Password(password)},
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
-		},
-	}
-
 	// Create the data dir
 	err := os.MkdirAll(dataDir, os.ModePerm)
 	if err != nil {
@@ -111,9 +87,39 @@ func TestTriggerQsubCommand(t *testing.T) {
 		Description: "fake SSH connection",
 	}
 
+	// Configure the SSH connection
+	privateKey, err := ioutil.ReadFile(privateKeyFilename)
+	if err != nil {
+		t.Errorf("Expected no error, but got '%+v'", err.Error())
+	}
+	signer, _ := ssh.ParsePrivateKey(privateKey)
+	clientConfig := &ssh.ClientConfig{
+		User: username,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
+		},
+	}
+
 	client, err := fc.NewClient(remote, clientConfig)
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
+	}
+
+	executeConfig := executeConfiguration{
+		privateKeyFilename:     privateKeyFilename,
+		payloadFilename:        payloadFilename,
+		targetPayloadDir:       targetPayloadDir,
+		targetPayloadFilename:  targetPayloadFilename,
+		userScriptPathFilename: userScriptPathFilename,
+		username:               username,
+		groupname:              groupname,
+		password:               password,
+		relayNodeName:          relayNodeName,
+		webhookID:              webhookID,
+		dataDir:                dataDir,
+		keyDir:                 keyDir,
+		homeDir:                homeDir,
 	}
 
 	err = triggerQsubCommand(fc, client, executeConfig)
@@ -141,23 +147,6 @@ func TestExecuteScript(t *testing.T) {
 	targetPayloadDir := userScriptDir
 	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
 	payload := []byte("{test: test}")
-
-	executeConfig := executeConfiguration{
-		privateKeyFilename:     privateKeyFilename,
-		payloadFilename:        payloadFilename,
-		targetPayloadDir:       targetPayloadDir,
-		targetPayloadFilename:  targetPayloadFilename,
-		userScriptPathFilename: userScriptPathFilename,
-		username:               username,
-		groupname:              groupname,
-		password:               password,
-		relayNodeName:          relayNodeName,
-		remoteServer:           remoteServer,
-		webhookID:              webhookID,
-		dataDir:                dataDir,
-		keyDir:                 keyDir,
-		homeDir:                homeDir,
-	}
 
 	// Create the data dir
 	err := os.MkdirAll(dataDir, os.ModePerm)
@@ -221,6 +210,23 @@ func TestExecuteScript(t *testing.T) {
 	err = ioutil.WriteFile(userScriptPathFilename, []byte("test.sh"), 0644)
 	if err != nil {
 		t.Errorf("Error writing script.sh")
+	}
+
+	executeConfig := executeConfiguration{
+		privateKeyFilename:     privateKeyFilename,
+		payloadFilename:        payloadFilename,
+		targetPayloadDir:       targetPayloadDir,
+		targetPayloadFilename:  targetPayloadFilename,
+		userScriptPathFilename: userScriptPathFilename,
+		username:               username,
+		groupname:              groupname,
+		password:               password,
+		relayNodeName:          relayNodeName,
+		remoteServer:           remoteServer,
+		webhookID:              webhookID,
+		dataDir:                dataDir,
+		keyDir:                 keyDir,
+		homeDir:                homeDir,
 	}
 
 	// Execute the script

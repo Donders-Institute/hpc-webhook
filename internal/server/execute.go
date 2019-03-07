@@ -85,7 +85,6 @@ func ExecuteScript(c Connector, conf executeConfiguration) error {
 	clientConfig := &ssh.ClientConfig{
 		User: conf.username,
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		// Auth: []ssh.AuthMethod{ssh.Password(conf.password)},
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
