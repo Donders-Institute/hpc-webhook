@@ -86,7 +86,7 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	httpCode, err := s.putJSON(&myURL, server.ConfigurationRequest{Username: cuser.Username, Groupname: cgroup.Name, Hash: id}, response)
+	httpCode, err := s.putJSON(&myURL, server.ConfigurationRequest{Username: cuser.Username, Groupname: cgroup.Name, Hash: id}, &response)
 
 	log.Debugf("response data: %+v", response)
 
