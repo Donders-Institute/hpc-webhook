@@ -28,12 +28,8 @@ and change the contents:
 QAAS_HOST=qaas.dccn.nl
 QAAS_PORT=5111
 HOME_DIR=/home
-DATA_DIR=/data
-KEY_DIR=/keys
-INPUT_PRIVATE_KEY_FILE=qaas
-INPUT_PUBLIC_KEY_FILE=qaas.pub
-PRIVATE_KEY_FILE=qaas
-PUBLIC_KEY_FILE=qaas.pub
+PRIVATE_KEY_FILE=/run/secrets/qaas_private_key
+PUBLIC_KEY_FILE=/run/secrets/qaas_public_key
 
 # Relay computer node settings
 RELAY_NODE=relaynode.dccn.nl
@@ -47,10 +43,13 @@ POSTGRES_DATABASE=somedatabasename
 PGDATA=/data/postgres
 ```
 
+## Generate the server SSH keys
+
+Run the `generate-keys.sh` script in the `scripts` folder.
+
 ## Start the services
 
 Run the `start.sh` script in the `scripts` folder.
-
 
 ## Run the tests
 

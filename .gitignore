@@ -21,3 +21,5 @@ test/results/*
 qaas-database.env
 bin
 vendor
+configs/qaas
+configs/qaas.pub

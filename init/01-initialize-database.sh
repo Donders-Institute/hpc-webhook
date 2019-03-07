@@ -2,8 +2,7 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DATABASE" <<-EOSQL
-    DROP TABLE IF EXISTS qaas;
-    CREATE TABLE qaas(
+    CREATE TABLE IF NOT EXISTS qaas(
         id         SERIAL PRIMARY KEY,
         hash       CHAR (36) UNIQUE NOT NULL,
         groupname  VARCHAR (32) NOT NULL,

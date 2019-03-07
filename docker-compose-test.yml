@@ -9,6 +9,9 @@ services:
       dockerfile: Dockerfile-server-test
     env_file:
       - ./configs/qaas-database.env
+    secrets:
+      - qaas_private_key
+      - qaas_public_key
     ports:
       - 5111:5111
     volumes:
@@ -34,3 +37,9 @@ networks:
 volumes:
   postgres:
   data:
+
+secrets:
+  qaas_private_key:
+    file: ./configs/qaas
+  qaas_public_key:
+    file: ./configs/qaas.pub
