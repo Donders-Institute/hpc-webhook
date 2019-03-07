@@ -13,6 +13,52 @@ import (
 )
 
 func TestConfigurationHandler(t *testing.T) {
+	homeDir := path.Join("..", "..", "test", "results", "home")
+	err := os.MkdirAll(homeDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("error %s when creating %s dir", err, homeDir)
+	}
+	defer func() {
+		err = os.RemoveAll(homeDir) // cleanup when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, homeDir)
+		}
+	}()
+
+	dataDir := path.Join("..", "..", "test", "results", "data")
+	err = os.MkdirAll(dataDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("error %s when creating %s dir", err, dataDir)
+	}
+	defer func() {
+		err = os.RemoveAll(dataDir) // cleanup when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, dataDir)
+		}
+	}()
+
+	// Create key dir
+	keyDir := path.Join("..", "..", "test", "results", "keys")
+	err = os.MkdirAll(keyDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("error %s when creating %s dir", err, keyDir)
+	}
+	defer func() {
+		err = os.RemoveAll(keyDir) // cleanup when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, keyDir)
+		}
+	}()
+
+	// Generate a key pair
+	privateKeyFilename := path.Join(keyDir, "qaas")
+	publicKeyFilename := path.Join(keyDir, "qaas.pub")
+	err = generateKeyPair(privateKeyFilename, publicKeyFilename)
+	if err != nil {
+		t.Errorf("Expected no error, but got '%+v'", err.Error())
+		return
+	}
+
 	cases := []struct {
 		method         string
 		configURL      string
@@ -86,49 +132,15 @@ func TestConfigurationHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:   "",
-			VaultDir:  "",
-			HomeDir:   "",
-			RelayNode: "relaynode.dccn.nl",
-			QaasHost:  "qaas.dccn.nl",
-			QaasPort:  "5111",
+			DataDir:            dataDir,
+			HomeDir:            homeDir,
+			RelayNode:          "relaynode.dccn.nl",
+			QaasHost:           "qaas.dccn.nl",
+			QaasPort:           "5111",
+			KeyDir:             keyDir,
+			PrivateKeyFilename: publicKeyFilename,
+			PublicKeyFilename:  privateKeyFilename,
 		}
-
-		api.SetDataDir("..", "..", "test", "results", "data")
-		err = os.MkdirAll(api.DataDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
-		}
-		defer func() {
-			err = os.RemoveAll(api.DataDir) // cleanup when done
-			if err != nil {
-				t.Fatalf("error %s when removing %s dir", err, api.DataDir)
-			}
-		}()
-
-		api.SetVaultDir("..", "..", "test", "results", "vault")
-		err = os.MkdirAll(api.VaultDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("error %s when creating %s dir", err, api.VaultDir)
-		}
-		defer func() {
-			err = os.RemoveAll(api.VaultDir) // cleanup when done
-			if err != nil {
-				t.Fatalf("error %s when removing %s dir", err, api.VaultDir)
-			}
-		}()
-
-		api.SetHomeDir("..", "..", "test", "results", "home")
-		err = os.MkdirAll(api.HomeDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("error %s when creating %s dir", err, api.HomeDir)
-		}
-		defer func() {
-			err = os.RemoveAll(api.HomeDir) // cleanup when done
-			if err != nil {
-				t.Fatalf("error %s when removing %s dir", err, api.HomeDir)
-			}
-		}()
 
 		app := &api
 
@@ -182,6 +194,52 @@ func TestConfigurationHandler(t *testing.T) {
 }
 
 func TestHandlerWebhook(t *testing.T) {
+	homeDir := path.Join("..", "..", "test", "results", "home")
+	err := os.MkdirAll(homeDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("error %s when creating %s dir", err, homeDir)
+	}
+	defer func() {
+		err = os.RemoveAll(homeDir) // cleanup when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, homeDir)
+		}
+	}()
+
+	dataDir := path.Join("..", "..", "test", "results", "data")
+	err = os.MkdirAll(dataDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("error %s when creating %s dir", err, dataDir)
+	}
+	defer func() {
+		err = os.RemoveAll(dataDir) // cleanup when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, dataDir)
+		}
+	}()
+
+	// Create key dir
+	keyDir := path.Join("..", "..", "test", "results", "keys")
+	err = os.MkdirAll(keyDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("error %s when creating %s dir", err, keyDir)
+	}
+	defer func() {
+		err = os.RemoveAll(keyDir) // cleanup when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, keyDir)
+		}
+	}()
+
+	// Generate a key pair
+	privateKeyFilename := path.Join(keyDir, "qaas")
+	publicKeyFilename := path.Join(keyDir, "qaas.pub")
+	err = generateKeyPair(privateKeyFilename, publicKeyFilename)
+	if err != nil {
+		t.Errorf("Expected no error, but got '%+v'", err.Error())
+		return
+	}
+
 	cases := []struct {
 		method           string
 		payloadURL       string
@@ -199,7 +257,7 @@ func TestHandlerWebhook(t *testing.T) {
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			hash:             "550e8400-e29b-41d4-a716-446655440001",
 			username:         "dccnuser",
-			groupname:        "tg",
+			groupname:        "dccngroup",
 			testDataFilename: path.Join("..", "..", "test", "data", "example-github-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
@@ -216,7 +274,7 @@ func TestHandlerWebhook(t *testing.T) {
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440002",
 			hash:             "550e8400-e29b-41d4-a716-446655440002",
 			username:         "dccnuser",
-			groupname:        "tg",
+			groupname:        "dccngroup",
 			testDataFilename: path.Join("..", "..", "test", "data", "example-ifttt-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -230,7 +288,7 @@ func TestHandlerWebhook(t *testing.T) {
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440003",
 			hash:             "550e8400-e29b-41d4-a716-446655440003",
 			username:         "dccnuser",
-			groupname:        "tg",
+			groupname:        "dccngroup",
 			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -244,7 +302,7 @@ func TestHandlerWebhook(t *testing.T) {
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716",
 			hash:             "550e8400-e29b-41d4-a716",
 			username:         "dccnuser",
-			groupname:        "tg",
+			groupname:        "dccngroup",
 			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -258,7 +316,7 @@ func TestHandlerWebhook(t *testing.T) {
 			payloadURL:       "/wwwhook/550e8400-e29b-41d4-a716-446655440001",
 			hash:             "550e8400-e29b-41d4-a716-446655440001",
 			username:         "dccnuser",
-			groupname:        "tg",
+			groupname:        "dccngroup",
 			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -272,7 +330,7 @@ func TestHandlerWebhook(t *testing.T) {
 			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
 			hash:             "550e8400-e29b-41d4-a716-446655440001",
 			username:         "dccnuser",
-			groupname:        "tg",
+			groupname:        "dccngroup",
 			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
@@ -298,66 +356,18 @@ func TestHandlerWebhook(t *testing.T) {
 				Description: "fake SSH connection to relay node",
 			},
 			DataDir:                   "",
-			VaultDir:                  "",
 			HomeDir:                   "",
 			RelayNode:                 "relaynode.dccn.nl",
 			RelayNodeTestUser:         c.username,
 			RelayNodeTestUserPassword: "somepassword",
 			QaasHost:                  "qaas.dccn.nl",
 			QaasPort:                  "5111",
+			KeyDir:                    keyDir,
+			PrivateKeyFilename:        privateKeyFilename,
+			PublicKeyFilename:         publicKeyFilename,
 		}
-
-		api.SetDataDir("..", "..", "test", "results", "data")
-		err = os.MkdirAll(api.DataDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("error %s when creating %s dir", err, api.DataDir)
-		}
-		defer func() {
-			err = os.RemoveAll(api.DataDir) // cleanup when done
-			if err != nil {
-				t.Fatalf("error %s when removing %s dir", err, api.DataDir)
-			}
-		}()
-
-		api.SetVaultDir("..", "..", "test", "results", "vault")
-		err = os.MkdirAll(api.VaultDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("error %s when creating %s dir", err, api.VaultDir)
-		}
-		defer func() {
-			err = os.RemoveAll(api.VaultDir) // cleanup when done
-			if err != nil {
-				t.Fatalf("error %s when removing %s dir", err, api.VaultDir)
-			}
-		}()
-
-		api.SetHomeDir("..", "..", "test", "results", "home")
-		err = os.MkdirAll(api.HomeDir, os.ModePerm)
-		if err != nil {
-			t.Fatalf("error %s when creating %s dir", err, api.HomeDir)
-		}
-		defer func() {
-			err = os.RemoveAll(api.HomeDir) // cleanup when done
-			if err != nil {
-				t.Fatalf("error %s when removing %s dir", err, api.HomeDir)
-			}
-		}()
 
 		app := &api
-
-		// Setup some fake keys
-		keyDir := path.Join(api.DataDir, "keys", c.username)
-		err = os.MkdirAll(keyDir, os.ModePerm)
-		if err != nil {
-			t.Errorf("Expected no error, but got '%+v'", err.Error())
-		}
-		privateKeyFilename := path.Join(keyDir, "id_rsa")
-		publicKeyFilename := path.Join(keyDir, "id_rsa.pub")
-		err = generateKeyPair(privateKeyFilename, publicKeyFilename)
-		if err != nil {
-			t.Errorf("Expected no error, but got '%+v'", err.Error())
-			return
-		}
 
 		// Create the user script file
 		userScriptDir := path.Join(api.HomeDir, c.groupname, c.username, ".qaas", c.hash)

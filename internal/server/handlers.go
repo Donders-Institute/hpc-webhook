@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 )
 
@@ -17,13 +16,15 @@ type API struct {
 	DB                        *sql.DB
 	Connector                 Connector
 	DataDir                   string
-	VaultDir                  string
 	HomeDir                   string
 	RelayNode                 string
 	RelayNodeTestUser         string
 	RelayNodeTestUserPassword string
 	QaasHost                  string
 	QaasPort                  string
+	KeyDir                    string
+	PrivateKeyFilename        string
+	PublicKeyFilename         string
 }
 
 // WebhookPath is the first part of the webhook payload URL
@@ -39,21 +40,6 @@ func RunsWithinContainer() bool {
 		return false
 	}
 	return strings.Contains(string(file), "docker")
-}
-
-// SetDataDir sets the filepath of the qaas data files
-func (a *API) SetDataDir(elem ...string) {
-	a.DataDir = filepath.Join(elem...)
-}
-
-// SetVaultDir sets the filepath of the private key files with root read and write file permissions
-func (a *API) SetVaultDir(elem ...string) {
-	a.VaultDir = filepath.Join(elem...)
-}
-
-// SetHomeDir sets the filepath to the mounted /home dir
-func (a *API) SetHomeDir(elem ...string) {
-	a.HomeDir = filepath.Join(elem...)
 }
 
 // ConfigurationHandler handles a webhook registration HTTP PUT request
@@ -78,27 +64,13 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Check if key pair exists for user
-	privateKeyFilename := path.Join(keyDir, "id_rsa")
-	publicKeyFilename := path.Join(keyDir, "id_rsa.pub")
-	hasPrivateKeyFilename, _ := checkFile(privateKeyFilename)
-	hasPublicKeyFilename, _ := checkFile(publicKeyFilename)
-	if !hasPrivateKeyFilename || !hasPublicKeyFilename {
-		err = generateKeyPair(privateKeyFilename, publicKeyFilename)
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			fmt.Println(err)
-			fmt.Fprint(w, "Error 404 - Not found: ", err)
-			return
-		}
-
-		err = addAuthorizedPublicKey(a.HomeDir, configuration.Groupname, configuration.Username, publicKeyFilename)
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			fmt.Println(err)
-			fmt.Fprint(w, "Error 404 - Not found: ", err)
-			return
-		}
+	// Add key to authorized keys
+	err = addAuthorizedPublicKey(a.HomeDir, configuration.Groupname, configuration.Username, a.PublicKeyFilename)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
 	}
 
 	// Add a row in the database
@@ -175,18 +147,13 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Prepare the execution of the script
-	privateKeyFilename := path.Join(a.DataDir, "keys", username, "id_rsa")
-	payloadFilename := path.Join(a.DataDir, "payloads", username, "payload")
+	payloadFilename := path.Join(payloadDir, "payload")
 	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID)
 	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
 	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID, "script.sh")
-	tempPrivateKeyDir := path.Join(a.VaultDir, username)
-	tempPrivateKeyFilename := path.Join(tempPrivateKeyDir, "id_rsa")
 
 	executeConfig := executeConfiguration{
-		privateKeyFilename:     privateKeyFilename,
-		tempPrivateKeyDir:      tempPrivateKeyDir,
-		tempPrivateKeyFilename: tempPrivateKeyFilename,
+		privateKeyFilename:     a.PrivateKeyFilename,
 		payloadFilename:        payloadFilename,
 		targetPayloadDir:       targetPayloadDir,
 		targetPayloadFilename:  targetPayloadFilename,
@@ -196,7 +163,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		password:               a.RelayNodeTestUserPassword,
 		relayNodeName:          a.RelayNode,
 		dataDir:                a.DataDir,
-		vaultDir:               a.VaultDir,
+		keyDir:                 a.KeyDir,
 		homeDir:                a.HomeDir,
 		webhookID:              webhookID,
 		payload:                payload,

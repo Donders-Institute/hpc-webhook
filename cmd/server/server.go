@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/Donders-Institute/hpc-qaas/internal/server"
 	_ "github.com/lib/pq"
@@ -15,6 +16,13 @@ func main() {
 	qaasHost := os.Getenv("QAAS_HOST")
 	qaasPort := os.Getenv("QAAS_PORT")
 	address := fmt.Sprintf("%s:%s", qaasHost, qaasPort)
+	homeDir := os.Getenv("HOME_DIR")
+	dataDir := os.Getenv("DATA_DIR")
+	inputPrivateKeyFilename := os.Getenv("INPUT_PRIVATE_KEY_FILE")
+	inputPublicKeyFilename := os.Getenv("INPUT_PUBLIC_KEY_FILE")
+	keyDir := os.Getenv("KEY_DIR")
+	privateKeyFilename := path.Join(keyDir, os.Getenv("PRIVATE_KEY_FILE"))
+	publicKeyFilename := path.Join(keyDir, os.Getenv("PUBLIC_KEY_FILE"))
 
 	// Set target computer variables
 	relayNode := os.Getenv("RELAY_NODE")
@@ -49,32 +57,38 @@ func main() {
 		Connector: server.SSHConnector{
 			Description: "SSH connection to relay node",
 		},
-		DataDir:                   "",
-		VaultDir:                  "",
-		HomeDir:                   "",
+		DataDir:                   dataDir,
+		HomeDir:                   homeDir,
 		RelayNode:                 relayNode,
 		RelayNodeTestUser:         relayNodeTestUser,
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
 		QaasHost:                  qaasHost,
 		QaasPort:                  qaasPort,
+		KeyDir:                    keyDir,
+		PrivateKeyFilename:        privateKeyFilename,
+		PublicKeyFilename:         publicKeyFilename,
 	}
 
 	// Set the data dir and create it
-	api.SetDataDir("/data")
 	err = os.MkdirAll(api.DataDir, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
 
-	// Set the vault dir and create it
-	api.SetVaultDir("/vault")
-	err = os.MkdirAll(api.VaultDir, os.ModePerm)
+	// Copy the input keys
+	// Change the file permissions to root read and write for the private key file
+	err = server.CopyFile(inputPublicKeyFilename, api.PublicKeyFilename)
 	if err != nil {
 		panic(err)
 	}
-
-	// Set the /home dir
-	api.SetHomeDir("/home")
+	err = server.CopyFile(inputPrivateKeyFilename, api.PrivateKeyFilename)
+	if err != nil {
+		panic(err)
+	}
+	err = os.Chmod(api.PrivateKeyFilename, 0600)
+	if err != nil {
+		panic(err)
+	}
 
 	app := &api
 

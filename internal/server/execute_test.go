@@ -15,16 +15,15 @@ func TestTriggerQsubCommand(t *testing.T) {
 	remote := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
 	username := "dccnuser"
-	groupname := "tg"
+	groupname := "dccngroup"
 	password := "somepassword"
 	dataDir := path.Join("..", "..", "test", "results", "executeScript", "data")
-	vaultDir := path.Join("..", "..", "test", "results", "executeScript", "vault")
+	keyDir := path.Join("..", "..", "test", "results", "executeScript", "keys")
 	homeDir := path.Join("..", "..", "test", "results", "executeScript", "home")
 	payloadDir := path.Join(dataDir, "payloads", username)
-	privateKeyFilename := path.Join(dataDir, "keys", username, "id_rsa")
+	privateKeyFilename := path.Join(keyDir, "qaas")
+	publicKeyFilename := path.Join(keyDir, "qaas.pub")
 	userScriptDir := path.Join(homeDir, groupname, username, ".qaas", webhookID)
-	tempPrivateKeyDir := path.Join(vaultDir, username, "id_rsa")
-	tempPrivateKeyFilename := path.Join(tempPrivateKeyDir, "id_rsa")
 	payloadFilename := path.Join(payloadDir, "payload")
 	targetPayloadDir := userScriptDir
 	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
@@ -32,8 +31,6 @@ func TestTriggerQsubCommand(t *testing.T) {
 
 	executeConfig := executeConfiguration{
 		privateKeyFilename:     privateKeyFilename,
-		tempPrivateKeyDir:      tempPrivateKeyDir,
-		tempPrivateKeyFilename: tempPrivateKeyFilename,
 		payloadFilename:        payloadFilename,
 		targetPayloadDir:       targetPayloadDir,
 		targetPayloadFilename:  targetPayloadFilename,
@@ -44,7 +41,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 		relayNodeName:          relayNodeName,
 		webhookID:              webhookID,
 		dataDir:                dataDir,
-		vaultDir:               vaultDir,
+		keyDir:                 keyDir,
 		homeDir:                homeDir,
 	}
 
@@ -80,6 +77,26 @@ func TestTriggerQsubCommand(t *testing.T) {
 		}
 	}()
 
+	// Create the key files
+	err = os.MkdirAll(keyDir, os.ModePerm)
+	if err != nil {
+		t.Errorf("Error writing key dir")
+	}
+	err = ioutil.WriteFile(publicKeyFilename, []byte("test"), 0644)
+	if err != nil {
+		t.Errorf("Error writing public key")
+	}
+	err = ioutil.WriteFile(privateKeyFilename, []byte("test"), 0600)
+	if err != nil {
+		t.Errorf("Error writing private key")
+	}
+	defer func() {
+		err = os.RemoveAll(keyDir) // clean up when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, keyDir)
+		}
+	}()
+
 	// Create the user script file
 	err = os.MkdirAll(userScriptDir, os.ModePerm)
 	if err != nil {
@@ -110,17 +127,15 @@ func TestExecuteScript(t *testing.T) {
 	remoteServer := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
 	username := "dccnuser"
-	groupname := "tg"
+	groupname := "dccngroup"
 	password := "somepassword"
 	dataDir := path.Join("..", "..", "test", "results", "executeScript", "data")
-	vaultDir := path.Join("..", "..", "test", "results", "executeScript", "vault")
+	keyDir := path.Join("..", "..", "test", "results", "executeScript", "keys")
 	homeDir := path.Join("..", "..", "test", "results", "executeScript", "home")
-	keyDir := path.Join(dataDir, "keys", username)
 	payloadDir := path.Join(dataDir, "payloads", username)
-	privateKeyFilename := path.Join(dataDir, "keys", username, "id_rsa")
+	privateKeyFilename := path.Join(keyDir, "qaas")
+	publicKeyFilename := path.Join(keyDir, "qaas.pub")
 	userScriptDir := path.Join(homeDir, groupname, username, ".qaas", webhookID)
-	tempPrivateKeyDir := path.Join(vaultDir, username, "id_rsa")
-	tempPrivateKeyFilename := path.Join(tempPrivateKeyDir, "id_rsa")
 	payloadFilename := path.Join(payloadDir, "payload")
 	userScriptPathFilename := path.Join(userScriptDir, "script.sh")
 	targetPayloadDir := userScriptDir
@@ -129,8 +144,6 @@ func TestExecuteScript(t *testing.T) {
 
 	executeConfig := executeConfiguration{
 		privateKeyFilename:     privateKeyFilename,
-		tempPrivateKeyDir:      tempPrivateKeyDir,
-		tempPrivateKeyFilename: tempPrivateKeyFilename,
 		payloadFilename:        payloadFilename,
 		targetPayloadDir:       targetPayloadDir,
 		targetPayloadFilename:  targetPayloadFilename,
@@ -142,7 +155,7 @@ func TestExecuteScript(t *testing.T) {
 		remoteServer:           remoteServer,
 		webhookID:              webhookID,
 		dataDir:                dataDir,
-		vaultDir:               vaultDir,
+		keyDir:                 keyDir,
 		homeDir:                homeDir,
 	}
 
@@ -151,47 +164,53 @@ func TestExecuteScript(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing test result data dir")
 	}
-	// defer func() {
-	// 	err = os.RemoveAll(dataDir) // clean up when done
-	// 	if err != nil {
-	// 		t.Fatalf("error %s when removing %s dir", err, dataDir)
-	// 	}
-	// }()
+	defer func() {
+		err = os.RemoveAll(dataDir) // clean up when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, dataDir)
+		}
+	}()
 
 	// Create the home dir
 	err = os.MkdirAll(homeDir, os.ModePerm)
 	if err != nil {
 		t.Errorf("Error writing test result home dir")
 	}
-	// defer func() {
-	// 	err = os.RemoveAll(homeDir) // clean up when done
-	// 	if err != nil {
-	// 		t.Fatalf("error %s when removing %s dir", err, homeDir)
-	// 	}
-	// }()
+	defer func() {
+		err = os.RemoveAll(homeDir) // clean up when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, homeDir)
+		}
+	}()
 
 	// Create the key files
 	err = os.MkdirAll(keyDir, os.ModePerm)
 	if err != nil {
-		t.Errorf("Error writing test result dir")
+		t.Errorf("Error writing key dir")
 	}
-	err = ioutil.WriteFile(path.Join(keyDir, "id_rsa.pub"), []byte("test"), 0644)
+	err = ioutil.WriteFile(publicKeyFilename, []byte("test"), 0644)
 	if err != nil {
-		t.Errorf("Error writing test result")
+		t.Errorf("Error writing public key")
 	}
-	err = ioutil.WriteFile(path.Join(keyDir, "id_rsa"), []byte("test"), 0600)
+	err = ioutil.WriteFile(privateKeyFilename, []byte("test"), 0600)
 	if err != nil {
-		t.Errorf("Error writing test result")
+		t.Errorf("Error writing private key")
 	}
+	defer func() {
+		err = os.RemoveAll(keyDir) // clean up when done
+		if err != nil {
+			t.Fatalf("error %s when removing %s dir", err, keyDir)
+		}
+	}()
 
 	// Create the payload file
 	err = os.MkdirAll(payloadDir, os.ModePerm)
 	if err != nil {
-		t.Errorf("Error writing test result dir")
+		t.Errorf("Error writing payload dir")
 	}
 	err = ioutil.WriteFile(path.Join(payloadDir, "payload"), payload, 0644)
 	if err != nil {
-		t.Errorf("Error writing test result")
+		t.Errorf("Error writing payload")
 	}
 
 	// Create the user script file

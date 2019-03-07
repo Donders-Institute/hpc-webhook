@@ -27,6 +27,13 @@ and change the contents:
 # Qaas server settings
 QAAS_HOST=qaas.dccn.nl
 QAAS_PORT=5111
+HOME_DIR=/home
+DATA_DIR=/data
+KEY_DIR=/keys
+INPUT_PRIVATE_KEY_FILE=qaas
+INPUT_PUBLIC_KEY_FILE=qaas.pub
+PRIVATE_KEY_FILE=qaas
+PUBLIC_KEY_FILE=qaas.pub
 
 # Relay computer node settings
 RELAY_NODE=relaynode.dccn.nl

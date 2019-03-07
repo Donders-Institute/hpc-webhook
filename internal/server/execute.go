@@ -12,8 +12,6 @@ import (
 
 type executeConfiguration struct {
 	privateKeyFilename     string
-	tempPrivateKeyDir      string
-	tempPrivateKeyFilename string
 	payloadFilename        string
 	targetPayloadDir       string
 	targetPayloadFilename  string
@@ -21,7 +19,7 @@ type executeConfiguration struct {
 	relayNodeName          string
 	remoteServer           string
 	dataDir                string
-	vaultDir               string
+	keyDir                 string
 	homeDir                string
 	webhookID              string
 	payload                []byte
@@ -30,9 +28,9 @@ type executeConfiguration struct {
 	password               string
 }
 
-// Copy the src file to dst.
+// CopyFile copies a source file to a destination file.
 // Any existing file will be overwritten and will not copy file attributes.
-func copyFile(src string, dst string) error {
+func CopyFile(src string, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err
@@ -78,33 +76,16 @@ func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfigurati
 
 // ExecuteScript triggers a qsub command on the HPC cluster
 func ExecuteScript(c Connector, conf executeConfiguration) error {
-	// Copy the private key to the vault directory and
-	// change its file permissions to root read and write access only
-	err := os.MkdirAll(conf.tempPrivateKeyDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	fmt.Println(conf.privateKeyFilename)
-	fmt.Println(conf.tempPrivateKeyFilename)
-	err = copyFile(conf.privateKeyFilename, conf.tempPrivateKeyFilename)
-	if err != nil {
-		return err
-	}
-	err = os.Chmod(conf.tempPrivateKeyFilename, 0600)
-	if err != nil {
-		return err
-	}
-
 	// Configure the SSH connection
-	// privateKey, err := ioutil.ReadFile(privateKeyFilename)
-	// if err != nil {
-	// 	return err
-	// }
-	//signer, _ := ssh.ParsePrivateKey(privateKey)
+	privateKey, err := ioutil.ReadFile(conf.privateKeyFilename)
+	if err != nil {
+		return err
+	}
+	signer, _ := ssh.ParsePrivateKey(privateKey)
 	clientConfig := &ssh.ClientConfig{
 		User: conf.username,
-		// Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		Auth: []ssh.AuthMethod{ssh.Password(conf.password)},
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		// Auth: []ssh.AuthMethod{ssh.Password(conf.password)},
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
@@ -122,7 +103,7 @@ func ExecuteScript(c Connector, conf executeConfiguration) error {
 	if err != nil {
 		return err
 	}
-	err = copyFile(conf.payloadFilename, conf.targetPayloadFilename)
+	err = CopyFile(conf.payloadFilename, conf.targetPayloadFilename)
 	if err != nil {
 		return err
 	}
