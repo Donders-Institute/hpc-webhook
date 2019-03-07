@@ -355,8 +355,8 @@ func TestHandlerWebhook(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                   "",
-			HomeDir:                   "",
+			DataDir:                   dataDir,
+			HomeDir:                   homeDir,
 			RelayNode:                 "relaynode.dccn.nl",
 			RelayNodeTestUser:         c.username,
 			RelayNodeTestUserPassword: "somepassword",
