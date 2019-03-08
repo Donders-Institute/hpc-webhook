@@ -108,6 +108,7 @@ func TestValidWebhookID(t *testing.T) {
 func TestValidateConfigurationRequest(t *testing.T) {
 	cases := []struct {
 		conf           ConfigurationRequest
+		validateHash   bool
 		expectedResult bool
 	}{
 		{
@@ -116,6 +117,7 @@ func TestValidateConfigurationRequest(t *testing.T) {
 				Groupname: "dccngroup",
 				Username:  "dccnuser",
 			},
+			validateHash:   true,
 			expectedResult: true, // valid, no error (i.e. 36 characters with 4 hyphens)
 		},
 		{
@@ -124,6 +126,7 @@ func TestValidateConfigurationRequest(t *testing.T) {
 				Groupname: "dccngroup",
 				Username:  "dccnuser",
 			},
+			validateHash:   true,
 			expectedResult: false, // Invalid hash (i.e. capitals A-F instead of a-f)
 		},
 		{
@@ -132,6 +135,7 @@ func TestValidateConfigurationRequest(t *testing.T) {
 				Groupname: "dccngroup",
 				Username:  "dccnuser",
 			},
+			validateHash:   true,
 			expectedResult: false, // Invalid hash (i.e. 35 characters with 4 hyphens)
 		},
 		{
@@ -140,6 +144,7 @@ func TestValidateConfigurationRequest(t *testing.T) {
 				Groupname: "dccngroup",
 				Username:  "",
 			},
+			validateHash:   true,
 			expectedResult: false, // Invalid username
 		},
 		{
@@ -148,12 +153,22 @@ func TestValidateConfigurationRequest(t *testing.T) {
 				Groupname: "",
 				Username:  "dccnuser",
 			},
+			validateHash:   true,
 			expectedResult: false, // Invalid groupname
+		},
+		{
+			conf: ConfigurationRequest{
+				Hash:      "",
+				Groupname: "dccngroup",
+				Username:  "dccnuser",
+			},
+			validateHash:   false,
+			expectedResult: true, // Empty hash but no error because validateHash = false
 		},
 	}
 
 	for _, c := range cases {
-		err := validateConfigurationRequest(c.conf)
+		err := validateConfigurationRequest(c.conf, c.validateHash)
 		if c.expectedResult {
 			if err != nil {
 				t.Errorf("Expected valid configuration request '%s', but got invalid configuration request", c.conf)

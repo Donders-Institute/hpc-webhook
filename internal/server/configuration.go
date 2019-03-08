@@ -52,7 +52,8 @@ func parseConfigurationRequest(req *http.Request) (ConfigurationRequest, error) 
 	}
 
 	// Validate the configuration
-	err = validateConfigurationRequest(configuration)
+	validateHash := true
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -82,7 +83,8 @@ func parseConfigurationListRequest(req *http.Request) (ConfigurationRequest, err
 	}
 
 	// Validate the configuration
-	err = validateConfigurationRequest(configuration)
+	validateHash := false
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -112,7 +114,8 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 	}
 
 	// Validate the configuration
-	err = validateConfigurationRequest(configuration)
+	validateHash := true
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -125,11 +128,11 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	switch method := req.Method; method {
 	case "PUT":
-		a.ConfigurationHandlerAdd(w, req)
+		a.ConfigurationAddHandler(w, req)
 	case "GET":
-		a.ConfigurationHandlerList(w, req)
+		a.ConfigurationListHandler(w, req)
 	case "DELETE":
-		a.ConfigurationHandlerDelete(w, req)
+		a.ConfigurationDeleteHandler(w, req)
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		err := fmt.Errorf("invalid method '%s'", req.Method)
@@ -138,9 +141,9 @@ func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// ConfigurationHandlerAdd handles a HTTP PUT request
+// ConfigurationAddHandler handles a HTTP PUT request
 // to register a certain webhook with hash, groupname, and username in its body
-func (a *API) ConfigurationHandlerAdd(w http.ResponseWriter, req *http.Request) {
+func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	configuration, err := parseConfigurationRequest(req)
 	if err != nil {
@@ -185,9 +188,9 @@ func (a *API) ConfigurationHandlerAdd(w http.ResponseWriter, req *http.Request) 
 	return
 }
 
-// ConfigurationHandlerList handles a HTTP GET request
+// ConfigurationListHandler handles a HTTP GET request
 // to obtain all webhooks for a certain user
-func (a *API) ConfigurationHandlerList(w http.ResponseWriter, req *http.Request) {
+func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	configuration, err := parseConfigurationListRequest(req)
 	if err != nil {
@@ -197,15 +200,16 @@ func (a *API) ConfigurationHandlerList(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	fmt.Printf("%+v\n", configuration)
-	// // Add a row in the database
-	// err = getRows(a.DB, configuration.Groupname, configuration.Username)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	fmt.Println(err)
-	// 	fmt.Fprint(w, "Error 404 - Not found: ", err)
-	// 	return
-	// }
+	// Get the list of webhooks
+	list, err := getListRows(a.DB, configuration.Groupname, configuration.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	fmt.Printf("%+v\n", list)
 
 	// Succes
 	configurationListResponse := ConfigurationListResponse{
@@ -223,9 +227,9 @@ func (a *API) ConfigurationHandlerList(w http.ResponseWriter, req *http.Request)
 	return
 }
 
-// ConfigurationHandlerDelete handles a HTTP DELETE request
+// ConfigurationDeleteHandler handles a HTTP DELETE request
 // to delete a certain webhook for a certain user
-func (a *API) ConfigurationHandlerDelete(w http.ResponseWriter, req *http.Request) {
+func (a *API) ConfigurationDeleteHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
 	configuration, err := parseConfigurationDeleteRequest(req)
 	if err != nil {
@@ -235,15 +239,14 @@ func (a *API) ConfigurationHandlerDelete(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	fmt.Printf("%+v\n", configuration)
-	// // Delete a row in the database
-	// err = deleteRow(a.DB, configuration.Hash, configuration.Groupname, configuration.Username)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	fmt.Println(err)
-	// 	fmt.Fprint(w, "Error 404 - Not found: ", err)
-	// 	return
-	// }
+	// Delete a row in the database
+	err = deleteRow(a.DB, configuration.Hash, configuration.Groupname, configuration.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
 
 	// Succes
 	configurationDeleteResponse := ConfigurationDeleteResponse{

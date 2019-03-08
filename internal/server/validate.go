@@ -26,8 +26,8 @@ func isValidWebhookID(webhookID string) bool {
 	return validWebhookIDRegex.MatchString(webhookID)
 }
 
-func validateConfigurationRequest(conf ConfigurationRequest) error {
-	if !isValidWebhookID(conf.Hash) {
+func validateConfigurationRequest(conf ConfigurationRequest, validateHash bool) error {
+	if validateHash && !isValidWebhookID(conf.Hash) {
 		return errors.New("invalid configuration request: invalid hash")
 	}
 	if conf.Username == "" {
