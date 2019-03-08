@@ -12,6 +12,21 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
 
+func obtainWebhookPayloadBody(testDataFilename string) (*bytes.Buffer, error) {
+	file, err := os.Open(testDataFilename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	body, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.NewBuffer(body), err
+}
+
 func TestHandlerWebhook(t *testing.T) {
 	cases := []struct {
 		method           string
@@ -173,17 +188,10 @@ func TestHandlerWebhook(t *testing.T) {
 		}
 
 		// Obtain the body
-		file, err := os.Open(c.testDataFilename)
+		b, err := obtainWebhookPayloadBody(c.testDataFilename)
 		if err != nil {
-			t.Errorf("Expected no error, but got '%+v'", err.Error())
+			t.Fatal(err)
 		}
-		defer file.Close()
-
-		body, err := ioutil.ReadAll(file)
-		if err != nil {
-			t.Errorf("Test data unavailable: %v", err)
-		}
-		b := bytes.NewBuffer(body)
 
 		// Make a new HTTP POST request with this body
 		req, err := http.NewRequest(c.method, c.payloadURL, b)
@@ -196,6 +204,7 @@ func TestHandlerWebhook(t *testing.T) {
 			req.Header.Set(key, value)
 		}
 
+		// Set the query that is expected to be executed
 		if c.expectedResult {
 			expectedUsername := c.username
 			expectedGroupname := c.groupname
