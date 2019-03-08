@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -12,53 +13,51 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
 
+type testConfiguration struct {
+	homeDir            string
+	dataDir            string
+	keyDir             string
+	privateKeyFilename string
+	publicKeyFilename  string
+}
+
+func setupTestCase(testConfig testConfiguration) error {
+	err := os.MkdirAll(testConfig.homeDir, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("error %s when creating %s dir", err, testConfig.homeDir)
+	}
+	err = os.MkdirAll(testConfig.dataDir, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("error %s when creating %s dir", err, testConfig.dataDir)
+	}
+	err = os.MkdirAll(testConfig.keyDir, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("error %s when creating %s dir", err, testConfig.keyDir)
+	}
+	err = generateKeyPair(testConfig.privateKeyFilename, testConfig.publicKeyFilename)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func teardownTestCase(testConfig testConfiguration) error {
+	err := os.RemoveAll(testConfig.homeDir)
+	if err != nil {
+		return fmt.Errorf("error %s when removing %s dir", err, testConfig.homeDir)
+	}
+	err = os.RemoveAll(testConfig.dataDir)
+	if err != nil {
+		return fmt.Errorf("error %s when removing %s dir", err, testConfig.dataDir)
+	}
+	err = os.RemoveAll(testConfig.keyDir)
+	if err != nil {
+		return fmt.Errorf("error %s when removing %s dir", err, testConfig.keyDir)
+	}
+	return err
+}
+
 func TestConfigurationHandler(t *testing.T) {
-	homeDir := path.Join("..", "..", "test", "results", "home")
-	err := os.MkdirAll(homeDir, os.ModePerm)
-	if err != nil {
-		t.Fatalf("error %s when creating %s dir", err, homeDir)
-	}
-	defer func() {
-		err = os.RemoveAll(homeDir) // cleanup when done
-		if err != nil {
-			t.Fatalf("error %s when removing %s dir", err, homeDir)
-		}
-	}()
-
-	dataDir := path.Join("..", "..", "test", "results", "data")
-	err = os.MkdirAll(dataDir, os.ModePerm)
-	if err != nil {
-		t.Fatalf("error %s when creating %s dir", err, dataDir)
-	}
-	defer func() {
-		err = os.RemoveAll(dataDir) // cleanup when done
-		if err != nil {
-			t.Fatalf("error %s when removing %s dir", err, dataDir)
-		}
-	}()
-
-	// Create key dir
-	keyDir := path.Join("..", "..", "test", "results", "keys")
-	err = os.MkdirAll(keyDir, os.ModePerm)
-	if err != nil {
-		t.Fatalf("error %s when creating %s dir", err, keyDir)
-	}
-	defer func() {
-		err = os.RemoveAll(keyDir) // cleanup when done
-		if err != nil {
-			t.Fatalf("error %s when removing %s dir", err, keyDir)
-		}
-	}()
-
-	// Generate a key pair
-	privateKeyFilename := path.Join(keyDir, "qaas")
-	publicKeyFilename := path.Join(keyDir, "qaas.pub")
-	err = generateKeyPair(privateKeyFilename, publicKeyFilename)
-	if err != nil {
-		t.Errorf("Expected no error, but got '%+v'", err.Error())
-		return
-	}
-
 	cases := []struct {
 		method         string
 		configURL      string
@@ -119,6 +118,25 @@ func TestConfigurationHandler(t *testing.T) {
 		},
 	}
 
+	keyDir := path.Join("..", "..", "test", "results", "keys")
+	testConfig := testConfiguration{
+		homeDir:            path.Join("..", "..", "test", "results", "home"),
+		dataDir:            path.Join("..", "..", "test", "results", "data"),
+		keyDir:             keyDir,
+		privateKeyFilename: path.Join(keyDir, "qaas"),
+		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+	}
+
+	err := setupTestCase(testConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := teardownTestCase(testConfig); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
 	for _, c := range cases {
 
 		db, mock, err := sqlmock.New()
@@ -132,13 +150,13 @@ func TestConfigurationHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:            dataDir,
-			HomeDir:            homeDir,
+			DataDir:            testConfig.dataDir,
+			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
 			QaasPort:           "5111",
-			PrivateKeyFilename: publicKeyFilename,
-			PublicKeyFilename:  privateKeyFilename,
+			PrivateKeyFilename: testConfig.publicKeyFilename,
+			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -193,52 +211,6 @@ func TestConfigurationHandler(t *testing.T) {
 }
 
 func TestHandlerWebhook(t *testing.T) {
-	homeDir := path.Join("..", "..", "test", "results", "home")
-	err := os.MkdirAll(homeDir, os.ModePerm)
-	if err != nil {
-		t.Fatalf("error %s when creating %s dir", err, homeDir)
-	}
-	defer func() {
-		err = os.RemoveAll(homeDir) // cleanup when done
-		if err != nil {
-			t.Fatalf("error %s when removing %s dir", err, homeDir)
-		}
-	}()
-
-	dataDir := path.Join("..", "..", "test", "results", "data")
-	err = os.MkdirAll(dataDir, os.ModePerm)
-	if err != nil {
-		t.Fatalf("error %s when creating %s dir", err, dataDir)
-	}
-	defer func() {
-		err = os.RemoveAll(dataDir) // cleanup when done
-		if err != nil {
-			t.Fatalf("error %s when removing %s dir", err, dataDir)
-		}
-	}()
-
-	// Create key dir
-	keyDir := path.Join("..", "..", "test", "results", "keys")
-	err = os.MkdirAll(keyDir, os.ModePerm)
-	if err != nil {
-		t.Fatalf("error %s when creating %s dir", err, keyDir)
-	}
-	defer func() {
-		err = os.RemoveAll(keyDir) // cleanup when done
-		if err != nil {
-			t.Fatalf("error %s when removing %s dir", err, keyDir)
-		}
-	}()
-
-	// Generate a key pair
-	privateKeyFilename := path.Join(keyDir, "qaas")
-	publicKeyFilename := path.Join(keyDir, "qaas.pub")
-	err = generateKeyPair(privateKeyFilename, publicKeyFilename)
-	if err != nil {
-		t.Errorf("Expected no error, but got '%+v'", err.Error())
-		return
-	}
-
 	cases := []struct {
 		method           string
 		payloadURL       string
@@ -340,6 +312,25 @@ func TestHandlerWebhook(t *testing.T) {
 		},
 	}
 
+	keyDir := path.Join("..", "..", "test", "results", "keys")
+	testConfig := testConfiguration{
+		homeDir:            path.Join("..", "..", "test", "results", "home"),
+		dataDir:            path.Join("..", "..", "test", "results", "data"),
+		keyDir:             keyDir,
+		privateKeyFilename: path.Join(keyDir, "qaas"),
+		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+	}
+
+	err := setupTestCase(testConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := teardownTestCase(testConfig); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
 	for _, c := range cases {
 
 		db, mock, err := sqlmock.New()
@@ -354,15 +345,15 @@ func TestHandlerWebhook(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                   dataDir,
-			HomeDir:                   homeDir,
+			DataDir:                   testConfig.dataDir,
+			HomeDir:                   testConfig.homeDir,
 			RelayNode:                 "relaynode.dccn.nl",
 			RelayNodeTestUser:         c.username,
 			RelayNodeTestUserPassword: "somepassword",
 			QaasHost:                  "qaas.dccn.nl",
 			QaasPort:                  "5111",
-			PrivateKeyFilename:        privateKeyFilename,
-			PublicKeyFilename:         publicKeyFilename,
+			PrivateKeyFilename:        testConfig.privateKeyFilename,
+			PublicKeyFilename:         testConfig.publicKeyFilename,
 		}
 
 		app := &api
