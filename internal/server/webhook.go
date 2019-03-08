@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 )
@@ -85,4 +86,86 @@ func parseWebhookRequest(req *http.Request) (*Webhook, string, error) {
 	}
 
 	return webhook, webhookID, err
+}
+
+// WebhookHandler handles a HTTP POST request containing the webhook payload in its body
+func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
+	// Parse and validate the request
+	_, webhookID, err := parseWebhookRequest(req)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Check if webhookID exists
+	groupname, username, err := checkWebhookID(a.DB, webhookID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Parse the webhook payload
+	var payload []byte
+	payload, err = parseWebhookPayload(req)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Create the payload dir
+	payloadDir := path.Join(a.DataDir, "payloads", username)
+	err = os.MkdirAll(payloadDir, os.ModePerm)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Write the payload to file
+	err = writeWebhookPayloadToFile(payloadDir, payload, username)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Prepare the execution of the script
+	payloadFilename := path.Join(payloadDir, "payload")
+	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID)
+	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
+	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID, "script.sh")
+
+	executeConfig := executeConfiguration{
+		privateKeyFilename:     a.PrivateKeyFilename,
+		payloadFilename:        payloadFilename,
+		targetPayloadDir:       targetPayloadDir,
+		targetPayloadFilename:  targetPayloadFilename,
+		userScriptPathFilename: userScriptPathFilename,
+		username:               username,
+		groupname:              groupname,
+		password:               a.RelayNodeTestUserPassword,
+		relayNodeName:          a.RelayNode,
+		dataDir:                a.DataDir,
+		homeDir:                a.HomeDir,
+		webhookID:              webhookID,
+		payload:                payload,
+	}
+
+	// Execute the script
+	if err := ExecuteScript(a.Connector, executeConfig); err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Succes
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "Webhook handled successfully")
+	return
 }
