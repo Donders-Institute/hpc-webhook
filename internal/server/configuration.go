@@ -22,7 +22,7 @@ type ConfigurationResponse struct {
 
 // ConfigurationListResponse contains thelist of regstered webhooks for a certain user
 type ConfigurationListResponse struct {
-	Webhooks string `json:"webhooks"`
+	Webhooks []Item `json:"webhooks"`
 }
 
 // ConfigurationDeleteResponse contains the webhook that has been deleted
@@ -209,11 +209,9 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	fmt.Printf("%+v\n", list)
-
 	// Succes
 	configurationListResponse := ConfigurationListResponse{
-		Webhooks: "",
+		Webhooks: list,
 	}
 	js, err := json.Marshal(configurationListResponse)
 	if err != nil {
@@ -224,6 +222,7 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
+	fmt.Printf("%+v\n", string(js))
 	return
 }
 

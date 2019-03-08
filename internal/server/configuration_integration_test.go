@@ -238,7 +238,7 @@ func TestConfigurationListHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhooks":""}`,
+			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username"}]}`,
 			expectedResult: true, // No error
 		},
 		{

@@ -80,24 +80,24 @@ func deleteRow(db *sql.DB, hash string, groupname string, username string) error
 	return err
 }
 
-type item struct {
-	ID        int
-	Hash      string
-	Groupname string
-	Username  string
+type Item struct {
+	ID        int    `json:"-"` // Do not output this one
+	Hash      string `json:"hash"`
+	Groupname string `json:"groupname"`
+	Username  string `json:"username"`
 }
 
 // Find the rows with a specific hash (should be 1)
-func getRow(db *sql.DB, hash string) ([]item, error) {
+func getRow(db *sql.DB, hash string) ([]Item, error) {
 	rows, err := db.Query("SELECT id, hash, groupname, username FROM qaas WHERE hash = $1", hash)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var list []item
+	var list []Item
 	for rows.Next() {
-		p := item{}
+		p := Item{}
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username); err != nil {
 			return nil, err
 		}
@@ -114,16 +114,16 @@ func getRow(db *sql.DB, hash string) ([]item, error) {
 }
 
 // Find the rows for a specific groupname, username
-func getListRows(db *sql.DB, groupname string, username string) ([]item, error) {
+func getListRows(db *sql.DB, groupname string, username string) ([]Item, error) {
 	rows, err := db.Query("SELECT id, hash, groupname, username FROM qaas groupname = $1, username = $2", groupname, username)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var list []item
+	var list []Item
 	for rows.Next() {
-		p := item{}
+		p := Item{}
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username); err != nil {
 			return nil, err
 		}

@@ -66,7 +66,7 @@ func TestDeleteRow(t *testing.T) {
 }
 
 func TestGetRow(t *testing.T) {
-	var list []item
+	var list []Item
 	var err error
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -81,7 +81,7 @@ func TestGetRow(t *testing.T) {
 	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).AddRow(1, hash, expectedGroupname, expectedUsername)
 	mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").WithArgs(hash).WillReturnRows(expectedRows)
 
-	listExpected := []item{
+	listExpected := []Item{
 		{
 			ID:        1,
 			Hash:      hash,
@@ -105,7 +105,7 @@ func TestGetRow(t *testing.T) {
 }
 
 func TestGetListRows(t *testing.T) {
-	var list []item
+	var list []Item
 	var err error
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -125,7 +125,7 @@ func TestGetListRows(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").WithArgs(expectedGroupname1, expectedUsername1).WillReturnRows(expectedRows)
 
-	listExpected := []item{
+	listExpected := []Item{
 		{
 			ID:        1,
 			Hash:      hash1,
