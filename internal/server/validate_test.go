@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestValidConfigurationURLPath(t *testing.T) {
+func TestValidConfigurationAddURLPath(t *testing.T) {
 	cases := []struct {
 		urlPath        string
 		expectedResult bool
@@ -28,7 +28,112 @@ func TestValidConfigurationURLPath(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		result := isValidConfigurationURLPath(c.urlPath)
+		result := isValidConfigurationAddURLPath(c.urlPath)
+		if result != c.expectedResult {
+			if c.expectedResult {
+				t.Errorf("Expected valid url path '%s', but got invalid url path", c.urlPath)
+			} else {
+				t.Errorf("Expected invalid url path '%s', but got valid url path", c.urlPath)
+			}
+		}
+	}
+}
+
+func TestValidConfigurationInfoURLPath(t *testing.T) {
+	cases := []struct {
+		urlPath        string
+		expectedResult bool
+	}{
+		{
+			urlPath:        "/configuration/550e8400-e29b-41d4-a716-446655440001",
+			expectedResult: true, // Valid configuration URL path, no error
+		},
+		{
+			urlPath:        "/configuration/550e8400-e29b-41d4-a716",
+			expectedResult: false, // Invalid hash
+		},
+		{
+			urlPath:        "/configuration/nonexisting",
+			expectedResult: false, // Invalid configuration URL path
+		},
+		{
+			urlPath:        "/nonexisting/550e8400-e29b-41d4-a716-446655440001",
+			expectedResult: false, // Invalid configuration URL path
+		},
+	}
+
+	for _, c := range cases {
+		result := isValidConfigurationInfoURLPath(c.urlPath)
+		if result != c.expectedResult {
+			if c.expectedResult {
+				t.Errorf("Expected valid url path '%s', but got invalid url path", c.urlPath)
+			} else {
+				t.Errorf("Expected invalid url path '%s', but got valid url path", c.urlPath)
+			}
+		}
+	}
+}
+
+func TestValidConfigurationListURLPath(t *testing.T) {
+	cases := []struct {
+		urlPath        string
+		expectedResult bool
+	}{
+		{
+			urlPath:        "/configuration",
+			expectedResult: true, // Valid configuration URL path, no error
+		},
+		{
+			urlPath:        "/configuration/",
+			expectedResult: false, // Invalid configuration URL path
+		},
+		{
+			urlPath:        "/configuration/nonexisting",
+			expectedResult: false, // Invalid configuration URL path
+		},
+		{
+			urlPath:        "/nonexisting/",
+			expectedResult: false, // Invalid configuration URL path
+		},
+	}
+
+	for _, c := range cases {
+		result := isValidConfigurationListURLPath(c.urlPath)
+		if result != c.expectedResult {
+			if c.expectedResult {
+				t.Errorf("Expected valid url path '%s', but got invalid url path", c.urlPath)
+			} else {
+				t.Errorf("Expected invalid url path '%s', but got valid url path", c.urlPath)
+			}
+		}
+	}
+}
+
+func TestValidConfigurationDeleteURLPath(t *testing.T) {
+	cases := []struct {
+		urlPath        string
+		expectedResult bool
+	}{
+		{
+			urlPath:        "/configuration/550e8400-e29b-41d4-a716-446655440001",
+			expectedResult: true, // Valid configuration URL path, no error
+		},
+		{
+			urlPath:        "/configuration/550e8400-e29b-41d4-a716",
+			expectedResult: false, // Invalid chas
+		},
+		{
+			urlPath:        "/configuration/nonexisting",
+			expectedResult: false, // Invalid configuration URL path
+		},
+		{
+			urlPath:        "/nonexisting/550e8400-e29b-41d4-a716-446655440001",
+			expectedResult: false, // Invalid configuration URL path
+		},
+	}
+
+	for _, c := range cases {
+		result := isValidConfigurationDeleteURLPath(c.urlPath)
 		if result != c.expectedResult {
 			if c.expectedResult {
 				t.Errorf("Expected valid url path '%s', but got invalid url path", c.urlPath)

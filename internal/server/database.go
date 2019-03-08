@@ -115,7 +115,7 @@ func getRow(db *sql.DB, hash string) ([]Item, error) {
 
 // Find the rows for a specific groupname, username
 func getListRows(db *sql.DB, groupname string, username string) ([]Item, error) {
-	rows, err := db.Query("SELECT id, hash, groupname, username FROM qaas groupname = $1, username = $2", groupname, username)
+	rows, err := db.Query("SELECT id, hash, groupname, username FROM qaas WHERE groupname = $1, username = $2", groupname, username)
 	if err != nil {
 		return nil, err
 	}

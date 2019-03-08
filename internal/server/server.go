@@ -21,11 +21,23 @@ type API struct {
 	PublicKeyFilename         string
 }
 
-// WebhookPath is the first part of the webhook payload URL
+// WebhookPath is the first part of the webhook payload URL [POST]
 const WebhookPath = "/webhook/"
 
-// ConfigurationPath is the URL path to add a new webhook
+// ConfigurationPath is the basic URL path for configuring the qaas server
 const ConfigurationPath = "/configuration"
+
+// ConfigurationAddPath is the URL path to add a new webhook [PUT]
+const ConfigurationAddPath = "/configuration"
+
+// ConfigurationListPath is the URL path to list all webhook for a certain user [GET]
+const ConfigurationListPath = "/configuration"
+
+// ConfigurationInfoPath is the URL path to get detailed information about a certain webhook [GET]
+const ConfigurationInfoPath = "/configuration/{webhook}"
+
+// ConfigurationDeletePath is the URL path to delete a certain webhook [DELETE]
+const ConfigurationDeletePath = "/configuration/{webhook}"
 
 // RunsWithinContainer checks if the program runs in a Docker container or not
 func RunsWithinContainer() bool {

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Donders-Institute/hpc-qaas/internal/server"
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
@@ -72,11 +73,16 @@ func main() {
 
 	app := &api
 
+	r := mux.NewRouter()
+
 	// Handle external webhook payloads
-	http.HandleFunc(server.WebhookPath, app.WebhookHandler)
+	r.HandleFunc(server.WebhookPath, app.WebhookHandler).Methods("POST")
 
 	// Handle internal webhook configuration payloads
-	http.HandleFunc(server.ConfigurationPath, app.ConfigurationHandler)
+	r.HandleFunc(server.ConfigurationAddPath, app.ConfigurationAddHandler).Methods("PUT")
+	r.HandleFunc(server.ConfigurationInfoPath, app.ConfigurationInfoHandler).Methods("GET")
+	r.HandleFunc(server.ConfigurationListPath, app.ConfigurationListHandler).Methods("GET")
+	r.HandleFunc(server.ConfigurationDeletePath, app.ConfigurationDeleteHandler).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(address, nil))
 }

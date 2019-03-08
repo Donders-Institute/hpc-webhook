@@ -20,7 +20,12 @@ type ConfigurationResponse struct {
 	Webhook string `json:"webhook"`
 }
 
-// ConfigurationListResponse contains thelist of regstered webhooks for a certain user
+// ConfigurationInfoResponse contains the detailed information about a specific webhook
+type ConfigurationInfoResponse struct {
+	Webhook Item `json:"webhook"`
+}
+
+// ConfigurationListResponse contains the list of regstered webhooks for a certain user
 type ConfigurationListResponse struct {
 	Webhooks []Item `json:"webhooks"`
 }
@@ -30,7 +35,7 @@ type ConfigurationDeleteResponse struct {
 	Webhook string `json:"webhook"`
 }
 
-func parseConfigurationRequest(req *http.Request) (ConfigurationRequest, error) {
+func parseConfigurationAddRequest(req *http.Request) (ConfigurationRequest, error) {
 	var configuration ConfigurationRequest
 	var err error
 
@@ -40,7 +45,38 @@ func parseConfigurationRequest(req *http.Request) (ConfigurationRequest, error) 
 	}
 
 	// Check the URL path
-	if !isValidConfigurationURLPath(req.URL.Path) {
+	if !isValidConfigurationAddURLPath(req.URL.Path) {
+		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
+	}
+
+	// Obtain the configuration
+	decoder := json.NewDecoder(req.Body)
+	err = decoder.Decode(&configuration)
+	if err != nil {
+		return configuration, errors.New("invalid JSON body")
+	}
+
+	// Validate the configuration
+	validateHash := true
+	err = validateConfigurationRequest(configuration, validateHash)
+	if err != nil {
+		return configuration, err
+	}
+
+	return configuration, err
+}
+
+func parseConfigurationInfoRequest(req *http.Request) (ConfigurationRequest, error) {
+	var configuration ConfigurationRequest
+	var err error
+
+	// Check method
+	if !strings.EqualFold(req.Method, "GET") {
+		return configuration, fmt.Errorf("invalid method '%s'", req.Method)
+	}
+
+	// Check the URL path
+	if !isValidConfigurationInfoURLPath(req.URL.Path) {
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
 	}
 
@@ -71,7 +107,7 @@ func parseConfigurationListRequest(req *http.Request) (ConfigurationRequest, err
 	}
 
 	// Check the URL path
-	if !isValidConfigurationURLPath(req.URL.Path) {
+	if !isValidConfigurationListURLPath(req.URL.Path) {
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
 	}
 
@@ -102,7 +138,7 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 	}
 
 	// Check the URL path
-	if !isValidConfigurationURLPath(req.URL.Path) {
+	if !isValidConfigurationDeleteURLPath(req.URL.Path) {
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
 	}
 
@@ -123,29 +159,11 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 	return configuration, err
 }
 
-// ConfigurationHandler handles a webhook registration HTTP PUT request
-// with the hash and username in its body
-func (a *API) ConfigurationHandler(w http.ResponseWriter, req *http.Request) {
-	switch method := req.Method; method {
-	case "PUT":
-		a.ConfigurationAddHandler(w, req)
-	case "GET":
-		a.ConfigurationListHandler(w, req)
-	case "DELETE":
-		a.ConfigurationDeleteHandler(w, req)
-	default:
-		w.WriteHeader(http.StatusNotFound)
-		err := fmt.Errorf("invalid method '%s'", req.Method)
-		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		return
-	}
-}
-
 // ConfigurationAddHandler handles a HTTP PUT request
 // to register a certain webhook with hash, groupname, and username in its body
 func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) {
 	// Parse and validate the request
-	configuration, err := parseConfigurationRequest(req)
+	configuration, err := parseConfigurationAddRequest(req)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -185,6 +203,45 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
+	return
+}
+
+// ConfigurationInfoHandler handles a HTTP GET request
+// to obtain detailed information about a specific webhook
+func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request) {
+	// Parse and validate the request
+	configuration, err := parseConfigurationInfoRequest(req)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+
+	// Get the item
+	list, err := getRow(a.DB, configuration.Hash)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Println(err)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+	item := list[0]
+
+	// Succes
+	configurationInfoResponse := ConfigurationInfoResponse{
+		Webhook: item,
+	}
+	js, err := json.Marshal(configurationInfoResponse)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+	fmt.Printf("%+v\n", string(js))
 	return
 }
 

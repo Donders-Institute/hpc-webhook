@@ -78,8 +78,10 @@ func TestGetRow(t *testing.T) {
 
 	expectedGroupname := "dccngroup"
 	expectedUsername := "dccnuser"
-	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).AddRow(1, hash, expectedGroupname, expectedUsername)
-	mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").WithArgs(hash).WillReturnRows(expectedRows)
+	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).
+		AddRow(1, hash, expectedGroupname, expectedUsername)
+
+	mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas WHERE").WithArgs(hash).WillReturnRows(expectedRows)
 
 	listExpected := []Item{
 		{
