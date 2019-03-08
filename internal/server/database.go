@@ -80,6 +80,7 @@ func deleteRow(db *sql.DB, hash string, groupname string, username string) error
 	return err
 }
 
+// Item corresponds to a row in the qaas database
 type Item struct {
 	ID        int    `json:"-"` // Do not output this one
 	Hash      string `json:"hash"`
