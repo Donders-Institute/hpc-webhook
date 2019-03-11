@@ -26,7 +26,10 @@ import (
 
 // WebhookInfo is a data structure containing the information (and/or attributes) of a webhook.
 type WebhookInfo struct {
-	ID string
+	ID           string
+	Description  string
+	CreationTime string
+	WebhookURL   url.URL
 }
 
 // Webhook provides client interfaces for managing webhook registry on the QaaS server, using the RESTful interface.
@@ -118,7 +121,13 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 func (s *Webhook) List() (chan WebhookInfo, error) {
 
 	// get current user
-	user, err := user.Current()
+	cuser, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+
+	// get current user's primary group
+	cgroup, err := user.LookupGroupId(cuser.Gid)
 	if err != nil {
 		return nil, err
 	}
@@ -134,13 +143,46 @@ func (s *Webhook) List() (chan WebhookInfo, error) {
 	wg.Add(nworkers)
 
 	for i := 0; i < nworkers; i++ {
-		go func() {
+		go func(userName, userGroupName string) {
 			for id := range chanWebhookID {
 				// TODO: call httpGetJSON to retrieve information from the server.
-				chanWebhookInfo <- WebhookInfo{ID: id}
+				myURL := url.URL{
+					Scheme: "https",
+					Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+					Path:   server.ConfigurationPath,
+				}
+				var response server.ConfigurationInfoResponse
+
+				httpCode, err := s.httpGetJSON(&myURL,
+					server.ConfigurationRequest{
+						Hash:        id,
+						Groupname:   userGroupName,
+						Username:    userName,
+						Script:      "",
+						Description: "",
+						Created:     time.Now().Format(time.RFC3339),
+					},
+					&response)
+
+				log.Debugf("response data: %+v", response)
+
+				if err != nil || httpCode != 200 {
+					log.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
+				}
+
+				chanWebhookInfo <- WebhookInfo{
+					ID:           response.Webhook.Hash,
+					Description:  response.Webhook.Description,
+					CreationTime: response.Webhook.Created,
+					WebhookURL: url.URL{
+						Scheme: "https",
+						Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+						Path:   path.Join(server.WebhookPath, response.Webhook.Hash),
+					},
+				}
 			}
 			wg.Done()
-		}()
+		}(cuser.Username, cgroup.Name)
 	}
 
 	// go routine feeding webhook ids to chanWebhookID, and wait for all local webhook ids are visited to get webhookInfo
@@ -149,7 +191,7 @@ func (s *Webhook) List() (chan WebhookInfo, error) {
 		//
 		// - the item is a directory
 		// - the name of the item can be passed by uuid.Parse() function
-		if items, err := ioutil.ReadDir(path.Join(user.HomeDir, ".qaas")); err == nil {
+		if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, ".qaas")); err == nil {
 			for _, f := range items {
 				if !f.IsDir() {
 					continue
@@ -197,7 +239,7 @@ func (s *Webhook) Delete(id string, removeDir bool) error {
 		Path:   path.Join(server.ConfigurationPath, id),
 	}
 	var response server.ConfigurationResponse
-	httpCode, err := s.httpGetJSON(&myURL, &response)
+	httpCode, err := s.httpGetJSON(&myURL, nil, &response)
 	if err != nil {
 		return err
 	}
@@ -266,12 +308,32 @@ func (s *Webhook) httpPutJSON(url *url.URL, request interface{}, response interf
 }
 
 // httpGetJSON makes a HTTP GET request to the given url and returns unmarshals JSON response.
-func (s *Webhook) httpGetJSON(url *url.URL, response interface{}) (int, error) {
+func (s *Webhook) httpGetJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
+
 	c := s.newHTTPSClient()
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return 0, err
+
+	var req *http.Request
+
+	if request != nil {
+		// with JSON request body in the GET call
+		data, err := json.Marshal(request)
+		if err != nil {
+			return 0, err
+		}
+		req, err = http.NewRequest("GET", url.String(), bytes.NewReader(data))
+		if err != nil {
+			return 0, err
+		}
+		req.Header.Set("content-type", "application/json")
+	} else {
+		// without request body in the GET call
+		var err error
+		req, err = http.NewRequest("GET", url.String(), nil)
+		if err != nil {
+			return 0, err
+		}
 	}
+
 	req.Header.Set("content-type", "application/json")
 
 	// make HTTP GET call
