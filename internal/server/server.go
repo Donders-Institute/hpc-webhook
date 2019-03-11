@@ -21,8 +21,11 @@ type API struct {
 	PublicKeyFilename         string
 }
 
-// WebhookPath is the first part of the webhook payload URL [POST]
-const WebhookPath = "/webhook/"
+// WebhookPath is the basic part of the webhook payload URL
+const WebhookPath = "/webhook"
+
+// WebhookPostPath is the first part of the webhook payload URL [POST]
+const WebhookPostPath = "/webhook/{webhook}"
 
 // ConfigurationPath is the basic URL path for configuring the qaas server
 const ConfigurationPath = "/configuration"

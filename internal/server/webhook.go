@@ -29,7 +29,7 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 	if !strings.HasPrefix(path, WebhookPath) {
 		return "", fmt.Errorf("Invalid URL path '%s'", path)
 	}
-	webhookID := path[len(WebhookPath):]
+	webhookID := path[len(WebhookPath)+1:]
 	return webhookID, nil
 }
 

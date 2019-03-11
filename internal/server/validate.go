@@ -18,7 +18,7 @@ var validConfigurationListURLPathRegex = regexp.MustCompile(validConfigurationLi
 var validConfigurationDeleteURLPathRegexString = fmt.Sprintf(`^%s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, ConfigurationPath)
 var validConfigurationDeleteURLPathRegex = regexp.MustCompile(validConfigurationDeleteURLPathRegexString)
 
-var validURLPathRegexString = fmt.Sprintf(`^%s[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, WebhookPath)
+var validURLPathRegexString = fmt.Sprintf(`^%s/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, WebhookPath)
 var validURLPathRegex = regexp.MustCompile(validURLPathRegexString)
 
 var validWebhookIDRegex = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)

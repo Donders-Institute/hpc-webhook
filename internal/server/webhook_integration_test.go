@@ -63,91 +63,91 @@ func TestHandlerWebhook(t *testing.T) {
 			expectedString: "Webhook handled successfully",
 			expectedResult: true, // No error
 		},
-		// {
-		// 	method:           "POST",
-		// 	payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440002",
-		// 	hash:             "550e8400-e29b-41d4-a716-446655440002",
-		// 	username:         "dccnuser",
-		// 	groupname:        "dccngroup",
-		// 	script:           "script.sh",
-		// 	description:      "",
-		// 	created:          "2019-03-11 10:10:25",
-		// 	testDataFilename: path.Join("..", "..", "test", "data", "example-ifttt-webhook.json"),
-		// 	headerInfo: map[string]string{
-		// 		"Content-Type": "application/json; charset=utf-8",
-		// 	},
-		// 	expectedStatus: 200,
-		// 	expectedString: "Webhook handled successfully",
-		// 	expectedResult: true, // No error
-		// },
-		// {
-		// 	method:           "POST",
-		// 	payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440003",
-		// 	hash:             "550e8400-e29b-41d4-a716-446655440003",
-		// 	username:         "dccnuser",
-		// 	groupname:        "dccngroup",
-		// 	script:           "script.sh",
-		// 	description:      "",
-		// 	created:          "2019-03-11 10:10:25",
-		// 	testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
-		// 	headerInfo: map[string]string{
-		// 		"Content-Type": "application/json; charset=utf-8",
-		// 	},
-		// 	expectedStatus: 200,
-		// 	expectedString: "Webhook handled successfully",
-		// 	expectedResult: true, // No error
-		// },
-		// {
-		// 	method:           "POST",
-		// 	payloadURL:       "/webhook/550e8400-e29b-41d4-a716",
-		// 	hash:             "550e8400-e29b-41d4-a716",
-		// 	username:         "dccnuser",
-		// 	groupname:        "dccngroup",
-		// 	script:           "script.sh",
-		// 	description:      "",
-		// 	created:          "2019-03-11 10:10:25",
-		// 	testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
-		// 	headerInfo: map[string]string{
-		// 		"Content-Type": "application/json; charset=utf-8",
-		// 	},
-		// 	expectedStatus: 404,
-		// 	expectedString: `Error 404 - Not found: invalid URL path '/webhook/550e8400-e29b-41d4-a716'`,
-		// 	expectedResult: false, // Invalid webhook id
-		// },
-		// {
-		// 	method:           "POST",
-		// 	payloadURL:       "/wwwhook/550e8400-e29b-41d4-a716-446655440001",
-		// 	hash:             "550e8400-e29b-41d4-a716-446655440001",
-		// 	username:         "dccnuser",
-		// 	groupname:        "dccngroup",
-		// 	script:           "script.sh",
-		// 	description:      "",
-		// 	created:          "2019-03-11 10:10:25",
-		// 	testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
-		// 	headerInfo: map[string]string{
-		// 		"Content-Type": "application/json; charset=utf-8",
-		// 	},
-		// 	expectedStatus: 404,
-		// 	expectedString: `Error 404 - Not found: invalid URL path '/wwwhook/550e8400-e29b-41d4-a716-446655440001'`,
-		// 	expectedResult: false, // Invalid URL path
-		// },
-		// {
-		// 	method:           "GET",
-		// 	payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
-		// 	hash:             "550e8400-e29b-41d4-a716-446655440001",
-		// 	username:         "dccnuser",
-		// 	groupname:        "dccngroup",
-		// 	script:           "script.sh",
-		// 	description:      "",
-		// 	created:          "2019-03-11 10:10:25",
-		// 	testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
-		// 	headerInfo: map[string]string{
-		// 		"Content-Type": "application/json; charset=utf-8",
-		// 	},
-		// 	expectedStatus: 404,
-		// 	expectedString: `Error 404 - Not found: invalid method 'GET'`,
-		// 	expectedResult: false, // Invalid method
-		// },
+		{
+			method:           "POST",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440002",
+			hash:             "550e8400-e29b-41d4-a716-446655440002",
+			username:         "dccnuser",
+			groupname:        "dccngroup",
+			script:           "script.sh",
+			description:      "",
+			created:          "2019-03-11 10:10:25",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-ifttt-webhook.json"),
+			headerInfo: map[string]string{
+				"Content-Type": "application/json; charset=utf-8",
+			},
+			expectedStatus: 200,
+			expectedString: "Webhook handled successfully",
+			expectedResult: true, // No error
+		},
+		{
+			method:           "POST",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440003",
+			hash:             "550e8400-e29b-41d4-a716-446655440003",
+			username:         "dccnuser",
+			groupname:        "dccngroup",
+			script:           "script.sh",
+			description:      "",
+			created:          "2019-03-11 10:10:25",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
+			headerInfo: map[string]string{
+				"Content-Type": "application/json; charset=utf-8",
+			},
+			expectedStatus: 200,
+			expectedString: "Webhook handled successfully",
+			expectedResult: true, // No error
+		},
+		{
+			method:           "POST",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716",
+			hash:             "550e8400-e29b-41d4-a716",
+			username:         "dccnuser",
+			groupname:        "dccngroup",
+			script:           "script.sh",
+			description:      "",
+			created:          "2019-03-11 10:10:25",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
+			headerInfo: map[string]string{
+				"Content-Type": "application/json; charset=utf-8",
+			},
+			expectedStatus: 404,
+			expectedString: `Error 404 - Not found: invalid URL path '/webhook/550e8400-e29b-41d4-a716'`,
+			expectedResult: false, // Invalid webhook id
+		},
+		{
+			method:           "POST",
+			payloadURL:       "/wwwhook/550e8400-e29b-41d4-a716-446655440001",
+			hash:             "550e8400-e29b-41d4-a716-446655440001",
+			username:         "dccnuser",
+			groupname:        "dccngroup",
+			script:           "script.sh",
+			description:      "",
+			created:          "2019-03-11 10:10:25",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
+			headerInfo: map[string]string{
+				"Content-Type": "application/json; charset=utf-8",
+			},
+			expectedStatus: 404,
+			expectedString: `Error 404 - Not found: invalid URL path '/wwwhook/550e8400-e29b-41d4-a716-446655440001'`,
+			expectedResult: false, // Invalid URL path
+		},
+		{
+			method:           "GET",
+			payloadURL:       "/webhook/550e8400-e29b-41d4-a716-446655440001",
+			hash:             "550e8400-e29b-41d4-a716-446655440001",
+			username:         "dccnuser",
+			groupname:        "dccngroup",
+			script:           "script.sh",
+			description:      "",
+			created:          "2019-03-11 10:10:25",
+			testDataFilename: path.Join("..", "..", "test", "data", "example-zapier-webhook.json"),
+			headerInfo: map[string]string{
+				"Content-Type": "application/json; charset=utf-8",
+			},
+			expectedStatus: 404,
+			expectedString: `Error 404 - Not found: invalid method 'GET'`,
+			expectedResult: false, // Invalid method
+		},
 	}
 
 	keyDir := path.Join("..", "..", "test", "results", "keys")

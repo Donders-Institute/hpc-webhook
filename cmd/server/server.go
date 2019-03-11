@@ -76,7 +76,7 @@ func main() {
 	r := mux.NewRouter()
 
 	// Handle external webhook payloads
-	r.HandleFunc(server.WebhookPath, app.WebhookHandler).Methods("POST")
+	r.HandleFunc(server.WebhookPostPath, app.WebhookHandler).Methods("POST")
 
 	// Handle internal webhook configuration payloads
 	r.HandleFunc(server.ConfigurationAddPath, app.ConfigurationAddHandler).Methods("PUT")
@@ -84,5 +84,5 @@ func main() {
 	r.HandleFunc(server.ConfigurationListPath, app.ConfigurationListHandler).Methods("GET")
 	r.HandleFunc(server.ConfigurationDeletePath, app.ConfigurationDeleteHandler).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(address, nil))
+	log.Fatal(http.ListenAndServe(address, r))
 }

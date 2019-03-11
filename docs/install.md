@@ -28,6 +28,7 @@ and change the contents:
 QAAS_HOST=qaas.dccn.nl
 QAAS_PORT=5111
 HOME_DIR=/home
+DATA_DIR=/data
 PRIVATE_KEY_FILE=/run/secrets/qaas_private_key
 PUBLIC_KEY_FILE=/run/secrets/qaas_public_key
 
