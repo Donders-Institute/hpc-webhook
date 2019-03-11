@@ -17,7 +17,7 @@ func TestNewWebhook(t *testing.T) {
 
 	c := Webhook{
 		QaasHost:     "localhost",
-		QaasPort:     5111,
+		QaasPort:     443,
 		QaasCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/cert/TestServer.crt"),
 	}
 
@@ -35,7 +35,7 @@ func TestNewWebhook(t *testing.T) {
 func TestListWebhook(t *testing.T) {
 	c := Webhook{
 		QaasHost:     "localhost",
-		QaasPort:     5111,
+		QaasPort:     443,
 		QaasCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/cert/TestServer.crt"),
 	}
 

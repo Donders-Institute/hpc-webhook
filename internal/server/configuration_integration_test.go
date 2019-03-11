@@ -162,7 +162,8 @@ func TestConfigurationAddHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasPort:           "5111",
+			QaasInternalPort:   "443",
+			QaasExternalPort:   "5111",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
@@ -340,7 +341,8 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasPort:           "5111",
+			QaasInternalPort:   "443",
+			QaasExternalPort:   "5111",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
@@ -511,7 +513,8 @@ func TestConfigurationListHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasPort:           "5111",
+			QaasInternalPort:   "443",
+			QaasExternalPort:   "5111",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
@@ -681,7 +684,8 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasPort:           "5111",
+			QaasInternalPort:   "443",
+			QaasExternalPort:   "5111",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}

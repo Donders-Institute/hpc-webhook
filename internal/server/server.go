@@ -16,7 +16,8 @@ type API struct {
 	RelayNodeTestUser         string
 	RelayNodeTestUserPassword string
 	QaasHost                  string
-	QaasPort                  string
+	QaasInternalPort          string // Port for internal use
+	QaasExternalPort          string // Port for the outside world
 	PrivateKeyFilename        string
 	PublicKeyFilename         string
 }

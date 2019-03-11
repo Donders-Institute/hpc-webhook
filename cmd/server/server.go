@@ -14,8 +14,9 @@ import (
 func main() {
 	// Set Qaas server variables
 	qaasHost := os.Getenv("QAAS_HOST")
-	qaasPort := os.Getenv("QAAS_PORT")
-	address := fmt.Sprintf("%s:%s", qaasHost, qaasPort)
+	qaasExternalPort := os.Getenv("QAAS_EXTERNAL_PORT")
+	qaasInternalPort := os.Getenv("QAAS_INTERNAL_PORT")
+	address := fmt.Sprintf("%s:%s", qaasHost, qaasInternalPort)
 	homeDir := os.Getenv("HOME_DIR")
 	dataDir := os.Getenv("DATA_DIR")
 	privateKeyFilename := os.Getenv("PRIVATE_KEY_FILE")
@@ -36,7 +37,7 @@ func main() {
 	// Override settings if we run the server in a Docker container
 	if server.RunsWithinContainer() {
 		host = "db"
-		address = fmt.Sprintf("0.0.0.0:%s", qaasPort)
+		address = fmt.Sprintf("0.0.0.0:%s", qaasInternalPort)
 	}
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
@@ -60,7 +61,8 @@ func main() {
 		RelayNodeTestUser:         relayNodeTestUser,
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
 		QaasHost:                  qaasHost,
-		QaasPort:                  qaasPort,
+		QaasInternalPort:          qaasInternalPort,
+		QaasExtrenalPort:          qaasExternalPort,
 		PrivateKeyFilename:        privateKeyFilename,
 		PublicKeyFilename:         publicKeyFilename,
 	}
