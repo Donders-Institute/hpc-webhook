@@ -412,12 +412,12 @@ func TestConfigurationListHandler(t *testing.T) {
 				Username:    "username",
 				Description: "",
 			},
-			testData: `{"hash": "", "groupname": "groupname", "username": "username", description": ""}`,
+			testData: `{"hash": "", "groupname": "groupname", "username": "username", "description": ""}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440002"}]}`,
+			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:45:44+01:00","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440002"}]}`,
 			expectedResult: true, // No error
 		},
 		{
