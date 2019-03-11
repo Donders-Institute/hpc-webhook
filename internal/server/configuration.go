@@ -10,9 +10,12 @@ import (
 
 // ConfigurationRequest stores one row of webhook information
 type ConfigurationRequest struct {
-	Hash      string `json:"hash"`
-	Groupname string `json:"groupname"`
-	Username  string `json:"username"`
+	Hash        string `json:"hash"`
+	Groupname   string `json:"groupname"`
+	Username    string `json:"username"`
+	Script      string `json:"script"`
+	Description string `json:"description"`
+	Created     string `json:"created"`
 }
 
 // ConfigurationResponse contains the complete webhook payload URL
@@ -181,7 +184,13 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	}
 
 	// Add a row in the database
-	err = addRow(a.DB, configuration.Hash, configuration.Groupname, configuration.Username)
+	err = addRow(a.DB,
+		configuration.Hash,
+		configuration.Groupname,
+		configuration.Username,
+		configuration.Script,
+		configuration.Description,
+		configuration.Created)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)

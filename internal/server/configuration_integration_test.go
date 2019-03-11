@@ -71,11 +71,14 @@ func TestConfigurationAddHandler(t *testing.T) {
 			method:    "PUT",
 			configURL: "/configuration",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Script:      "script.sh",
+				Description: "description",
+				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -87,11 +90,14 @@ func TestConfigurationAddHandler(t *testing.T) {
 			method:    "PUT",
 			configURL: "/configuration/nonexisting",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Script:      "script.sh",
+				Description: "description",
+				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -103,11 +109,14 @@ func TestConfigurationAddHandler(t *testing.T) {
 			method:    "POST",
 			configURL: "/configuration",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Script:      "script.sh",
+				Description: "description",
+				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -175,12 +184,23 @@ func TestConfigurationAddHandler(t *testing.T) {
 		}
 
 		if c.expectedResult {
-			sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).
-				AddRow(1, c.configuration.Hash, c.configuration.Groupname, c.configuration.Username)
+			sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "script", "description", "created"}).
+				AddRow(1,
+					c.configuration.Hash,
+					c.configuration.Groupname,
+					c.configuration.Username,
+					c.configuration.Script,
+					c.configuration.Description,
+					c.configuration.Created)
 
 			mock.ExpectBegin()
 			mock.ExpectExec("INSERT INTO qaas").
-				WithArgs(c.configuration.Hash, c.configuration.Groupname, c.configuration.Username).
+				WithArgs(c.configuration.Hash,
+					c.configuration.Groupname,
+					c.configuration.Username,
+					c.configuration.Script,
+					c.configuration.Description,
+					c.configuration.Created).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()
 		}
@@ -229,27 +249,33 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			method:    "GET",
 			configURL: "/configuration/550e8400-e29b-41d4-a716-446655440001",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Script:      "script.sh",
+				Description: "description",
+				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username"}}`,
+			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","script":"script.sh","description":"description","created":"2019-03-11 10:10:25"}}`,
 			expectedResult: true, // No error
 		},
 		{
 			method:    "GET",
 			configURL: "/configuration/nonexisting",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Script:      "script.sh",
+				Description: "description",
+				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -261,11 +287,14 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			method:    "POST",
 			configURL: "/configuration/550e8400-e29b-41d4-a716-446655440001",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Script:      "script.sh",
+				Description: "description",
+				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -333,9 +362,16 @@ func TestConfigurationInfoHandler(t *testing.T) {
 		}
 
 		if c.expectedResult {
-			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).
-				AddRow(1, c.configuration.Hash, c.configuration.Groupname, c.configuration.Username)
-			mock.ExpectQuery("^SELECT id, hash, groupname, username FROM qaas").
+			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "script", "description", "created"}).
+				AddRow(1,
+					c.configuration.Hash,
+					c.configuration.Groupname,
+					c.configuration.Username,
+					c.configuration.Script,
+					c.configuration.Description,
+					c.configuration.Created,
+				)
+			mock.ExpectQuery("^SELECT id, hash, groupname, username, script, description, created FROM qaas").
 				WithArgs(c.configuration.Hash).
 				WillReturnRows(expectedRows)
 		}

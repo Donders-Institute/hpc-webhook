@@ -57,5 +57,11 @@ func validateConfigurationRequest(conf ConfigurationRequest, validateHash bool) 
 	if conf.Groupname == "" {
 		return errors.New("invalid configuration request: groupname missing")
 	}
+	if conf.Script == "" {
+		return errors.New("invalid configuration request: script missing")
+	}
+	if conf.Created == "" {
+		return errors.New("invalid configuration request: created missing")
+	}
 	return nil
 }

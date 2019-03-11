@@ -40,6 +40,7 @@ type Webhook struct {
 func (s *Webhook) New(script string) (*url.URL, error) {
 
 	// check existence of the script, and it's type.
+	scriptBase := filepath.Base(script)
 	scriptAbs, err := filepath.Abs(script)
 	if err != nil {
 		return nil, err
@@ -87,7 +88,16 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	httpCode, err := s.httpPutJSON(&myURL, server.ConfigurationRequest{Username: cuser.Username, Groupname: cgroup.Name, Hash: id}, &response)
+	httpCode, err := s.httpPutJSON(&myURL,
+		server.ConfigurationRequest{
+			Hash:        id,
+			Groupname:   cgroup.Name,
+			Username:    cuser.Username,
+			Script:      scriptBase,
+			Description: "",
+			Created:     time.Now().Format(time.RFC3339),
+		},
+		&response)
 
 	log.Debugf("response data: %+v", response)
 
@@ -251,7 +261,7 @@ func (s *Webhook) httpGetJSON(url *url.URL, response interface{}) (int, error) {
 	}
 	req.Header.Set("content-type", "application/json")
 
-	// make HTTP DELETE call
+	// make HTTP GET call
 	rsp, err := c.Do(req)
 	if err != nil {
 		return 0, err
