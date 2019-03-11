@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +12,14 @@ import (
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 )
+
+type AnyTimeString struct{}
+
+// Match satisfies sqlmock.Argument interface
+func (a AnyTimeString) Match(v driver.Value) bool {
+	_, ok := v.(string)
+	return ok
+}
 
 type testConfiguration struct {
 	homeDir            string
@@ -193,7 +202,7 @@ func TestConfigurationAddHandler(t *testing.T) {
 					c.configuration.Groupname,
 					c.configuration.Username,
 					c.configuration.Description,
-					"2019-03-11T19:44:44+01:00").
+					AnyTimeString{}).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()
 		}
@@ -247,12 +256,12 @@ func TestConfigurationInfoHandler(t *testing.T) {
 				Username:    "username",
 				Description: "description",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", description": "description"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username",description":"description"}}`,
+			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"description","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440001"}}`,
 			expectedResult: true, // No error
 		},
 		{
