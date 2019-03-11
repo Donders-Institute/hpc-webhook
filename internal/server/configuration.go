@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // ConfigurationRequest stores one row of webhook information
@@ -13,9 +14,7 @@ type ConfigurationRequest struct {
 	Hash        string `json:"hash"`
 	Groupname   string `json:"groupname"`
 	Username    string `json:"username"`
-	Script      string `json:"script"`
 	Description string `json:"description"`
-	Created     string `json:"created"`
 }
 
 // ConfigurationResponse contains the complete webhook payload URL
@@ -61,9 +60,7 @@ func parseConfigurationAddRequest(req *http.Request) (ConfigurationRequest, erro
 
 	// Validate the configuration
 	validateHash := true
-	validateScript := true
-	validateCreated := true
-	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -94,9 +91,7 @@ func parseConfigurationInfoRequest(req *http.Request) (ConfigurationRequest, err
 
 	// Validate the configuration
 	validateHash := true
-	validateScript := false
-	validateCreated := false
-	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -127,9 +122,7 @@ func parseConfigurationListRequest(req *http.Request) (ConfigurationRequest, err
 
 	// Validate the configuration
 	validateHash := false
-	validateScript := false
-	validateCreated := false
-	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -160,9 +153,7 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 
 	// Validate the configuration
 	validateHash := true
-	validateScript := false
-	validateCreated := false
-	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
+	err = validateConfigurationRequest(configuration, validateHash)
 	if err != nil {
 		return configuration, err
 	}
@@ -196,9 +187,8 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 		configuration.Hash,
 		configuration.Groupname,
 		configuration.Username,
-		configuration.Script,
 		configuration.Description,
-		configuration.Created)
+		time.Now().Format(time.RFC3339))
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -236,7 +226,7 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the item
-	list, err := getRow(a.DB, configuration.Hash)
+	list, err := getRow(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Hash)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -275,7 +265,7 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the list of webhooks
-	list, err := getListRows(a.DB, configuration.Groupname, configuration.Username)
+	list, err := getListRows(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Groupname, configuration.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)

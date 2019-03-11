@@ -33,9 +33,9 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 	return webhookID, nil
 }
 
-// Check if the webhook id exists. Return the unsername
-func checkWebhookID(db *sql.DB, webhookID string) (string, string, error) {
-	list, err := getRow(db, webhookID)
+// Check if the webhook id exists. Return the username
+func checkWebhookID(db *sql.DB, qaasHost string, qaasExternalPort string, webhookID string) (string, string, error) {
+	list, err := getRow(db, qaasHost, qaasExternalPort, webhookID)
 	if err != nil || len(list) == 0 {
 		return "", "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
 	}
@@ -100,7 +100,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if webhookID exists
-	groupname, username, err := checkWebhookID(a.DB, webhookID)
+	groupname, username, err := checkWebhookID(a.DB, a.QaasHost, a.QaasExternalPort, webhookID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)

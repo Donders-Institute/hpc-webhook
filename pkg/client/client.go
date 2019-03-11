@@ -42,8 +42,7 @@ type Webhook struct {
 // New provisions a new webhook for QaaS and registry the new webhook at the QaaS server.
 func (s *Webhook) New(script string) (*url.URL, error) {
 
-	// check existence of the script, and it's type.
-	scriptBase := filepath.Base(script)
+	// check existence of the script and its type.
 	scriptAbs, err := filepath.Abs(script)
 	if err != nil {
 		return nil, err
@@ -96,9 +95,7 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 			Hash:        id,
 			Groupname:   cgroup.Name,
 			Username:    cuser.Username,
-			Script:      scriptBase,
 			Description: "",
-			Created:     time.Now().Format(time.RFC3339),
 		},
 		&response)
 
@@ -158,9 +155,7 @@ func (s *Webhook) List() (chan WebhookInfo, error) {
 						Hash:        id,
 						Groupname:   userGroupName,
 						Username:    userName,
-						Script:      "",
 						Description: "",
-						Created:     time.Now().Format(time.RFC3339),
 					},
 					&response)
 
@@ -263,9 +258,7 @@ func (s *Webhook) Delete(id string, removeDir bool) error {
 			Hash:        id,
 			Groupname:   cgroup.Name,
 			Username:    cuser.Username,
-			Script:      "",
 			Description: "",
-			Created:     "",
 		})
 	if httpCode != 200 {
 		return fmt.Errorf("fail to delete webhook %s: %+v (HTTP CODE: %d)", id, err, httpCode)

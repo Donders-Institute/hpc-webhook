@@ -14,8 +14,8 @@ import (
 func main() {
 	// Set Qaas server variables
 	qaasHost := os.Getenv("QAAS_HOST")
-	qaasExternalPort := os.Getenv("QAAS_EXTERNAL_PORT")
 	qaasInternalPort := os.Getenv("QAAS_INTERNAL_PORT")
+	qaasExternalPort := os.Getenv("QAAS_EXTERNAL_PORT")
 	address := fmt.Sprintf("%s:%s", qaasHost, qaasInternalPort)
 	homeDir := os.Getenv("HOME_DIR")
 	dataDir := os.Getenv("DATA_DIR")

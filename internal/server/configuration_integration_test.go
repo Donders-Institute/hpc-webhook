@@ -74,11 +74,9 @@ func TestConfigurationAddHandler(t *testing.T) {
 				Hash:        "550e8400-e29b-41d4-a716-446655440001",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "script.sh",
 				Description: "description",
-				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -93,11 +91,9 @@ func TestConfigurationAddHandler(t *testing.T) {
 				Hash:        "550e8400-e29b-41d4-a716-446655440001",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "script.sh",
 				Description: "description",
-				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -112,11 +108,9 @@ func TestConfigurationAddHandler(t *testing.T) {
 				Hash:        "550e8400-e29b-41d4-a716-446655440001",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "script.sh",
 				Description: "description",
-				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -185,23 +179,21 @@ func TestConfigurationAddHandler(t *testing.T) {
 		}
 
 		if c.expectedResult {
-			sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "script", "description", "created"}).
+			sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
 				AddRow(1,
 					c.configuration.Hash,
 					c.configuration.Groupname,
 					c.configuration.Username,
-					c.configuration.Script,
 					c.configuration.Description,
-					c.configuration.Created)
+					"2019-03-11T19:44:44+01:00")
 
 			mock.ExpectBegin()
 			mock.ExpectExec("INSERT INTO qaas").
 				WithArgs(c.configuration.Hash,
 					c.configuration.Groupname,
 					c.configuration.Username,
-					c.configuration.Script,
 					c.configuration.Description,
-					c.configuration.Created).
+					"2019-03-11T19:44:44+01:00").
 				WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()
 		}
@@ -253,16 +245,14 @@ func TestConfigurationInfoHandler(t *testing.T) {
 				Hash:        "550e8400-e29b-41d4-a716-446655440001",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "script.sh",
 				Description: "description",
-				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","script":"script.sh","description":"description","created":"2019-03-11 10:10:25"}}`,
+			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username",description":"description"}}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -272,11 +262,9 @@ func TestConfigurationInfoHandler(t *testing.T) {
 				Hash:        "550e8400-e29b-41d4-a716-446655440001",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "script.sh",
 				Description: "description",
-				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -291,11 +279,9 @@ func TestConfigurationInfoHandler(t *testing.T) {
 				Hash:        "550e8400-e29b-41d4-a716-446655440001",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "script.sh",
 				Description: "description",
-				Created:     "2019-03-11 10:10:25",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "script": "script.sh", "description": "description", "created": "2019-03-11 10:10:25"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -364,16 +350,15 @@ func TestConfigurationInfoHandler(t *testing.T) {
 		}
 
 		if c.expectedResult {
-			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "script", "description", "created"}).
+			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
 				AddRow(1,
 					c.configuration.Hash,
 					c.configuration.Groupname,
 					c.configuration.Username,
-					c.configuration.Script,
 					c.configuration.Description,
-					c.configuration.Created,
+					"2019-03-11T19:44:44+01:00",
 				)
-			mock.ExpectQuery("^SELECT id, hash, groupname, username, script, description, created FROM qaas").
+			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
 				WithArgs(c.configuration.Hash).
 				WillReturnRows(expectedRows)
 		}
@@ -425,16 +410,14 @@ func TestConfigurationListHandler(t *testing.T) {
 				Hash:        "",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "",
 				Description: "",
-				Created:     "",
 			},
-			testData: `{"hash": "", "groupname": "groupname", "username": "username", "script": "", "description": "", "created": ""}`,
+			testData: `{"hash": "", "groupname": "groupname", "username": "username", description": ""}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","script":"","description":"","created":""},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","script":"","description":"","created":""}]}`,
+			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440002"}]}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -444,11 +427,9 @@ func TestConfigurationListHandler(t *testing.T) {
 				Hash:        "",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "",
 				Description: "",
-				Created:     "",
 			},
-			testData: `{"hash": "", "groupname": "groupname", "username": "username", "script": "", "description": "", "created": ""}`,
+			testData: `{"hash": "", "groupname": "groupname", "username": "username", "description": ""}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -463,11 +444,9 @@ func TestConfigurationListHandler(t *testing.T) {
 				Hash:        "",
 				Groupname:   "groupname",
 				Username:    "username",
-				Script:      "",
 				Description: "",
-				Created:     "",
 			},
-			testData: `{"hash": "", "groupname": "groupname", "username": "username", "script": "", "description": "", "created": ""}`,
+			testData: `{"hash": "", "groupname": "groupname", "username": "username", "description": ""}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -538,22 +517,20 @@ func TestConfigurationListHandler(t *testing.T) {
 		if c.expectedResult {
 			hash1 := "550e8400-e29b-41d4-a716-446655440001"
 			hash2 := "550e8400-e29b-41d4-a716-446655440002"
-			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "script", "description", "created"}).
+			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
 				AddRow(1,
 					hash1,
 					c.configuration.Groupname,
 					c.configuration.Username,
-					c.configuration.Script,
 					c.configuration.Description,
-					c.configuration.Created).
+					"2019-03-11T19:44:44+01:00").
 				AddRow(2,
 					hash2,
 					c.configuration.Groupname,
 					c.configuration.Username,
-					c.configuration.Script,
 					c.configuration.Description,
-					c.configuration.Created)
-			mock.ExpectQuery("^SELECT id, hash, groupname, username, script, description, created FROM qaas").
+					"2019-03-11T19:45:44+01:00")
+			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
 				WithArgs(c.configuration.Groupname, c.configuration.Username).
 				WillReturnRows(expectedRows)
 		}
@@ -602,9 +579,10 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			method:    "DELETE",
 			configURL: "/configuration/550e8400-e29b-41d4-a716-446655440001",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Description: "description",
 			},
 			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
 			headerInfo: map[string]string{
@@ -618,9 +596,10 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			method:    "DELETE",
 			configURL: "/configuration/nonexisting",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Description: "description",
 			},
 			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
 			headerInfo: map[string]string{
@@ -634,9 +613,10 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			method:    "POST",
 			configURL: "/configuration/550e8400-e29b-41d4-a716-446655440001",
 			configuration: ConfigurationRequest{
-				Hash:      "550e8400-e29b-41d4-a716-446655440001",
-				Groupname: "groupname",
-				Username:  "username",
+				Hash:        "550e8400-e29b-41d4-a716-446655440001",
+				Groupname:   "groupname",
+				Username:    "username",
+				Description: "description",
 			},
 			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
 			headerInfo: map[string]string{
@@ -709,9 +689,19 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 		if c.expectedResult {
 			hash1 := c.configuration.Hash
 			hash2 := "550e8400-e29b-41d4-a716-446655440002"
-			sqlmock.NewRows([]string{"id", "hash", "groupname", "username"}).
-				AddRow(1, c.configuration.Hash, c.configuration.Groupname, c.configuration.Username).
-				AddRow(2, hash2, c.configuration.Groupname, c.configuration.Username)
+			sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
+				AddRow(1,
+					c.configuration.Hash,
+					c.configuration.Groupname,
+					c.configuration.Username,
+					c.configuration.Description,
+					"2019-03-11T19:44:44+01:00").
+				AddRow(2,
+					hash2,
+					c.configuration.Groupname,
+					c.configuration.Username,
+					c.configuration.Description,
+					"2019-03-11T19:45:44+01:00")
 
 			mock.ExpectBegin()
 			mock.ExpectExec("DELETE FROM qaas").
