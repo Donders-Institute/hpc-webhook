@@ -47,7 +47,7 @@ func isValidWebhookID(webhookID string) bool {
 	return validWebhookIDRegex.MatchString(webhookID)
 }
 
-func validateConfigurationRequest(conf ConfigurationRequest, validateHash bool) error {
+func validateConfigurationRequest(conf ConfigurationRequest, validateHash bool, validateScript bool, validateCreated bool) error {
 	if validateHash && !isValidWebhookID(conf.Hash) {
 		return errors.New("invalid configuration request: invalid hash")
 	}
@@ -57,10 +57,10 @@ func validateConfigurationRequest(conf ConfigurationRequest, validateHash bool) 
 	if conf.Groupname == "" {
 		return errors.New("invalid configuration request: groupname missing")
 	}
-	if conf.Script == "" {
+	if validateScript && conf.Script == "" {
 		return errors.New("invalid configuration request: script missing")
 	}
-	if conf.Created == "" {
+	if validateCreated && conf.Created == "" {
 		return errors.New("invalid configuration request: created missing")
 	}
 	return nil
