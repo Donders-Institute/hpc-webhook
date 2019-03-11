@@ -158,7 +158,8 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Execute the script
-	if err := ExecuteScript(a.Connector, executeConfig); err != nil {
+	err = ExecuteScript(a.Connector, executeConfig)
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
 		return
@@ -167,5 +168,6 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	// Succes
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Webhook handled successfully")
+
 	return
 }

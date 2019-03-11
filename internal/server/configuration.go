@@ -61,7 +61,9 @@ func parseConfigurationAddRequest(req *http.Request) (ConfigurationRequest, erro
 
 	// Validate the configuration
 	validateHash := true
-	err = validateConfigurationRequest(configuration, validateHash)
+	validateScript := true
+	validateCreated := true
+	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
 	if err != nil {
 		return configuration, err
 	}
@@ -92,7 +94,9 @@ func parseConfigurationInfoRequest(req *http.Request) (ConfigurationRequest, err
 
 	// Validate the configuration
 	validateHash := true
-	err = validateConfigurationRequest(configuration, validateHash)
+	validateScript := false
+	validateCreated := false
+	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
 	if err != nil {
 		return configuration, err
 	}
@@ -123,7 +127,9 @@ func parseConfigurationListRequest(req *http.Request) (ConfigurationRequest, err
 
 	// Validate the configuration
 	validateHash := false
-	err = validateConfigurationRequest(configuration, validateHash)
+	validateScript := false
+	validateCreated := false
+	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
 	if err != nil {
 		return configuration, err
 	}
@@ -154,7 +160,9 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 
 	// Validate the configuration
 	validateHash := true
-	err = validateConfigurationRequest(configuration, validateHash)
+	validateScript := false
+	validateCreated := false
+	err = validateConfigurationRequest(configuration, validateHash, validateScript, validateCreated)
 	if err != nil {
 		return configuration, err
 	}
