@@ -211,7 +211,20 @@ func (s *Webhook) Delete(id string, removeDir bool) error {
 		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
 		Path:   path.Join(server.ConfigurationPath, id),
 	}
-	httpCode, err = s.httpDelete(&myURL)
+
+	cgroup, err := user.LookupGroupId(cuser.Gid)
+	if err != nil {
+		return err
+	}
+	httpCode, err = s.httpDelete(&myURL,
+		server.ConfigurationRequest{
+			Hash:        id,
+			Groupname:   cgroup.Name,
+			Username:    cuser.Username,
+			Script:      "",
+			Description: "",
+			Created:     "",
+		})
 	if httpCode != 200 {
 		return fmt.Errorf("fail to delete webhook %s: %+v (HTTP CODE: %d)", id, err, httpCode)
 	}
@@ -272,12 +285,21 @@ func (s *Webhook) httpGetJSON(url *url.URL, response interface{}) (int, error) {
 }
 
 // httpDelete makes a HTTP DELETE request to the given url.
-func (s *Webhook) httpDelete(url *url.URL) (int, error) {
-	c := s.newHTTPSClient()
-	req, err := http.NewRequest("DELETE", url.String(), nil)
+func (s *Webhook) httpDelete(url *url.URL, request interface{}) (int, error) {
+
+	data, err := json.Marshal(request)
 	if err != nil {
 		return 0, err
 	}
+
+	log.Debugf("request data: %s", string(data))
+
+	c := s.newHTTPSClient()
+	req, err := http.NewRequest("DELETE", url.String(), bytes.NewReader(data))
+	if err != nil {
+		return 0, err
+	}
+	req.Header.Set("content-type", "application/json")
 
 	// make HTTP DELETE call
 	rsp, err := c.Do(req)
