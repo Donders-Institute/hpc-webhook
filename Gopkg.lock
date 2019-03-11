@@ -2,20 +2,28 @@
 
 
 [[projects]]
-  digest = "1:bcf7a85791e7f2a7d3099085f4ccddd7105fd449a322599114c3701e0d7a510d"
+  digest = "1:c84a587136cb69cecc11f3dbe9f9001444044c0dba74997b07f7e4c150b07cda"
   name = "github.com/DATA-DOG/go-sqlmock"
   packages = ["."]
   pruneopts = "UT"
-  revision = "472e287dbafe67e526a3797165b64cb14f34705a"
-  version = "v1.3.2"
+  revision = "3f9954f6f6697845b082ca57995849ddf614f450"
+  version = "v1.3.3"
 
 [[projects]]
-  digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
+  digest = "1:582b704bebaa06b48c29b0cec224a6058a09c86883aaddabde889cd1a5f73e1b"
   name = "github.com/google/uuid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8"
-  version = "v1.1.0"
+  revision = "0cd6bf5da1e1c83f8b45653022c74f71af0538a4"
+  version = "v1.1.1"
+
+[[projects]]
+  digest = "1:ca59b1175189b3f0e9f1793d2c350114be36eaabbe5b9f554b35edee1de50aea"
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a7962380ca08b5a188038c69871b8d3fbdf31e89"
+  version = "v1.7.0"
 
 [[projects]]
   digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
@@ -46,7 +54,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:88b263547ac34936dc6f6b23346a3855847f9e158350e1a2728b649a152e12e2"
+  digest = "1:e86b06b02faaecaa9eb62062d3e7b65b58399b65a86056dbad6be5e5857e4598"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -59,18 +67,19 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "215aa809caaf1f5be699aef5e3ccebeb15d67b0b"
+  revision = "c2843e01d9a2bc60bb26ad24e09734fdc2d9ec58"
 
 [[projects]]
   branch = "master"
-  digest = "1:80200f57d482f61334a482a046ddedbad77c04dbec6ab81a4e1b3c6adbdfadef"
+  digest = "1:7ec26cdaed34033c7997d6e1944eb482e2dda9e5dcb67db985a51d2f6ac4c27f"
   name = "golang.org/x/sys"
   packages = [
+    "cpu",
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "775f8194d0f9e65c46913c7be783d3d95a29333c"
+  revision = "10058d7d4faa7dd5ef860cbd31af00903076e7b8"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -78,6 +87,7 @@
   input-imports = [
     "github.com/DATA-DOG/go-sqlmock",
     "github.com/google/uuid",
+    "github.com/gorilla/mux",
     "github.com/lib/pq",
     "github.com/sirupsen/logrus",
     "golang.org/x/crypto/ssh",
