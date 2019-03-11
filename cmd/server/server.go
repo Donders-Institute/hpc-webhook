@@ -62,7 +62,7 @@ func main() {
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
 		QaasHost:                  qaasHost,
 		QaasInternalPort:          qaasInternalPort,
-		QaasExtrenalPort:          qaasExternalPort,
+		QaasExternalPort:          qaasExternalPort,
 		PrivateKeyFilename:        privateKeyFilename,
 		PublicKeyFilename:         publicKeyFilename,
 	}
