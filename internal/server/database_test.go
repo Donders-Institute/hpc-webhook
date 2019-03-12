@@ -63,7 +63,7 @@ func TestDeleteRow(t *testing.T) {
 		AddRow(2, hash2, expectedGroupname, expectedUsername, "This is script 2", "2019-03-11 10:20:00")
 
 	mock.ExpectBegin()
-	mock.ExpectExec("DELETE FROM qaas").
+	mock.ExpectExec("^DELETE FROM qaas").
 		WithArgs(hash2, expectedGroupname, expectedUsername).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()

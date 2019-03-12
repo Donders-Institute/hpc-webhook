@@ -71,7 +71,7 @@ func deleteRow(db *sql.DB, hash string, groupname string, username string) error
 		}
 	}()
 
-	sqlStatement := fmt.Sprintf("DELETE FROM qaas (hash, groupname, username) VALUES ($1, $2, $3)")
+	sqlStatement := fmt.Sprintf("DELETE FROM qaas WHERE hash = $1 AND groupname = $2 AND username = $3")
 
 	if _, err = tx.Exec(sqlStatement, hash, groupname, username); err != nil {
 		return err

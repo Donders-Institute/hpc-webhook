@@ -144,8 +144,6 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
 	}
 
-	fmt.Printf("%+v\n", req.Body)
-
 	// Obtain the configuration
 	decoder := json.NewDecoder(req.Body)
 	err = decoder.Decode(&configuration)
