@@ -91,7 +91,7 @@ func (s *WebhookConfig) New(script string) (*url.URL, error) {
 		return nil, err
 	}
 	httpCode, err := s.httpPutJSON(&myURL,
-		server.ConfigurationRequest{
+		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
 			Username:    cuser.Username,
@@ -194,7 +194,7 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	var response server.ConfigurationInfoResponse
 
 	httpCode, err := s.httpGetJSON(&myURL,
-		server.ConfigurationRequest{
+		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
 			Username:    cuser.Username,
@@ -205,7 +205,7 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	log.Debugf("response data: %+v", response)
 
 	if err != nil || httpCode != 200 {
-		return info, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
+		return info, fmt.Errorf("error retrieving webhook info from the QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
 	}
 
 	if id != response.Webhook.Hash {
@@ -268,7 +268,7 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 		return err
 	}
 	httpCode, err = s.httpDelete(&myURL,
-		server.ConfigurationRequest{
+		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
 			Username:    cuser.Username,
@@ -327,6 +327,7 @@ func (s *WebhookConfig) httpGetJSON(url *url.URL, request interface{}, response 
 		if err != nil {
 			return 0, err
 		}
+		log.Debugf("request data: %s", string(data))
 		req, err = http.NewRequest("GET", url.String(), bytes.NewReader(data))
 		if err != nil {
 			return 0, err
