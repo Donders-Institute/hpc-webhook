@@ -14,6 +14,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -221,7 +222,8 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	if script, err := ioutil.ReadFile(path.Join(cuser.HomeDir, ".qaas", id, "script.sh")); err != nil {
 		log.Errorf("cannot locate script of webhook: %s\n", id)
 	} else {
-		info.Script = string(script)
+		// remove tailing "\n"
+		info.Script = strings.TrimSuffix(string(script), "\n")
 	}
 
 	return info, nil
