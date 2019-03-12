@@ -29,6 +29,7 @@ type WebhookConfigInfo struct {
 	ID           string
 	Description  string
 	CreationTime string
+	Script       string
 	WebhookURL   string
 }
 
@@ -215,6 +216,14 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	info.Description = response.Webhook.Description
 	info.CreationTime = response.Webhook.Created
 	info.WebhookURL = response.Webhook.URL
+
+	// read local script from the webhook's working directory
+	scriptFile := path.Join(cuser.HomeDir, ".qaas", id, "script.sh")
+	if script, err := ioutil.ReadFile(path.Join(cuser.HomeDir, ".qaas", id, "script.sh")); err != nil {
+		log.Errorf("cannot locate script of webhook: %s\n", scriptFile)
+	} else {
+		info.Script = string(script)
+	}
 
 	return info, nil
 }
