@@ -103,7 +103,7 @@ func (s *WebhookConfig) New(script string) (*url.URL, error) {
 
 	log.Debugf("response data: %+v", response)
 
-	if err != nil || httpCode != 200 {
+	if err != nil {
 		return nil, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
 	}
 
@@ -206,8 +206,8 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 
 	log.Debugf("response data: %+v", response)
 
-	if err != nil || httpCode != 200 {
-		return info, fmt.Errorf("error retrieving webhook info from the QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
+	if err != nil {
+		return info, fmt.Errorf("error retrieving webhook info from the QaaS server: %+v (HTTP CODE: %d)", err, httpCode)
 	}
 
 	if id != response.Webhook.Hash {
@@ -321,6 +321,10 @@ func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response 
 	}
 	defer rsp.Body.Close()
 
+	if rsp.StatusCode != 200 {
+		return rsp.StatusCode, fmt.Errorf("%s", rsp.Status)
+	}
+
 	return rsp.StatusCode, json.NewDecoder(rsp.Body).Decode(response)
 }
 
@@ -361,6 +365,10 @@ func (s *WebhookConfig) httpGetJSON(url *url.URL, request interface{}, response 
 	}
 	defer rsp.Body.Close()
 
+	if rsp.StatusCode != 200 {
+		return rsp.StatusCode, fmt.Errorf("%s", rsp.Status)
+	}
+
 	return rsp.StatusCode, json.NewDecoder(rsp.Body).Decode(response)
 }
 
@@ -387,6 +395,10 @@ func (s *WebhookConfig) httpDelete(url *url.URL, request interface{}) (int, erro
 		return 0, err
 	}
 	defer rsp.Body.Close()
+
+	if rsp.StatusCode != 200 {
+		return rsp.StatusCode, fmt.Errorf("%s", rsp.Status)
+	}
 
 	return rsp.StatusCode, nil
 }
