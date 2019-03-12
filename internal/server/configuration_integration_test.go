@@ -593,7 +593,7 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 				Username:    "username",
 				Description: "description",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -610,7 +610,7 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 				Username:    "username",
 				Description: "description",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -627,7 +627,7 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 				Username:    "username",
 				Description: "description",
 			},
-			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username"}`,
+			testData: `{"hash": "550e8400-e29b-41d4-a716-446655440001", "groupname": "groupname", "username": "username", "description": "description"}`,
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
@@ -722,6 +722,8 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 		// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(app.ConfigurationDeleteHandler)
+
+		fmt.Printf("%+v\n", req.Body)
 
 		// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 		// directly and pass in our Request and ResponseRecorder.
