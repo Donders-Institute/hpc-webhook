@@ -26,8 +26,8 @@ and change the contents:
 ```
 # Qaas server settings
 QAAS_HOST=qaas.dccn.nl
-QAAS_INTERNAL_PORT=443
-QAAS_EXTERNAL_PORT=5111
+QAAS_INTERNAL_PORT=5111
+QAAS_EXTERNAL_PORT=443
 HOME_DIR=/home
 DATA_DIR=/data
 PRIVATE_KEY_FILE=/run/secrets/qaas_private_key

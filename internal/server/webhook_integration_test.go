@@ -175,8 +175,8 @@ func TestHandlerWebhook(t *testing.T) {
 			RelayNodeTestUser:         c.username,
 			RelayNodeTestUserPassword: "somepassword",
 			QaasHost:                  "qaas.dccn.nl",
-			QaasInternalPort:          "443",
-			QaasExternalPort:          "5111",
+			QaasInternalPort:          "5111",
+			QaasExternalPort:          "443",
 			PrivateKeyFilename:        testConfig.privateKeyFilename,
 			PublicKeyFilename:         testConfig.publicKeyFilename,
 		}

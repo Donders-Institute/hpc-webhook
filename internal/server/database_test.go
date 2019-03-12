@@ -100,7 +100,7 @@ func TestGetRow(t *testing.T) {
 		WillReturnRows(expectedRows)
 
 	qaasHost := "qaas.dccn.nl"
-	qaasExternalPort := "5111"
+	qaasExternalPort := "443"
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -157,7 +157,7 @@ func TestGetListRows(t *testing.T) {
 		WillReturnRows(expectedRows)
 
 	qaasHost := "qaas.dccn.nl"
-	qaasExternalPort := "5111"
+	qaasExternalPort := "443"
 	listExpected := []Item{
 		{
 			ID:          1,

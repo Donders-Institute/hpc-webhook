@@ -1,8 +1,8 @@
-FROM golang:1.12-rc-stretch
+FROM golang:1.12-stretch
 ENV SRC_DIR=/go/src/github.com/Donders-Institute/hpc-qaas
 ADD . $SRC_DIR/
 WORKDIR $SRC_DIR
 RUN make
-EXPOSE 443
+EXPOSE 5111
 # Wait and sleep for 30 sec before starting server
 CMD $SRC_DIR/scripts/wait-for-it.sh db:5432 --timeout=0 -- sleep 30 && echo "Started" && server

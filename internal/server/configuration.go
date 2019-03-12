@@ -197,7 +197,7 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	}
 
 	// Succes
-	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.QaasHost, a.QaasInternalPort, configuration.Hash)
+	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.QaasHost, a.QaasExternalPort, configuration.Hash)
 	configurationResponse := ConfigurationResponse{
 		Webhook: webhookPayloadURL,
 	}

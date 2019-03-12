@@ -13,7 +13,7 @@ services:
       - qaas_private_key
       - qaas_public_key
     ports:
-      - 443:443
+      - 5111:5111
     volumes:
       - data:/data
     networks:

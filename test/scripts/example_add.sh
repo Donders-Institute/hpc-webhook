@@ -1,6 +1,6 @@
 #!/bin/bash
 curl -X PUT \
-  http://localhost:443/configuration \
+  http://localhost:5111/configuration \
   -H 'Content-Type: application/json' \
   -H 'cache-control: no-cache' \
   -d '{

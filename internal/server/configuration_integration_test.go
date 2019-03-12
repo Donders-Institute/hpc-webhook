@@ -165,8 +165,8 @@ func TestConfigurationAddHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "443",
-			QaasExternalPort:   "5111",
+			QaasInternalPort:   "5111",
+			QaasExternalPort:   "443",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
@@ -261,7 +261,7 @@ func TestConfigurationInfoHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"description","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440001"}}`,
+			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"description","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:443/550e8400-e29b-41d4-a716-446655440001"}}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -336,8 +336,8 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "443",
-			QaasExternalPort:   "5111",
+			QaasInternalPort:   "5111",
+			QaasExternalPort:   "443",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
@@ -426,7 +426,7 @@ func TestConfigurationListHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:45:44+01:00","url":"https://qaas.dccn.nl:5111/550e8400-e29b-41d4-a716-446655440002"}]}`,
+			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:443/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:45:44+01:00","url":"https://qaas.dccn.nl:443/550e8400-e29b-41d4-a716-446655440002"}]}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -501,8 +501,8 @@ func TestConfigurationListHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "443",
-			QaasExternalPort:   "5111",
+			QaasInternalPort:   "5111",
+			QaasExternalPort:   "443",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
@@ -673,8 +673,8 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			HomeDir:            testConfig.homeDir,
 			RelayNode:          "relaynode.dccn.nl",
 			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "443",
-			QaasExternalPort:   "5111",
+			QaasInternalPort:   "5111",
+			QaasExternalPort:   "443",
 			PrivateKeyFilename: testConfig.publicKeyFilename,
 			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
