@@ -24,23 +24,23 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// WebhookInfo is a data structure containing the information (and/or attributes) of a webhook.
-type WebhookInfo struct {
+// WebhookConfigInfo is a data structure containing the information (and/or attributes) of a webhook.
+type WebhookConfigInfo struct {
 	ID           string
 	Description  string
 	CreationTime string
-	WebhookURL   url.URL
+	WebhookURL   string
 }
 
-// Webhook provides client interfaces for managing webhook registry on the QaaS server, using the RESTful interface.
-type Webhook struct {
+// WebhookConfig provides client interfaces for managing webhook registry on the QaaS server, using the RESTful interface.
+type WebhookConfig struct {
 	QaasHost     string
 	QaasPort     int
 	QaasCertFile string
 }
 
-// New provisions a new webhook for QaaS and registry the new webhook at the QaaS server.
-func (s *Webhook) New(script string) (*url.URL, error) {
+// New provisions a new WebhookConfig for QaaS and registry the new webhook at the QaaS server.
+func (s *WebhookConfig) New(script string) (*url.URL, error) {
 
 	// check existence of the script and its type.
 	scriptAbs, err := filepath.Abs(script)
@@ -115,101 +115,115 @@ func (s *Webhook) New(script string) (*url.URL, error) {
 
 // List retrieves a list of webhooks of the current user.
 // The information of webhooks is returned with a channel.
-func (s *Webhook) List() (chan WebhookInfo, error) {
-
-	// get current user
-	cuser, err := user.Current()
-	if err != nil {
-		return nil, err
-	}
-
-	// get current user's primary group
-	cgroup, err := user.LookupGroupId(cuser.Gid)
-	if err != nil {
-		return nil, err
-	}
+func (s *WebhookConfig) List() (chan WebhookConfigInfo, error) {
 
 	// channel for webhook ids found in local QaaS directory.
 	chanWebhookID := make(chan string)
 
 	// channel for webhook information found in the remote QaaS server.
-	chanWebhookInfo := make(chan WebhookInfo)
+	chanWebhookConfigInfo := make(chan WebhookConfigInfo)
 
 	wg := new(sync.WaitGroup)
 	nworkers := 4
 	wg.Add(nworkers)
 
 	for i := 0; i < nworkers; i++ {
-		go func(userName, userGroupName string) {
+		go func() {
 			for id := range chanWebhookID {
-				// TODO: call httpGetJSON to retrieve information from the server.
-				myURL := url.URL{
-					Scheme: "https",
-					Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
-					Path:   server.ConfigurationPath,
-				}
-				var response server.ConfigurationInfoResponse
-
-				httpCode, err := s.httpGetJSON(&myURL,
-					server.ConfigurationRequest{
-						Hash:        id,
-						Groupname:   userGroupName,
-						Username:    userName,
-						Description: "",
-					},
-					&response)
-
-				log.Debugf("response data: %+v", response)
-
-				if err != nil || httpCode != 200 {
-					log.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
-				}
-
-				chanWebhookInfo <- WebhookInfo{
-					ID:           response.Webhook.Hash,
-					Description:  response.Webhook.Description,
-					CreationTime: response.Webhook.Created,
-					WebhookURL: url.URL{
-						Scheme: "https",
-						Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
-						Path:   path.Join(server.WebhookPath, response.Webhook.Hash),
-					},
+				info, err := s.GetInfo(id)
+				if err != nil {
+					log.Errorln(err)
+				} else {
+					chanWebhookConfigInfo <- info
 				}
 			}
 			wg.Done()
-		}(cuser.Username, cgroup.Name)
+		}()
 	}
 
 	// go routine feeding webhook ids to chanWebhookID, and wait for all local webhook ids are visited to get webhookInfo
 	go func() {
-		// add names of the items under $HOME/.gass into the list if:
-		//
-		// - the item is a directory
-		// - the name of the item can be passed by uuid.Parse() function
-		if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, ".qaas")); err == nil {
-			for _, f := range items {
-				if !f.IsDir() {
-					continue
-				}
-				if _, err := uuid.Parse(f.Name()); err == nil {
-					chanWebhookID <- f.Name()
+		// perform ID fetching from user's home directory only when the current user can be determined.
+		if cuser, err := user.Current(); err != nil {
+			// add names of the items under $HOME/.gass into the list if:
+			//
+			// - the item is a directory
+			// - the name of the item can be passed by uuid.Parse() function
+			if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, ".qaas")); err == nil {
+				for _, f := range items {
+					if !f.IsDir() {
+						continue
+					}
+					if _, err := uuid.Parse(f.Name()); err == nil {
+						chanWebhookID <- f.Name()
+					}
 				}
 			}
 		}
 		close(chanWebhookID)
 
 		wg.Wait()
-		close(chanWebhookInfo)
+		close(chanWebhookConfigInfo)
 	}()
 
-	return chanWebhookInfo, nil
+	return chanWebhookConfigInfo, nil
+}
+
+// GetInfo retrieves information of a single Webhook configuration referred by the hash id.
+func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
+
+	info := WebhookConfigInfo{ID: id}
+
+	// get current user
+	cuser, err := user.Current()
+	if err != nil {
+		return info, err
+	}
+
+	// get current user's primary group
+	cgroup, err := user.LookupGroupId(cuser.Gid)
+	if err != nil {
+		return info, err
+	}
+
+	myURL := url.URL{
+		Scheme: "https",
+		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+		Path:   path.Join(server.ConfigurationPath, id),
+	}
+	var response server.ConfigurationInfoResponse
+
+	httpCode, err := s.httpGetJSON(&myURL,
+		server.ConfigurationRequest{
+			Hash:        id,
+			Groupname:   cgroup.Name,
+			Username:    cuser.Username,
+			Description: "",
+		},
+		&response)
+
+	log.Debugf("response data: %+v", response)
+
+	if err != nil || httpCode != 200 {
+		return info, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
+	}
+
+	if id != response.Webhook.Hash {
+		return info, fmt.Errorf("expect webhook id: %s, server returns id: %s", id, response.Webhook.Hash)
+	}
+
+	info.Description = response.Webhook.Description
+	info.CreationTime = response.Webhook.Created
+	info.WebhookURL = response.Webhook.URL
+
+	return info, nil
 }
 
 // Delete removes a webhook with the given id.
 //
 // The deletion maily removes webhook registry from QaaS server.
 // If removeDir is true, the local webhook working directory is removed when the webhook is unregistered from the QaaS server.
-func (s *Webhook) Delete(id string, removeDir bool) error {
+func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 
 	// check if there is a webhook directory in user's .qaas directory.
 	cuser, err := user.Current()
@@ -273,7 +287,7 @@ func (s *Webhook) Delete(id string, removeDir bool) error {
 }
 
 // httpPutJSON makes a HTTP PUT request with provided JSON data.
-func (s *Webhook) httpPutJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
+func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
 
 	data, err := json.Marshal(request)
 	if err != nil {
@@ -301,7 +315,7 @@ func (s *Webhook) httpPutJSON(url *url.URL, request interface{}, response interf
 }
 
 // httpGetJSON makes a HTTP GET request to the given url and returns unmarshals JSON response.
-func (s *Webhook) httpGetJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
+func (s *WebhookConfig) httpGetJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
 
 	c := s.newHTTPSClient()
 
@@ -340,7 +354,7 @@ func (s *Webhook) httpGetJSON(url *url.URL, request interface{}, response interf
 }
 
 // httpDelete makes a HTTP DELETE request to the given url.
-func (s *Webhook) httpDelete(url *url.URL, request interface{}) (int, error) {
+func (s *WebhookConfig) httpDelete(url *url.URL, request interface{}) (int, error) {
 
 	data, err := json.Marshal(request)
 	if err != nil {
@@ -367,7 +381,7 @@ func (s *Webhook) httpDelete(url *url.URL, request interface{}) (int, error) {
 }
 
 // newHTTPSClient sets up the client instance ready for making HTTPs requests.
-func (s *Webhook) newHTTPSClient() *http.Client {
+func (s *WebhookConfig) newHTTPSClient() *http.Client {
 
 	rootCertPool := x509.NewCertPool()
 
