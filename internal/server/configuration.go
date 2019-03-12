@@ -227,7 +227,7 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 
 	// Get the item
 	list, err := getRow(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Hash)
-	if err != nil && len(list) == 0 {
+	if err != nil || len(list) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
