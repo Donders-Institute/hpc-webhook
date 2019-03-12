@@ -144,7 +144,7 @@ func (s *WebhookConfig) List() (chan WebhookConfigInfo, error) {
 	// go routine feeding webhook ids to chanWebhookID, and wait for all local webhook ids are visited to get webhookInfo
 	go func() {
 		// perform ID fetching from user's home directory only when the current user can be determined.
-		if cuser, err := user.Current(); err != nil {
+		if cuser, err := user.Current(); err == nil {
 			// add names of the items under $HOME/.gass into the list if:
 			//
 			// - the item is a directory
