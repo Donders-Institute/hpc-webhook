@@ -92,8 +92,35 @@ type Item struct {
 }
 
 // Find the rows with a specific hash (should be 1)
-func getRow(db *sql.DB, qaasHost string, qaasExternalPort string, hash string) ([]Item, error) {
+func getRowHashOnly(db *sql.DB, qaasHost string, qaasExternalPort string, hash string) ([]Item, error) {
 	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM qaas WHERE hash = $1", hash)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []Item
+	for rows.Next() {
+		p := Item{}
+		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
+			return nil, err
+		}
+		p.URL = fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, p.Hash)
+		list = append(list, p)
+	}
+	if rows.Err() != nil {
+		return nil, err
+	}
+	if len(list) > 1 {
+		return nil, fmt.Errorf("invalid getRow result: list should have length 1 but has length %d", len(list))
+	}
+
+	return list, nil
+}
+
+// Find the rows with a specific hash (should be 1)
+func getRow(db *sql.DB, qaasHost string, qaasExternalPort string, hash string, groupname string, username string) ([]Item, error) {
+	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM qaas WHERE hash = $1 AND groupname = $2 AND username = $3", hash, groupname, username)
 	if err != nil {
 		return nil, err
 	}

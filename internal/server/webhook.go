@@ -35,7 +35,7 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 
 // Check if the webhook id exists. Return the username
 func checkWebhookID(db *sql.DB, qaasHost string, qaasExternalPort string, webhookID string) (string, string, error) {
-	list, err := getRow(db, qaasHost, qaasExternalPort, webhookID)
+	list, err := getRowHashOnly(db, qaasHost, qaasExternalPort, webhookID)
 	if err != nil || len(list) == 0 {
 		return "", "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
 	}

@@ -226,7 +226,7 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the item
-	list, err := getRow(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Hash)
+	list, err := getRow(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Hash, configuration.Groupname, configuration.Username)
 	if err != nil || len(list) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)

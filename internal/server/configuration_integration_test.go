@@ -368,7 +368,7 @@ func TestConfigurationInfoHandler(t *testing.T) {
 					"2019-03-11T19:44:44+01:00",
 				)
 			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
-				WithArgs(c.configuration.Hash).
+				WithArgs(c.configuration.Hash, c.configuration.Groupname, c.configuration.Username).
 				WillReturnRows(expectedRows)
 		}
 

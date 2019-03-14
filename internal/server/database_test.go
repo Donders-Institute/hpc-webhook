@@ -77,7 +77,7 @@ func TestDeleteRow(t *testing.T) {
 	}
 }
 
-func TestGetRow(t *testing.T) {
+func TestGetRowHashOnly(t *testing.T) {
 	var list []Item
 	var err error
 	db, mock, err := sqlmock.New()
@@ -113,7 +113,57 @@ func TestGetRow(t *testing.T) {
 		},
 	}
 
-	list, err = getRow(db, qaasHost, qaasExternalPort, hash)
+	list, err = getRowHashOnly(db, qaasHost, qaasExternalPort, hash)
+	if err != nil {
+		t.Errorf("error was not expected while getting row: %s", err)
+	}
+
+	if !reflect.DeepEqual(list, listExpected) {
+		t.Errorf("Lists are not equal: found length %d, but has %d", len(list), len(listExpected))
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestGetRow(t *testing.T) {
+	var list []Item
+	var err error
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	hash := "550e8400-e29b-41d4-a716-446655440001"
+
+	expectedGroupname := "dccngroup"
+	expectedUsername := "dccnuser"
+	expectedDescription := "This is script 1"
+	expectedCreated := "2019-03-11 10:10:00"
+	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
+		AddRow(1, hash, expectedGroupname, expectedUsername, expectedDescription, expectedCreated)
+
+	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas WHERE").
+		WithArgs(hash, expectedGroupname, expectedUsername).
+		WillReturnRows(expectedRows)
+
+	qaasHost := "qaas.dccn.nl"
+	qaasExternalPort := "443"
+	listExpected := []Item{
+		{
+			ID:          1,
+			Hash:        hash,
+			Groupname:   expectedGroupname,
+			Username:    expectedUsername,
+			Description: expectedDescription,
+			Created:     expectedCreated,
+			URL:         fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, hash),
+		},
+	}
+
+	list, err = getRow(db, qaasHost, qaasExternalPort, hash, expectedGroupname, expectedUsername)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}
