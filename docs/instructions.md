@@ -78,7 +78,7 @@ There should be a green tickmark.
 
 Login to a mentat machine of choice, for example `mentat005.dccn.nl`.
 
-Go to your qaas results folder `/home/tg/rutvdee/.qaas/5126d168-e3f1-4c7f-b228-a57fbaf007c4`.
+Go to your qaas results folder `/home/dccngroup/dccnuser/.qaas/5126d168-e3f1-4c7f-b228-a57fbaf007c4`.
 
 Run `qstat` to check if your submitted job is queued, running or completed.
 
