@@ -182,7 +182,8 @@ func (s *WebhookConfig) List() (chan WebhookConfigInfo, error) {
 			for id := range chanWebhookID {
 				info, err := s.GetInfo(id)
 				if err != nil {
-					log.Errorln(err)
+					// only show error message in debug mode
+					log.Debugln(err)
 				} else {
 					chanWebhookConfigInfo <- info
 				}
