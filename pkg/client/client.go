@@ -88,7 +88,7 @@ type WebhookConfig struct {
 }
 
 // New provisions a new WebhookConfig for QaaS and registry the new webhook at the QaaS server.
-func (s *WebhookConfig) New(script string) (*url.URL, error) {
+func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 
 	// check existence of the script and its type.
 	scriptAbs, err := filepath.Abs(script)
@@ -145,7 +145,7 @@ func (s *WebhookConfig) New(script string) (*url.URL, error) {
 			Hash:        id,
 			Groupname:   cgroup.Name,
 			Username:    cuser.Username,
-			Description: "",
+			Description: desc,
 		},
 		&response)
 
