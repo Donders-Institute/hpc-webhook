@@ -34,12 +34,16 @@ type WebhookConfigInfo struct {
 	WebhookURL   string
 }
 
-// TriggerWebhook makes a POST call to the WebhookURL with the given payload data.
+// TriggerWebhook makes a POST call to the WebhookURL with the given payload.
+//
+// The payload is specified by `data` as a byte array, and the string `contentType` as the
+// HTTP request content type.
+//
 // For the WebhookURL supporting HTTPS protocol, the provided X509 certificate file `cacert`
 // is used for making the connection.
 //
-// The response body of the POST call is returned.
-func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, cacert string) ([]byte, error) {
+// The response body of the POST is returned as a byte array.
+func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, contentType string, cacert string) ([]byte, error) {
 
 	if info.ID == "" || info.WebhookURL == "" || info.Script == "" {
 		return nil, fmt.Errorf("invalid Webhook: %+v", info)
@@ -55,7 +59,7 @@ func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, cacert string) ([]
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("content-type", "application/json")
+	req.Header.Set("content-type", contentType)
 
 	// make HTTP PUT call
 	rsp, err := c.Do(req)
@@ -134,7 +138,9 @@ func (s *WebhookConfig) New(script string) (*url.URL, error) {
 	if err != nil {
 		return nil, err
 	}
-	httpCode, err := s.httpPutJSON(&myURL,
+	httpCode, err := httpPutJSON(
+		&myURL,
+		s.QaasCertFile,
 		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
@@ -237,7 +243,9 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	}
 	var response server.ConfigurationInfoResponse
 
-	httpCode, err := s.httpGetJSON(&myURL,
+	httpCode, err := httpGetJSON(
+		&myURL,
+		s.QaasCertFile,
 		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
@@ -308,7 +316,9 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 	if err != nil {
 		return err
 	}
-	httpCode, err := s.httpDelete(&myURL,
+	httpCode, err := httpDelete(
+		&myURL,
+		s.QaasCertFile,
 		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
@@ -330,7 +340,7 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 }
 
 // httpPutJSON makes a HTTP PUT request with provided JSON data.
-func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
+func httpPutJSON(url *url.URL, cacert string, request interface{}, response interface{}) (int, error) {
 
 	data, err := json.Marshal(request)
 	if err != nil {
@@ -339,7 +349,7 @@ func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response 
 
 	log.Debugf("request data: %s", string(data))
 
-	c := httpsClient(s.QaasCertFile)
+	c := httpsClient(cacert)
 	req, err := http.NewRequest("PUT", url.String(), bytes.NewReader(data))
 	if err != nil {
 		return 0, err
@@ -362,9 +372,9 @@ func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response 
 }
 
 // httpGetJSON makes a HTTP GET request to the given url and returns unmarshals JSON response.
-func (s *WebhookConfig) httpGetJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
+func httpGetJSON(url *url.URL, cacert string, request interface{}, response interface{}) (int, error) {
 
-	c := httpsClient(s.QaasCertFile)
+	c := httpsClient(cacert)
 
 	var req *http.Request
 
@@ -406,7 +416,7 @@ func (s *WebhookConfig) httpGetJSON(url *url.URL, request interface{}, response 
 }
 
 // httpDelete makes a HTTP DELETE request to the given url.
-func (s *WebhookConfig) httpDelete(url *url.URL, request interface{}) (int, error) {
+func httpDelete(url *url.URL, cacert string, request interface{}) (int, error) {
 
 	data, err := json.Marshal(request)
 	if err != nil {
@@ -415,7 +425,7 @@ func (s *WebhookConfig) httpDelete(url *url.URL, request interface{}) (int, erro
 
 	log.Debugf("request data: %s", string(data))
 
-	c := httpsClient(s.QaasCertFile)
+	c := httpsClient(cacert)
 	req, err := http.NewRequest("DELETE", url.String(), bytes.NewReader(data))
 	if err != nil {
 		return 0, err
