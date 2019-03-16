@@ -61,7 +61,7 @@ func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, contentType string
 	}
 	req.Header.Set("content-type", contentType)
 
-	// make HTTP PUT call
+	// make HTTP POST call
 	rsp, err := c.Do(req)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, contentType string
 	defer rsp.Body.Close()
 
 	if rsp.StatusCode != 200 {
-		return nil, fmt.Errorf("fail trigger webhook: %s (%d: %s)", info.ID, rsp.StatusCode, rsp.Status)
+		return nil, fmt.Errorf("fail trigger webhook: %s (%d: %s)", myURL.String(), rsp.StatusCode, rsp.Status)
 	}
 
 	rspBody, err := ioutil.ReadAll(rsp.Body)
