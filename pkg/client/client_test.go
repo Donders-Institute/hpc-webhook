@@ -23,7 +23,7 @@ func TestNewWebhook(t *testing.T) {
 
 	script := path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/data/qsub.sh")
 
-	url, err := c.New(script)
+	url, err := c.New(script, "")
 
 	if err != nil {
 		t.Errorf("test failed: %+v\n", err)
