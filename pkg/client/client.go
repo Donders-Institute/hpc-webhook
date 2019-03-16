@@ -34,6 +34,48 @@ type WebhookConfigInfo struct {
 	WebhookURL   string
 }
 
+// TriggerWebhook makes a POST call to the WebhookURL with the given payload data.
+// For the WebhookURL supporting HTTPS protocol, the provided X509 certificate file `cacert`
+// is used for making the connection.
+//
+// The response body of the POST call is returned.
+func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, cacert string) ([]byte, error) {
+
+	if info.ID == "" || info.WebhookURL == "" || info.Script == "" {
+		return nil, fmt.Errorf("invalid Webhook: %+v", info)
+	}
+
+	myURL, err := url.Parse(info.WebhookURL)
+	if err != nil {
+		return nil, err
+	}
+
+	c := httpsClient(cacert)
+	req, err := http.NewRequest("POST", myURL.String(), bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("content-type", "application/json")
+
+	// make HTTP PUT call
+	rsp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode != 200 {
+		return nil, fmt.Errorf("fail trigger webhook: %s (%d: %s)", info.ID, rsp.StatusCode, rsp.Status)
+	}
+
+	rspBody, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return rspBody, nil
+}
+
 // WebhookConfig provides client interfaces for managing webhook registry on the QaaS server, using the RESTful interface.
 type WebhookConfig struct {
 	QaasHost     string
@@ -308,7 +350,7 @@ func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response 
 
 	log.Debugf("request data: %s", string(data))
 
-	c := s.newHTTPSClient()
+	c := httpsClient(s.QaasCertFile)
 	req, err := http.NewRequest("PUT", url.String(), bytes.NewReader(data))
 	if err != nil {
 		return 0, err
@@ -333,7 +375,7 @@ func (s *WebhookConfig) httpPutJSON(url *url.URL, request interface{}, response 
 // httpGetJSON makes a HTTP GET request to the given url and returns unmarshals JSON response.
 func (s *WebhookConfig) httpGetJSON(url *url.URL, request interface{}, response interface{}) (int, error) {
 
-	c := s.newHTTPSClient()
+	c := httpsClient(s.QaasCertFile)
 
 	var req *http.Request
 
@@ -384,7 +426,7 @@ func (s *WebhookConfig) httpDelete(url *url.URL, request interface{}) (int, erro
 
 	log.Debugf("request data: %s", string(data))
 
-	c := s.newHTTPSClient()
+	c := httpsClient(s.QaasCertFile)
 	req, err := http.NewRequest("DELETE", url.String(), bytes.NewReader(data))
 	if err != nil {
 		return 0, err
@@ -406,12 +448,12 @@ func (s *WebhookConfig) httpDelete(url *url.URL, request interface{}) (int, erro
 }
 
 // newHTTPSClient sets up the client instance ready for making HTTPs requests.
-func (s *WebhookConfig) newHTTPSClient() *http.Client {
+func httpsClient(cacert string) *http.Client {
 
 	rootCertPool := x509.NewCertPool()
 
-	if s.QaasCertFile != "" {
-		pem, _ := ioutil.ReadFile(s.QaasCertFile)
+	if cacert != "" {
+		pem, _ := ioutil.ReadFile(cacert)
 		rootCertPool.AppendCertsFromPEM(pem)
 	}
 
