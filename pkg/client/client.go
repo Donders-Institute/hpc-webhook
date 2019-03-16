@@ -292,21 +292,10 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 		return fmt.Errorf("not a directory: %s", workdir)
 	}
 
-	// // check if we can get the given webhook from the server.
-	// // call QaaS to register the webhook
-	// myURL := url.URL{
-	// 	Scheme: "https",
-	// 	Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
-	// 	Path:   path.Join(server.ConfigurationPath, id),
-	// }
-	// var response server.ConfigurationResponse
-	// httpCode, err := s.httpGetJSON(&myURL, nil, &response)
-	// if err != nil {
-	// 	return err
-	// }
-	// if httpCode != 200 {
-	// 	return fmt.Errorf("fail to find webhook %s: %+v (HTTP CODE: %d)", id, err, httpCode)
-	// }
+	// check if we can get the given webhook from the server.
+	if _, err := s.GetInfo(id); err != nil {
+		return fmt.Errorf("webhook not found: %s", err)
+	}
 
 	// make DELETE call to the server and receive response.
 	myURL := url.URL{
