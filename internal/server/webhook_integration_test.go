@@ -130,8 +130,8 @@ func TestHandlerWebhook(t *testing.T) {
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
-			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method 'GET'`,
+			expectedStatus: 405,
+			expectedString: `Error 405 - Method not allowed: invalid method: GET`,
 			expectedResult: false, // Invalid method
 		},
 	}

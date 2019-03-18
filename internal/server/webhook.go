@@ -66,11 +66,6 @@ func parseWebhookRequest(req *http.Request) (*Webhook, string, error) {
 	var webhookID string
 	var err error
 
-	// Check the method
-	if !strings.EqualFold(req.Method, "POST") {
-		return webhook, "", fmt.Errorf("invalid method '%s'", req.Method)
-	}
-
 	// Check the URL path
 	if !isValidURLPath(req.URL.Path) {
 		return webhook, "", fmt.Errorf("invalid URL path '%s'", req.URL.Path)
@@ -90,6 +85,14 @@ func parseWebhookRequest(req *http.Request) (*Webhook, string, error) {
 
 // WebhookHandler handles a HTTP POST request containing the webhook payload in its body
 func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
+	// Check the method
+	if !strings.EqualFold(req.Method, "POST") {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
+		return
+	}
+
 	// Parse and validate the request
 	_, webhookID, err := parseWebhookRequest(req)
 	if err != nil {

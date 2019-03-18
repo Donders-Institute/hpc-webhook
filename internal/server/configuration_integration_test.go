@@ -123,8 +123,8 @@ func TestConfigurationAddHandler(t *testing.T) {
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
-			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method 'POST'`,
+			expectedStatus: 405,
+			expectedString: `Error 405 - Method not allowed: invalid method: POST`,
 			expectedResult: false, // Invalid method
 		},
 	}
@@ -294,8 +294,8 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
-			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method 'POST'`,
+			expectedStatus: 405,
+			expectedString: `Error 405 - Method not allowed: invalid method: POST`,
 			expectedResult: false, // Invalid method
 		},
 	}
@@ -459,8 +459,8 @@ func TestConfigurationListHandler(t *testing.T) {
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
-			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method 'POST'`,
+			expectedStatus: 405,
+			expectedString: `Error 405 - Method not allowed: invalid method: POST`,
 			expectedResult: false, // Invalid method
 		},
 	}
@@ -631,8 +631,8 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			headerInfo: map[string]string{
 				"Content-Type": "application/json; charset=utf-8",
 			},
-			expectedStatus: 404,
-			expectedString: `Error 404 - Not found: invalid method 'POST'`,
+			expectedStatus: 405,
+			expectedString: `Error 405 - Method not allowed: invalid method: POST`,
 			expectedResult: false, // Invalid method
 		},
 	}

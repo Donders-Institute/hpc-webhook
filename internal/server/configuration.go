@@ -41,11 +41,6 @@ func parseConfigurationAddRequest(req *http.Request) (ConfigurationRequest, erro
 	var configuration ConfigurationRequest
 	var err error
 
-	// Check method
-	if !strings.EqualFold(req.Method, "PUT") {
-		return configuration, fmt.Errorf("invalid method '%s'", req.Method)
-	}
-
 	// Check the URL path
 	if !isValidConfigurationAddURLPath(req.URL.Path) {
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
@@ -71,11 +66,6 @@ func parseConfigurationAddRequest(req *http.Request) (ConfigurationRequest, erro
 func parseConfigurationInfoRequest(req *http.Request) (ConfigurationRequest, error) {
 	var configuration ConfigurationRequest
 	var err error
-
-	// Check method
-	if !strings.EqualFold(req.Method, "GET") {
-		return configuration, fmt.Errorf("invalid method '%s'", req.Method)
-	}
 
 	// Check the URL path
 	if !isValidConfigurationInfoURLPath(req.URL.Path) {
@@ -103,11 +93,6 @@ func parseConfigurationListRequest(req *http.Request) (ConfigurationRequest, err
 	var configuration ConfigurationRequest
 	var err error
 
-	// Check method
-	if !strings.EqualFold(req.Method, "GET") {
-		return configuration, fmt.Errorf("invalid method '%s'", req.Method)
-	}
-
 	// Check the URL path
 	if !isValidConfigurationListURLPath(req.URL.Path) {
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
@@ -134,11 +119,6 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 	var configuration ConfigurationRequest
 	var err error
 
-	// Check method
-	if !strings.EqualFold(req.Method, "DELETE") {
-		return configuration, fmt.Errorf("invalid method '%s'", req.Method)
-	}
-
 	// Check the URL path
 	if !isValidConfigurationDeleteURLPath(req.URL.Path) {
 		return configuration, fmt.Errorf("invalid URL path '%s'", req.URL.Path)
@@ -164,6 +144,14 @@ func parseConfigurationDeleteRequest(req *http.Request) (ConfigurationRequest, e
 // ConfigurationAddHandler handles a HTTP PUT request
 // to register a certain webhook with hash, groupname, and username in its body
 func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) {
+	// Check method
+	if !strings.EqualFold(req.Method, "PUT") {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
+		return
+	}
+
 	// Parse and validate the request
 	configuration, err := parseConfigurationAddRequest(req)
 	if err != nil {
@@ -216,6 +204,14 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 // ConfigurationInfoHandler handles a HTTP GET request
 // to obtain detailed information about a specific webhook
 func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request) {
+	// Check method
+	if !strings.EqualFold(req.Method, "GET") {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
+		return
+	}
+
 	// Parse and validate the request
 	configuration, err := parseConfigurationInfoRequest(req)
 	if err != nil {
@@ -255,6 +251,14 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 // ConfigurationListHandler handles a HTTP GET request
 // to obtain all webhooks for a certain user
 func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request) {
+	// Check method
+	if !strings.EqualFold(req.Method, "GET") {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
+		return
+	}
+
 	// Parse and validate the request
 	configuration, err := parseConfigurationListRequest(req)
 	if err != nil {
@@ -293,6 +297,14 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 // ConfigurationDeleteHandler handles a HTTP DELETE request
 // to delete a certain webhook for a certain user
 func (a *API) ConfigurationDeleteHandler(w http.ResponseWriter, req *http.Request) {
+	// Check method
+	if !strings.EqualFold(req.Method, "DELETE") {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
+		return
+	}
+
 	// Parse and validate the request
 	configuration, err := parseConfigurationDeleteRequest(req)
 	if err != nil {
