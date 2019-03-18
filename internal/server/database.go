@@ -105,7 +105,7 @@ func getRowHashOnly(db *sql.DB, qaasHost string, qaasExternalPort string, hash s
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, p.Hash)
+		p.URL = fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {
@@ -132,7 +132,7 @@ func getRow(db *sql.DB, qaasHost string, qaasExternalPort string, hash string, g
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, p.Hash)
+		p.URL = fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {
@@ -159,7 +159,7 @@ func getListRows(db *sql.DB, qaasHost string, qaasExternalPort string, groupname
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, p.Hash)
+		p.URL = fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {

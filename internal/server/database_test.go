@@ -109,7 +109,7 @@ func TestGetRowHashOnly(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, hash),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash),
 		},
 	}
 
@@ -159,7 +159,7 @@ func TestGetRow(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, hash),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash),
 		},
 	}
 
@@ -216,7 +216,7 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername1,
 			Description: expectedDescription1,
 			Created:     expectedCreated1,
-			URL:         fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, hash1),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash1),
 		},
 		{
 			ID:          2,
@@ -225,7 +225,7 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername2,
 			Description: expectedDescription2,
 			Created:     expectedCreated2,
-			URL:         fmt.Sprintf("https://%s:%s/%s", qaasHost, qaasExternalPort, hash2),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash2),
 		},
 	}
 
