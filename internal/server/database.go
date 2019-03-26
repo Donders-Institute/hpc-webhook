@@ -43,7 +43,7 @@ func addRow(db *sql.DB, hash string, groupname string, username string, descript
 		}
 	}()
 
-	sqlStatement := fmt.Sprintf("INSERT INTO qaas (hash, groupname, username, description, created) VALUES ($1, $2, $3, $4, $5)")
+	sqlStatement := fmt.Sprintf("INSERT INTO hpc_webhook (hash, groupname, username, description, created) VALUES ($1, $2, $3, $4, $5)")
 
 	if _, err = tx.Exec(sqlStatement, hash, groupname, username, description, created); err != nil {
 		return err
@@ -71,7 +71,7 @@ func deleteRow(db *sql.DB, hash string, groupname string, username string) error
 		}
 	}()
 
-	sqlStatement := fmt.Sprintf("DELETE FROM qaas WHERE hash = $1 AND groupname = $2 AND username = $3")
+	sqlStatement := fmt.Sprintf("DELETE FROM hpc_webhook WHERE hash = $1 AND groupname = $2 AND username = $3")
 
 	if _, err = tx.Exec(sqlStatement, hash, groupname, username); err != nil {
 		return err
@@ -80,7 +80,7 @@ func deleteRow(db *sql.DB, hash string, groupname string, username string) error
 	return err
 }
 
-// Item corresponds to a row in the qaas database
+// Item corresponds to a row in the HPC webhook database
 type Item struct {
 	ID          int    `json:"-"` // Do not output this one
 	Hash        string `json:"hash"`
@@ -92,8 +92,8 @@ type Item struct {
 }
 
 // Find the rows with a specific hash (should be 1)
-func getRowHashOnly(db *sql.DB, qaasHost string, qaasExternalPort string, hash string) ([]Item, error) {
-	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM qaas WHERE hash = $1", hash)
+func getRowHashOnly(db *sql.DB, hpcWebhookHost string, hpcWebhookExternalPort string, hash string) ([]Item, error) {
+	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM hpc_webhook WHERE hash = $1", hash)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func getRowHashOnly(db *sql.DB, qaasHost string, qaasExternalPort string, hash s
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, p.Hash)
+		p.URL = fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {
@@ -119,8 +119,8 @@ func getRowHashOnly(db *sql.DB, qaasHost string, qaasExternalPort string, hash s
 }
 
 // Find the rows with a specific hash (should be 1)
-func getRow(db *sql.DB, qaasHost string, qaasExternalPort string, hash string, groupname string, username string) ([]Item, error) {
-	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM qaas WHERE hash = $1 AND groupname = $2 AND username = $3", hash, groupname, username)
+func getRow(db *sql.DB, hpcWebhookHost string, hpcWebhookExternalPort string, hash string, groupname string, username string) ([]Item, error) {
+	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM hpc_webhook WHERE hash = $1 AND groupname = $2 AND username = $3", hash, groupname, username)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func getRow(db *sql.DB, qaasHost string, qaasExternalPort string, hash string, g
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, p.Hash)
+		p.URL = fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {
@@ -146,8 +146,8 @@ func getRow(db *sql.DB, qaasHost string, qaasExternalPort string, hash string, g
 }
 
 // Find the rows for a specific groupname, username
-func getListRows(db *sql.DB, qaasHost string, qaasExternalPort string, groupname string, username string) ([]Item, error) {
-	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM qaas WHERE groupname = $1, username = $2", groupname, username)
+func getListRows(db *sql.DB, hpcWebhookHost string, hpcWebhookExternalPort string, groupname string, username string) ([]Item, error) {
+	rows, err := db.Query("SELECT id, hash, groupname, username, description, created FROM hpc_webhook WHERE groupname = $1, username = $2", groupname, username)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func getListRows(db *sql.DB, qaasHost string, qaasExternalPort string, groupname
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, p.Hash)
+		p.URL = fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {

@@ -2,7 +2,7 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DATABASE" <<-EOSQL
-    CREATE TABLE IF NOT EXISTS qaas(
+    CREATE TABLE IF NOT EXISTS hpc_webhook(
         id          SERIAL PRIMARY KEY,
         hash        CHAR (36) UNIQUE NOT NULL,
         groupname   VARCHAR (32) NOT NULL,

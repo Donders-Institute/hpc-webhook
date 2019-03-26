@@ -15,9 +15,9 @@ type API struct {
 	RelayNode                 string
 	RelayNodeTestUser         string
 	RelayNodeTestUserPassword string
-	QaasHost                  string
-	QaasInternalPort          string // Port for internal use
-	QaasExternalPort          string // Port for the outside world
+	HPCWebhookHost            string
+	HPCWebhookInternalPort    string // Port for internal use
+	HPCWebhookExternalPort    string // Port for the outside world
 	PrivateKeyFilename        string
 	PublicKeyFilename         string
 }
@@ -28,7 +28,7 @@ const WebhookPath = "/webhook"
 // WebhookPostPath is the first part of the webhook payload URL [POST]
 const WebhookPostPath = "/webhook/{webhook}"
 
-// ConfigurationPath is the basic URL path for configuring the qaas server
+// ConfigurationPath is the basic URL path for configuring the HPC webhook server
 const ConfigurationPath = "/configuration"
 
 // ConfigurationAddPath is the URL path to add a new webhook [PUT]

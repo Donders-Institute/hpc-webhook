@@ -2,6 +2,6 @@
 
 set -e
 
-qaas_key_dir=../configs/
+hpc_webhook_key_dir=../configs/
 
-ssh-keygen -t rsa -C "qaas-server" -f $qaas_key_dir/qaas
+ssh-keygen -t rsa -C "hpc-webhook-server" -f $hpc_webhook_key_dir/hpc-webhook

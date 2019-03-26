@@ -141,8 +141,8 @@ func TestHandlerWebhook(t *testing.T) {
 		homeDir:            path.Join("..", "..", "test", "results", "home"),
 		dataDir:            path.Join("..", "..", "test", "results", "data"),
 		keyDir:             keyDir,
-		privateKeyFilename: path.Join(keyDir, "qaas"),
-		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+		privateKeyFilename: path.Join(keyDir, "hpc-webhook"),
+		publicKeyFilename:  path.Join(keyDir, "hpc-webhook.pub"),
 	}
 
 	err := setupTestCase(testConfig)
@@ -174,9 +174,9 @@ func TestHandlerWebhook(t *testing.T) {
 			RelayNode:                 "relaynode.dccn.nl",
 			RelayNodeTestUser:         c.username,
 			RelayNodeTestUserPassword: "somepassword",
-			QaasHost:                  "qaas.dccn.nl",
-			QaasInternalPort:          "5111",
-			QaasExternalPort:          "443",
+			HPCWebhookHost:            "hpc-webhook.dccn.nl",
+			HPCWebhookInternalPort:    "5111",
+			HPCWebhookExternalPort:    "443",
 			PrivateKeyFilename:        testConfig.privateKeyFilename,
 			PublicKeyFilename:         testConfig.publicKeyFilename,
 		}
@@ -184,7 +184,7 @@ func TestHandlerWebhook(t *testing.T) {
 		app := &api
 
 		// Create the user script file
-		userScriptDir := path.Join(api.HomeDir, c.groupname, c.username, ".qaas", c.hash)
+		userScriptDir := path.Join(api.HomeDir, c.groupname, c.username, ".webhooks", c.hash)
 		userScriptPathFilename := path.Join(userScriptDir, "script.sh")
 		err = os.MkdirAll(userScriptDir, os.ModePerm)
 		if err != nil {
@@ -216,7 +216,7 @@ func TestHandlerWebhook(t *testing.T) {
 		if c.expectedResult {
 			expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
 				AddRow(1, c.hash, c.groupname, c.username, c.description, "2019-03-11T19:44:44+01:00")
-			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
+			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM hpc_webhook").
 				WithArgs(c.hash).
 				WillReturnRows(expectedRows)
 		}

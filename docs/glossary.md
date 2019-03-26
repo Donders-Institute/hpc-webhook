@@ -1,13 +1,13 @@
-# QaaS Glossary
+# HPC-webhook Glossary
 
-QaaS concepts are listed below in alphabetical order:
+HPC-webhook concepts are listed below in alphabetical order:
 
-* [QaaS](#qaas)
+* [HPC](#hpc)
 * [Webhook](#webhook)
 
-## QaaS
+## HPC
 
-Qsub as a Service (QaaS) is an infrastructure platform that allows the triggering of a qsub command on the High Performance Computing cluster by an external event.
+High Performance Computing.
 
 [^](#glossary)
 

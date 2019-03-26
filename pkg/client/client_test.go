@@ -16,12 +16,12 @@ func init() {
 func TestNewWebhook(t *testing.T) {
 
 	c := WebhookConfig{
-		QaasHost:     "localhost",
-		QaasPort:     443,
-		QaasCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/cert/TestServer.crt"),
+		HPCWebhookHost:     "localhost",
+		HPCWebhookPort:     443,
+		HPCWebhookCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-webhook/test/cert/TestServer.crt"),
 	}
 
-	script := path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/data/qsub.sh")
+	script := path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-webhook/test/data/qsub.sh")
 
 	url, err := c.New(script, "")
 
@@ -34,9 +34,9 @@ func TestNewWebhook(t *testing.T) {
 
 func TestListWebhook(t *testing.T) {
 	c := WebhookConfig{
-		QaasHost:     "localhost",
-		QaasPort:     443,
-		QaasCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-qaas/test/cert/TestServer.crt"),
+		HPCWebhookHost:     "localhost",
+		HPCWebhookPort:     443,
+		HPCWebhookCertFile: path.Join(os.Getenv("GOPATH"), "src/github.com/Donders-Institute/hpc-webhook/test/cert/TestServer.crt"),
 	}
 
 	chanWebhook, err := c.List()

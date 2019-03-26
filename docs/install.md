@@ -1,4 +1,4 @@
-# QaaS Installation Instructions
+# HPC-webhook Installation Instructions
 
 ## Obtain the source code
 
@@ -9,29 +9,29 @@ $ cd C:\Users\YOURUSERNAME\go\src\github.com\Donders-Institute
 
 Obtain the source code:
 ```console
-$ git clone https://github.com/Donders-Institute/hpc-qaas.git
+$ git clone https://github.com/Donders-Institute/hpc-webhook.git
 ```
 
 Go into the directory:
 ```console
-$ cd hpc-qaas
+$ cd hpc-webhook
 ```
 
 ## Configuration
 
 Go to the `configs` folder, 
-copy the `qaas-database.env.example` file to `qaas-database.env`, 
+copy the `hpc-webhook-database.env.example` file to `hpc-webhook-database.env`, 
 and change the contents:
 
 ```
-# Qaas server settings
-QAAS_HOST=qaas.dccn.nl
-QAAS_INTERNAL_PORT=5111
-QAAS_EXTERNAL_PORT=443
+# HPC webhook server settings
+HPC_WEBHOOK_HOST=webhook.dccn.nl
+HPC_WEBHOOK_INTERNAL_PORT=5111
+HPC_WEBHOOK_EXTERNAL_PORT=443
 HOME_DIR=/home
 DATA_DIR=/data
-PRIVATE_KEY_FILE=/run/secrets/qaas_private_key
-PUBLIC_KEY_FILE=/run/secrets/qaas_public_key
+PRIVATE_KEY_FILE=/run/secrets/hpc_webhook_private_key
+PUBLIC_KEY_FILE=/run/secrets/hpc_webhook_public_key
 
 # Relay computer node settings
 RELAY_NODE=relaynode.dccn.nl

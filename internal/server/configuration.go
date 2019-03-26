@@ -185,7 +185,7 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	}
 
 	// Succes
-	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.QaasHost, a.QaasExternalPort, configuration.Hash)
+	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.HPCWebhookHost, a.HPCWebhookExternalPort, configuration.Hash)
 	configurationResponse := ConfigurationResponse{
 		Webhook: webhookPayloadURL,
 	}
@@ -222,7 +222,7 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the item
-	list, err := getRow(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Hash, configuration.Groupname, configuration.Username)
+	list, err := getRow(a.DB, a.HPCWebhookHost, a.HPCWebhookExternalPort, configuration.Hash, configuration.Groupname, configuration.Username)
 	if err != nil || len(list) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -269,7 +269,7 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the list of webhooks
-	list, err := getListRows(a.DB, a.QaasHost, a.QaasExternalPort, configuration.Groupname, configuration.Username)
+	list, err := getListRows(a.DB, a.HPCWebhookHost, a.HPCWebhookExternalPort, configuration.Groupname, configuration.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)

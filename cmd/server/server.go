@@ -6,17 +6,17 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Donders-Institute/hpc-qaas/internal/server"
+	"github.com/Donders-Institute/hpc-webhook/internal/server"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	// Set Qaas server variables
-	qaasHost := os.Getenv("QAAS_HOST")
-	qaasInternalPort := os.Getenv("QAAS_INTERNAL_PORT")
-	qaasExternalPort := os.Getenv("QAAS_EXTERNAL_PORT")
-	address := fmt.Sprintf("%s:%s", qaasHost, qaasInternalPort)
+	// Set HPC webhook server variables
+	hpcWebhookHost := os.Getenv("HPC_WEBHOOK_HOST")
+	hpcWebhookInternalPort := os.Getenv("HPC_WEBHOOK_INTERNAL_PORT")
+	hpcWebhookExternalPort := os.Getenv("HPC_WEBHOOK_EXTERNAL_PORT")
+	address := fmt.Sprintf("%s:%s", hpcWebhookHost, hpcWebhookInternalPort)
 	homeDir := os.Getenv("HOME_DIR")
 	dataDir := os.Getenv("DATA_DIR")
 	privateKeyFilename := os.Getenv("PRIVATE_KEY_FILE")
@@ -37,7 +37,7 @@ func main() {
 	// Override settings if we run the server in a Docker container
 	if server.RunsWithinContainer() {
 		host = "db"
-		address = fmt.Sprintf("0.0.0.0:%s", qaasInternalPort)
+		address = fmt.Sprintf("0.0.0.0:%s", hpcWebhookInternalPort)
 	}
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
@@ -60,9 +60,9 @@ func main() {
 		RelayNode:                 relayNode,
 		RelayNodeTestUser:         relayNodeTestUser,
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
-		QaasHost:                  qaasHost,
-		QaasInternalPort:          qaasInternalPort,
-		QaasExternalPort:          qaasExternalPort,
+		HPCWebhookHost:            hpcWebhookHost,
+		HPCWebhookInternalPort:    hpcWebhookInternalPort,
+		HPCWebhookExternalPort:    hpcWebhookExternalPort,
 		PrivateKeyFilename:        privateKeyFilename,
 		PublicKeyFilename:         publicKeyFilename,
 	}

@@ -15,13 +15,13 @@ update_dep: $(GOPATH)/bin/dep
 	GOPATH=$(GOPATH) GOOS=$(GOOS) $(GOPATH)/bin/dep ensure --update
 
 build: build_dep
-	GOPATH=$(GOPATH) GOOS=$(GOOS) go install github.com/Donders-Institute/hpc-qaas/...
+	GOPATH=$(GOPATH) GOOS=$(GOOS) go install github.com/Donders-Institute/hpc-webhook/...
 
 doc:
 	@GOPATH=$(GOPATH) GOOS=$(GOOS) godoc -http=:6060
 
 test: build_dep
-	@GOPATH=$(GOPATH) GOOS=$(GOOS) GOCACHE=off go test -v github.com/Donders-Institute/hpc-qaas/...
+	@GOPATH=$(GOPATH) GOOS=$(GOOS) GOCACHE=off go test -v github.com/Donders-Institute/hpc-webhook/...
 
 install: build
 	@install -D $(GOPATH)/bin/* $(PREFIX)/bin
@@ -29,4 +29,4 @@ install: build
 clean:
 	@rm -rf $(GOPATH)/bin/cluster-*
 	@rm -rf $(GOPATH)/bin/trqhelpd
-	@rm -rf $(GOPATH)/pkg/*/Donders-Institute/hpc-qaas
+	@rm -rf $(GOPATH)/pkg/*/Donders-Institute/hpc-webhook

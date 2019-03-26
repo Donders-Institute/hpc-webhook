@@ -2,42 +2,42 @@ version: "3.7"
 
 services:
   server:
-    image: dccn/qaas-server
-    container_name: qaas_server_container
+    image: dccn/hpc-webhook-server
+    container_name: hpc_webhook_server_container
     build:
       context: .
       dockerfile: Dockerfile-server
     env_file:
-      - ./configs/qaas-database.env
+      - ./configs/hpc-webhook-database.env
     secrets:
-      - qaas_private_key
-      - qaas_public_key
+      - hpc_webhook_private_key
+      - hpc_webhook_public_key
     ports:
       - 5111:5111
     volumes:
       - ./data:/data
     networks:
-      - qaasnet
+      - hpc_webhook_net
     depends_on:
       - db
   db:
     image: postgres:11
     env_file:
-      - ./configs/qaas-database.env
+      - ./configs/hpc-webhook-database.env
     volumes:
       - ./init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh:ro
     networks:
-      - qaasnet
+      - hpc_webhook_net
     restart: always
 
 networks:
-  qaasnet:
+  hpc_webhook_net:
 
 volumes:
   postgres:
 
 secrets:
-  qaas_private_key:
-    file: ./configs/qaas
-  qaas_public_key:
-    file: ./configs/qaas.pub
+  hpc_webhook_private_key:
+    file: ./configs/hpc-webhook
+  hpc_webhook_public_key:
+    file: ./configs/hpc-webhook.pub

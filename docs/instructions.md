@@ -1,7 +1,7 @@
-# qaas testing instructions
+# webhook testing instructions
 
-We propose to use the following steps to try out qaas
-([https://github.com/Donders-Institute/hpc-qaas](https://github.com/Donders-Institute/hpc-qaas)).
+We propose to use the following steps to try out webhook
+([https://github.com/Donders-Institute/hpc-webhook](https://github.com/Donders-Institute/hpc-webhook)).
 
 ## 1. Create and debug your bash script on mentat
 
@@ -46,7 +46,7 @@ $ hpcutil webhook create test.sh
 
 You should get a message like
 ```
-INFO[0000] webhook created successfully with URL: https://qaas.dccn.nl:443/webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
+INFO[0000] webhook created successfully with URL: https://hpc-webhook.dccn.nl:443/webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
 ```
 Copy this webhook payload URL, we need it later.
 
@@ -60,7 +60,7 @@ Choose `Webhooks`.
 
 Fill in the webhook payload URL, for example:
 ```
-https://qaas.dccn.nl:443/webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
+https://hpc-webhook.dccn.nl:443/webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
 ```
 
 Update it.
@@ -78,14 +78,14 @@ There should be a green tickmark.
 
 Login to a mentat machine of choice, for example `mentat005.dccn.nl`.
 
-Go to your qaas results folder `/home/dccngroup/dccnuser/.qaas/5126d168-e3f1-4c7f-b228-a57fbaf007c4`.
+Go to your webhook results folder `/home/dccngroup/dccnuser/.webhooks/5126d168-e3f1-4c7f-b228-a57fbaf007c4`.
 
 Run `qstat` to check if your submitted job is queued, running or completed.
 
 Once the script is finished you should have two text files in this result folder, for example:
 
 ```
-$ cd ~/.qaas/5126d168-e3f1-4c7f-b228-a57fbaf007c4
+$ cd ~/.webhooks/5126d168-e3f1-4c7f-b228-a57fbaf007c4
 $ ls -1
 
 payload

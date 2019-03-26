@@ -1,5 +1,5 @@
 FROM golang:1.12-stretch
-ENV SRC_DIR=/go/src/github.com/Donders-Institute/hpc-qaas
+ENV SRC_DIR=/go/src/github.com/Donders-Institute/hpc-webhook
 ADD . $SRC_DIR/
 WORKDIR $SRC_DIR
 RUN make

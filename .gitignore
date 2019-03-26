@@ -20,8 +20,8 @@
 
 data/*
 test/results/*
-qaas-database.env
+hpc-webhook-database.env
 bin
 vendor
-configs/qaas
-configs/qaas.pub
+configs/hpc-webhook
+configs/hpc-webhook.pub

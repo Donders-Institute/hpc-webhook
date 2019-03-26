@@ -1,5 +1,5 @@
-# QaaS Design
+# HPC-webhook Design
 
 ## Architecture
 
-![Docker compose](figures/qaas-architecture.png)
+![Docker compose](figures/hpc-webhook-architecture.png)

@@ -90,7 +90,7 @@ func TestConfigurationAddHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":"https://qaas.dccn.nl:443/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
+			expectedString: `{"webhook":"https://hpc-webhook.dccn.nl:443/webhook/550e8400-e29b-41d4-a716-446655440001"}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -134,8 +134,8 @@ func TestConfigurationAddHandler(t *testing.T) {
 		homeDir:            path.Join("..", "..", "test", "results", "home"),
 		dataDir:            path.Join("..", "..", "test", "results", "data"),
 		keyDir:             keyDir,
-		privateKeyFilename: path.Join(keyDir, "qaas"),
-		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+		privateKeyFilename: path.Join(keyDir, "hpc-webhook"),
+		publicKeyFilename:  path.Join(keyDir, "hpc-webhook.pub"),
 	}
 
 	err := setupTestCase(testConfig)
@@ -161,14 +161,14 @@ func TestConfigurationAddHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:            testConfig.dataDir,
-			HomeDir:            testConfig.homeDir,
-			RelayNode:          "relaynode.dccn.nl",
-			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "5111",
-			QaasExternalPort:   "443",
-			PrivateKeyFilename: testConfig.publicKeyFilename,
-			PublicKeyFilename:  testConfig.privateKeyFilename,
+			DataDir:                testConfig.dataDir,
+			HomeDir:                testConfig.homeDir,
+			RelayNode:              "relaynode.dccn.nl",
+			HPCWebhookHost:         "hpc-webhook.dccn.nl",
+			HPCWebhookInternalPort: "5111",
+			HPCWebhookExternalPort: "443",
+			PrivateKeyFilename:     testConfig.publicKeyFilename,
+			PublicKeyFilename:      testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -197,7 +197,7 @@ func TestConfigurationAddHandler(t *testing.T) {
 					"2019-03-11T19:44:44+01:00")
 
 			mock.ExpectBegin()
-			mock.ExpectExec("INSERT INTO qaas").
+			mock.ExpectExec("INSERT INTO hpc_webhook").
 				WithArgs(c.configuration.Hash,
 					c.configuration.Groupname,
 					c.configuration.Username,
@@ -261,7 +261,7 @@ func TestConfigurationInfoHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"description","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:443/550e8400-e29b-41d4-a716-446655440001"}}`,
+			expectedString: `{"webhook":{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"description","created":"2019-03-11T19:44:44+01:00","url":"https://hpc-webhook.dccn.nl:443/550e8400-e29b-41d4-a716-446655440001"}}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -305,8 +305,8 @@ func TestConfigurationInfoHandler(t *testing.T) {
 		homeDir:            path.Join("..", "..", "test", "results", "home"),
 		dataDir:            path.Join("..", "..", "test", "results", "data"),
 		keyDir:             keyDir,
-		privateKeyFilename: path.Join(keyDir, "qaas"),
-		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+		privateKeyFilename: path.Join(keyDir, "hpc-webhook"),
+		publicKeyFilename:  path.Join(keyDir, "hpc-webhook.pub"),
 	}
 
 	err := setupTestCase(testConfig)
@@ -332,14 +332,14 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:            testConfig.dataDir,
-			HomeDir:            testConfig.homeDir,
-			RelayNode:          "relaynode.dccn.nl",
-			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "5111",
-			QaasExternalPort:   "443",
-			PrivateKeyFilename: testConfig.publicKeyFilename,
-			PublicKeyFilename:  testConfig.privateKeyFilename,
+			DataDir:                testConfig.dataDir,
+			HomeDir:                testConfig.homeDir,
+			RelayNode:              "relaynode.dccn.nl",
+			HPCWebhookHost:         "hpc-webhook.dccn.nl",
+			HPCWebhookInternalPort: "5111",
+			HPCWebhookExternalPort: "443",
+			PrivateKeyFilename:     testConfig.publicKeyFilename,
+			PublicKeyFilename:      testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -367,7 +367,7 @@ func TestConfigurationInfoHandler(t *testing.T) {
 					c.configuration.Description,
 					"2019-03-11T19:44:44+01:00",
 				)
-			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
+			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM hpc_webhook").
 				WithArgs(c.configuration.Hash, c.configuration.Groupname, c.configuration.Username).
 				WillReturnRows(expectedRows)
 		}
@@ -426,7 +426,7 @@ func TestConfigurationListHandler(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:44:44+01:00","url":"https://qaas.dccn.nl:443/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:45:44+01:00","url":"https://qaas.dccn.nl:443/550e8400-e29b-41d4-a716-446655440002"}]}`,
+			expectedString: `{"webhooks":[{"hash":"550e8400-e29b-41d4-a716-446655440001","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:44:44+01:00","url":"https://hpc-webhook.dccn.nl:443/550e8400-e29b-41d4-a716-446655440001"},{"hash":"550e8400-e29b-41d4-a716-446655440002","groupname":"groupname","username":"username","description":"","created":"2019-03-11T19:45:44+01:00","url":"https://hpc-webhook.dccn.nl:443/550e8400-e29b-41d4-a716-446655440002"}]}`,
 			expectedResult: true, // No error
 		},
 		{
@@ -470,8 +470,8 @@ func TestConfigurationListHandler(t *testing.T) {
 		homeDir:            path.Join("..", "..", "test", "results", "home"),
 		dataDir:            path.Join("..", "..", "test", "results", "data"),
 		keyDir:             keyDir,
-		privateKeyFilename: path.Join(keyDir, "qaas"),
-		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+		privateKeyFilename: path.Join(keyDir, "hpc-webhook"),
+		publicKeyFilename:  path.Join(keyDir, "hpc-webhook.pub"),
 	}
 
 	err := setupTestCase(testConfig)
@@ -497,14 +497,14 @@ func TestConfigurationListHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:            testConfig.dataDir,
-			HomeDir:            testConfig.homeDir,
-			RelayNode:          "relaynode.dccn.nl",
-			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "5111",
-			QaasExternalPort:   "443",
-			PrivateKeyFilename: testConfig.publicKeyFilename,
-			PublicKeyFilename:  testConfig.privateKeyFilename,
+			DataDir:                testConfig.dataDir,
+			HomeDir:                testConfig.homeDir,
+			RelayNode:              "relaynode.dccn.nl",
+			HPCWebhookHost:         "hpc-webhook.dccn.nl",
+			HPCWebhookInternalPort: "5111",
+			HPCWebhookExternalPort: "443",
+			PrivateKeyFilename:     testConfig.publicKeyFilename,
+			PublicKeyFilename:      testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -539,7 +539,7 @@ func TestConfigurationListHandler(t *testing.T) {
 					c.configuration.Username,
 					c.configuration.Description,
 					"2019-03-11T19:45:44+01:00")
-			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
+			mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM hpc_webhook").
 				WithArgs(c.configuration.Groupname, c.configuration.Username).
 				WillReturnRows(expectedRows)
 		}
@@ -642,8 +642,8 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 		homeDir:            path.Join("..", "..", "test", "results", "home"),
 		dataDir:            path.Join("..", "..", "test", "results", "data"),
 		keyDir:             keyDir,
-		privateKeyFilename: path.Join(keyDir, "qaas"),
-		publicKeyFilename:  path.Join(keyDir, "qaas.pub"),
+		privateKeyFilename: path.Join(keyDir, "hpc-webhook"),
+		publicKeyFilename:  path.Join(keyDir, "hpc-webhook.pub"),
 	}
 
 	err := setupTestCase(testConfig)
@@ -669,14 +669,14 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:            testConfig.dataDir,
-			HomeDir:            testConfig.homeDir,
-			RelayNode:          "relaynode.dccn.nl",
-			QaasHost:           "qaas.dccn.nl",
-			QaasInternalPort:   "5111",
-			QaasExternalPort:   "443",
-			PrivateKeyFilename: testConfig.publicKeyFilename,
-			PublicKeyFilename:  testConfig.privateKeyFilename,
+			DataDir:                testConfig.dataDir,
+			HomeDir:                testConfig.homeDir,
+			RelayNode:              "relaynode.dccn.nl",
+			HPCWebhookHost:         "hpc-webhook.dccn.nl",
+			HPCWebhookInternalPort: "5111",
+			HPCWebhookExternalPort: "443",
+			PrivateKeyFilename:     testConfig.publicKeyFilename,
+			PublicKeyFilename:      testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -713,7 +713,7 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 					"2019-03-11T19:45:44+01:00")
 
 			mock.ExpectBegin()
-			mock.ExpectExec("DELETE FROM qaas").
+			mock.ExpectExec("DELETE FROM hpc_webhook").
 				WithArgs(hash1, c.configuration.Groupname, c.configuration.Username).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 			mock.ExpectCommit()

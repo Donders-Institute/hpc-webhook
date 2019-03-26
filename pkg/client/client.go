@@ -20,7 +20,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Donders-Institute/hpc-qaas/internal/server"
+	"github.com/Donders-Institute/hpc-webhook/internal/server"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -80,14 +80,14 @@ func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, contentType string
 	return rspBody, nil
 }
 
-// WebhookConfig provides client interfaces for managing webhook registry on the QaaS server, using the RESTful interface.
+// WebhookConfig provides client interfaces for managing webhook registry on the HPC webhook server, using the RESTful interface.
 type WebhookConfig struct {
-	QaasHost     string
-	QaasPort     int
-	QaasCertFile string
+	HPCWebhookHost     string
+	HPCWebhookPort     int
+	HPCWebhookCertFile string
 }
 
-// New provisions a new WebhookConfig for QaaS and registry the new webhook at the QaaS server.
+// New provisions a new WebhookConfig for HPC webhook and registry the new webhook at the HPC webhook server.
 func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 
 	// check existence of the script and its type.
@@ -109,7 +109,7 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 		return nil, err
 	}
 	id := uuid.New().String()
-	workdir := path.Join(cuser.HomeDir, ".qaas", id)
+	workdir := path.Join(cuser.HomeDir, ".webhooks", id)
 
 	if err := os.MkdirAll(workdir, 0700); err != nil {
 		return nil, err
@@ -126,10 +126,10 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 		return nil, err
 	}
 
-	// call QaaS to register the webhook
+	// call HPC webhook server to register the webhook
 	myURL := url.URL{
 		Scheme: "https",
-		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+		Host:   fmt.Sprintf("%s:%d", s.HPCWebhookHost, s.HPCWebhookPort),
 		Path:   server.ConfigurationPath,
 	}
 	var response server.ConfigurationResponse
@@ -140,7 +140,7 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 	}
 	httpCode, err := httpPutJSON(
 		&myURL,
-		s.QaasCertFile,
+		s.HPCWebhookCertFile,
 		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
@@ -152,7 +152,7 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 	log.Debugf("response data: %+v", response)
 
 	if err != nil {
-		return nil, fmt.Errorf("error registering webhook on QaaS server: +%v (HTTP CODE: %d)", err, httpCode)
+		return nil, fmt.Errorf("error registering webhook on HPC webhook server: +%v (HTTP CODE: %d)", err, httpCode)
 	}
 
 	webhookURL, err := url.Parse(response.Webhook)
@@ -167,10 +167,10 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 // The information of webhooks is returned with a channel.
 func (s *WebhookConfig) List() (chan WebhookConfigInfo, error) {
 
-	// channel for webhook ids found in local QaaS directory.
+	// channel for webhook ids found in local webhooks directory.
 	chanWebhookID := make(chan string)
 
-	// channel for webhook information found in the remote QaaS server.
+	// channel for webhook information found in the remote HPC webhook server.
 	chanWebhookConfigInfo := make(chan WebhookConfigInfo)
 
 	wg := new(sync.WaitGroup)
@@ -200,7 +200,7 @@ func (s *WebhookConfig) List() (chan WebhookConfigInfo, error) {
 			//
 			// - the item is a directory
 			// - the name of the item can be passed by uuid.Parse() function
-			if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, ".qaas")); err == nil {
+			if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, ".webhooks")); err == nil {
 				for _, f := range items {
 					if !f.IsDir() {
 						continue
@@ -239,14 +239,14 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 
 	myURL := url.URL{
 		Scheme: "https",
-		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+		Host:   fmt.Sprintf("%s:%d", s.HPCWebhookHost, s.HPCWebhookPort),
 		Path:   path.Join(server.ConfigurationPath, id),
 	}
 	var response server.ConfigurationInfoResponse
 
 	httpCode, err := httpGetJSON(
 		&myURL,
-		s.QaasCertFile,
+		s.HPCWebhookCertFile,
 		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,
@@ -258,7 +258,7 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	log.Debugf("response data: %+v", response)
 
 	if err != nil {
-		return info, fmt.Errorf("error retrieving webhook info from the QaaS server: %+v (HTTP CODE: %d)", err, httpCode)
+		return info, fmt.Errorf("error retrieving webhook info from the HPC webhook server: %+v (HTTP CODE: %d)", err, httpCode)
 	}
 
 	if id != response.Webhook.Hash {
@@ -270,7 +270,7 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	info.WebhookURL = response.Webhook.URL
 
 	// read local script from the webhook's working directory
-	if script, err := ioutil.ReadFile(path.Join(cuser.HomeDir, ".qaas", id, "script.sh")); err != nil {
+	if script, err := ioutil.ReadFile(path.Join(cuser.HomeDir, ".webhooks", id, "script.sh")); err != nil {
 		log.Errorf("cannot locate script of webhook: %s\n", id)
 	} else {
 		// remove tailing "\n"
@@ -282,16 +282,16 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 
 // Delete removes a webhook with the given id.
 //
-// The deletion maily removes webhook registry from QaaS server.
-// If removeDir is true, the local webhook working directory is removed when the webhook is unregistered from the QaaS server.
+// The deletion maily removes webhook registry from HPC webhook server.
+// If removeDir is true, the local webhook working directory is removed when the webhook is unregistered from the HPC webhook server.
 func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 
-	// check if there is a webhook directory in user's .qaas directory.
+	// check if there is a webhook directory in user's webhooks directory.
 	cuser, err := user.Current()
 	if err != nil {
 		return err
 	}
-	workdir := path.Join(cuser.HomeDir, ".qaas", id)
+	workdir := path.Join(cuser.HomeDir, ".webhooks", id)
 
 	w, err := os.Lstat(workdir)
 	if err != nil {
@@ -309,7 +309,7 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 	// make DELETE call to the server and receive response.
 	myURL := url.URL{
 		Scheme: "https",
-		Host:   fmt.Sprintf("%s:%d", s.QaasHost, s.QaasPort),
+		Host:   fmt.Sprintf("%s:%d", s.HPCWebhookHost, s.HPCWebhookPort),
 		Path:   path.Join(server.ConfigurationPath, id),
 	}
 
@@ -319,7 +319,7 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 	}
 	httpCode, err := httpDelete(
 		&myURL,
-		s.QaasCertFile,
+		s.HPCWebhookCertFile,
 		&server.ConfigurationRequest{
 			Hash:        id,
 			Groupname:   cgroup.Name,

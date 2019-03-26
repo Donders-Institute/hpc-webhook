@@ -23,7 +23,7 @@ func TestAddRow(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO qaas").WithArgs(configuration.Hash,
+	mock.ExpectExec("INSERT INTO hpc_webhook").WithArgs(configuration.Hash,
 		configuration.Groupname,
 		configuration.Username,
 		configuration.Description,
@@ -63,7 +63,7 @@ func TestDeleteRow(t *testing.T) {
 		AddRow(2, hash2, expectedGroupname, expectedUsername, "This is script 2", "2019-03-11 10:20:00")
 
 	mock.ExpectBegin()
-	mock.ExpectExec("^DELETE FROM qaas").
+	mock.ExpectExec("^DELETE FROM hpc_webhook").
 		WithArgs(hash2, expectedGroupname, expectedUsername).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
@@ -95,12 +95,12 @@ func TestGetRowHashOnly(t *testing.T) {
 	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
 		AddRow(1, hash, expectedGroupname, expectedUsername, expectedDescription, expectedCreated)
 
-	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas WHERE").
+	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM hpc_webhook WHERE").
 		WithArgs(hash).
 		WillReturnRows(expectedRows)
 
-	qaasHost := "qaas.dccn.nl"
-	qaasExternalPort := "443"
+	hpcWebhookHost := "hpc-webhook.dccn.nl"
+	hpcWebhookExternalPort := "443"
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -109,11 +109,11 @@ func TestGetRowHashOnly(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash),
 		},
 	}
 
-	list, err = getRowHashOnly(db, qaasHost, qaasExternalPort, hash)
+	list, err = getRowHashOnly(db, hpcWebhookHost, hpcWebhookExternalPort, hash)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}
@@ -145,12 +145,12 @@ func TestGetRow(t *testing.T) {
 	expectedRows := sqlmock.NewRows([]string{"id", "hash", "groupname", "username", "description", "created"}).
 		AddRow(1, hash, expectedGroupname, expectedUsername, expectedDescription, expectedCreated)
 
-	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas WHERE").
+	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM hpc_webhook WHERE").
 		WithArgs(hash, expectedGroupname, expectedUsername).
 		WillReturnRows(expectedRows)
 
-	qaasHost := "qaas.dccn.nl"
-	qaasExternalPort := "443"
+	hpcWebhookHost := "hpc-webhook.dccn.nl"
+	hpcWebhookExternalPort := "443"
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -159,11 +159,11 @@ func TestGetRow(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash),
 		},
 	}
 
-	list, err = getRow(db, qaasHost, qaasExternalPort, hash, expectedGroupname, expectedUsername)
+	list, err = getRow(db, hpcWebhookHost, hpcWebhookExternalPort, hash, expectedGroupname, expectedUsername)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}
@@ -202,12 +202,12 @@ func TestGetListRows(t *testing.T) {
 		AddRow(1, hash1, expectedGroupname1, expectedUsername1, expectedDescription1, expectedCreated1).
 		AddRow(2, hash2, expectedGroupname2, expectedUsername2, expectedDescription2, expectedCreated2)
 
-	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM qaas").
+	mock.ExpectQuery("^SELECT id, hash, groupname, username, description, created FROM hpc_webhook").
 		WithArgs(expectedGroupname1, expectedUsername1).
 		WillReturnRows(expectedRows)
 
-	qaasHost := "qaas.dccn.nl"
-	qaasExternalPort := "443"
+	hpcWebhookHost := "hpc-webhook.dccn.nl"
+	hpcWebhookExternalPort := "443"
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -216,7 +216,7 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername1,
 			Description: expectedDescription1,
 			Created:     expectedCreated1,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash1),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash1),
 		},
 		{
 			ID:          2,
@@ -225,11 +225,11 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername2,
 			Description: expectedDescription2,
 			Created:     expectedCreated2,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", qaasHost, qaasExternalPort, WebhookPath, hash2),
+			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash2),
 		},
 	}
 
-	list, err = getListRows(db, qaasHost, qaasExternalPort, expectedGroupname1, expectedUsername1)
+	list, err = getListRows(db, hpcWebhookHost, hpcWebhookExternalPort, expectedGroupname1, expectedUsername1)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}

@@ -34,8 +34,8 @@ func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 }
 
 // Check if the webhook id exists. Return the username
-func checkWebhookID(db *sql.DB, qaasHost string, qaasExternalPort string, webhookID string) (string, string, error) {
-	list, err := getRowHashOnly(db, qaasHost, qaasExternalPort, webhookID)
+func checkWebhookID(db *sql.DB, hpcWebhookHost string, hpcWebhookExternalPort string, webhookID string) (string, string, error) {
+	list, err := getRowHashOnly(db, hpcWebhookHost, hpcWebhookExternalPort, webhookID)
 	if err != nil || len(list) == 0 {
 		return "", "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
 	}
@@ -103,7 +103,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if webhookID exists
-	groupname, username, err := checkWebhookID(a.DB, a.QaasHost, a.QaasExternalPort, webhookID)
+	groupname, username, err := checkWebhookID(a.DB, a.HPCWebhookHost, a.HPCWebhookExternalPort, webhookID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -140,9 +140,9 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Prepare the execution of the script
 	payloadFilename := path.Join(payloadDir, "payload")
-	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID)
+	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".webhooks", webhookID)
 	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
-	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, ".qaas", webhookID, "script.sh")
+	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, ".webhooks", webhookID, "script.sh")
 
 	executeConfig := executeConfiguration{
 		privateKeyFilename:     a.PrivateKeyFilename,
