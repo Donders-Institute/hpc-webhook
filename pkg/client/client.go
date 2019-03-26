@@ -34,13 +34,13 @@ type WebhookConfigInfo struct {
 	WebhookURL   string
 }
 
-// TriggerWebhook makes a POST call to the WebhookURL with the given payload.
+// TriggerWebhook makes a POST call to the WebhookURL with the given payload in byte array.
 //
-// The payload is specified by `data` as a byte array, and the string `contentType` as the
+// The data type of the payload is specified by `contentType` which is then used as the
 // HTTP request content type.
 //
 // For the WebhookURL supporting HTTPS protocol, the provided X509 certificate file `cacert`
-// is used for making the connection.
+// is used for validating the connection.
 //
 // The response body of the POST is returned as a byte array.
 func (info *WebhookConfigInfo) TriggerWebhook(payload []byte, contentType string, cacert string) ([]byte, error) {
