@@ -109,7 +109,7 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 		return nil, err
 	}
 	id := uuid.New().String()
-	workdir := path.Join(cuser.HomeDir, ".webhooks", id)
+	workdir := path.Join(cuser.HomeDir, server.WebhookWorkdir, id)
 
 	if err := os.MkdirAll(workdir, 0700); err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (s *WebhookConfig) New(script string, desc string) (*url.URL, error) {
 
 	// provision necessary directory
 	// - write path to the script.sh file
-	f, err := os.Create(path.Join(workdir, "script.sh"))
+	f, err := os.Create(path.Join(workdir, server.ScriptName))
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +200,7 @@ func (s *WebhookConfig) List() (chan WebhookConfigInfo, error) {
 			//
 			// - the item is a directory
 			// - the name of the item can be passed by uuid.Parse() function
-			if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, ".webhooks")); err == nil {
+			if items, err := ioutil.ReadDir(path.Join(cuser.HomeDir, server.WebhookWorkdir)); err == nil {
 				for _, f := range items {
 					if !f.IsDir() {
 						continue
@@ -270,7 +270,7 @@ func (s *WebhookConfig) GetInfo(id string) (WebhookConfigInfo, error) {
 	info.WebhookURL = response.Webhook.URL
 
 	// read local script from the webhook's working directory
-	if script, err := ioutil.ReadFile(path.Join(cuser.HomeDir, ".webhooks", id, "script.sh")); err != nil {
+	if script, err := ioutil.ReadFile(path.Join(cuser.HomeDir, server.WebhookWorkdir, id, server.ScriptName)); err != nil {
 		log.Errorf("cannot locate script of webhook: %s\n", id)
 	} else {
 		// remove tailing "\n"
@@ -291,7 +291,7 @@ func (s *WebhookConfig) Delete(id string, removeDir bool) error {
 	if err != nil {
 		return err
 	}
-	workdir := path.Join(cuser.HomeDir, ".webhooks", id)
+	workdir := path.Join(cuser.HomeDir, server.WebhookWorkdir, id)
 
 	w, err := os.Lstat(workdir)
 	if err != nil {
