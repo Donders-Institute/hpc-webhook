@@ -25,7 +25,7 @@ and change the contents:
 
 ```
 # HPC webhook server settings
-HPC_WEBHOOK_HOST=webhook.dccn.nl
+HPC_WEBHOOK_HOST=hpc-webhook.dccn.nl
 HPC_WEBHOOK_INTERNAL_PORT=5111
 HPC_WEBHOOK_EXTERNAL_PORT=443
 HOME_DIR=/home
