@@ -184,15 +184,15 @@ func TestHandlerWebhook(t *testing.T) {
 		app := &api
 
 		// Create the user script file
-		userScriptDir := path.Join(api.HomeDir, c.groupname, c.username, ".webhooks", c.hash)
-		userScriptPathFilename := path.Join(userScriptDir, "script.sh")
+		userScriptDir := path.Join(api.HomeDir, c.groupname, c.username, WebhooksWorkDir, c.hash)
+		userScriptPathFilename := path.Join(userScriptDir, ScriptName)
 		err = os.MkdirAll(userScriptDir, os.ModePerm)
 		if err != nil {
 			t.Errorf("Error writing user script dir")
 		}
-		err = ioutil.WriteFile(userScriptPathFilename, []byte("script.sh"), 0644)
+		err = ioutil.WriteFile(userScriptPathFilename, []byte("test"), 0644)
 		if err != nil {
-			t.Errorf("Error writing script.sh")
+			t.Errorf("Error writing script")
 		}
 
 		// Obtain the body
