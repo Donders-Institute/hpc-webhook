@@ -23,11 +23,11 @@ func TestTriggerQsubCommand(t *testing.T) {
 	payloadDir := path.Join(dataDir, "payloads", username)
 	privateKeyFilename := path.Join(keyDir, "hpc-webhook")
 	publicKeyFilename := path.Join(keyDir, "hpc-webhook.pub")
-	userScriptDir := path.Join(homeDir, groupname, username, ".webhooks", webhookID)
-	payloadFilename := path.Join(payloadDir, "payload")
+	userScriptDir := path.Join(homeDir, groupname, username, WebhooksWorkDir, webhookID)
+	payloadFilename := path.Join(payloadDir, PayLoadName)
 	targetPayloadDir := userScriptDir
-	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
-	userScriptPathFilename := path.Join(userScriptDir, "script.sh")
+	targetPayloadFilename := path.Join(targetPayloadDir, PayLoadName)
+	userScriptPathFilename := path.Join(userScriptDir, ScriptName)
 
 	// Create the data dir
 	err := os.MkdirAll(dataDir, os.ModePerm)
@@ -140,11 +140,11 @@ func TestExecuteScript(t *testing.T) {
 	payloadDir := path.Join(dataDir, "payloads", username)
 	privateKeyFilename := path.Join(keyDir, "hpc-webhook")
 	publicKeyFilename := path.Join(keyDir, "hpc-webhook.pub")
-	userScriptDir := path.Join(homeDir, groupname, username, ".webhooks", webhookID)
-	payloadFilename := path.Join(payloadDir, "payload")
-	userScriptPathFilename := path.Join(userScriptDir, "script.sh")
+	userScriptDir := path.Join(homeDir, groupname, username, WebhooksWorkDir, webhookID)
+	payloadFilename := path.Join(payloadDir, PayLoadName)
+	userScriptPathFilename := path.Join(userScriptDir, ScriptName)
 	targetPayloadDir := userScriptDir
-	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
+	targetPayloadFilename := path.Join(targetPayloadDir, PayLoadName)
 	payload := []byte("{test: test}")
 
 	// Create the data dir
@@ -196,7 +196,7 @@ func TestExecuteScript(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing payload dir")
 	}
-	err = ioutil.WriteFile(path.Join(payloadDir, "payload"), payload, 0644)
+	err = ioutil.WriteFile(path.Join(payloadDir, PayLoadName), payload, 0644)
 	if err != nil {
 		t.Errorf("Error writing payload")
 	}

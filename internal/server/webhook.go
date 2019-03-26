@@ -53,7 +53,7 @@ func parseWebhookPayload(req *http.Request) ([]byte, error) {
 
 // Write the payload to a file
 func writeWebhookPayloadToFile(payloadDir string, payload []byte, username string) error {
-	payloadFilename := path.Join(payloadDir, "payload")
+	payloadFilename := path.Join(payloadDir, PayLoadName)
 	err := ioutil.WriteFile(payloadFilename, payload, 0600)
 	if err != nil {
 		return err
@@ -139,10 +139,10 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Prepare the execution of the script
-	payloadFilename := path.Join(payloadDir, "payload")
-	targetPayloadDir := path.Join(a.HomeDir, groupname, username, ".webhooks", webhookID)
-	targetPayloadFilename := path.Join(targetPayloadDir, "payload")
-	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, ".webhooks", webhookID, "script.sh")
+	payloadFilename := path.Join(payloadDir, PayLoadName)
+	targetPayloadDir := path.Join(a.HomeDir, groupname, username, WebhooksWorkDir, webhookID)
+	targetPayloadFilename := path.Join(targetPayloadDir, PayLoadName)
+	userScriptPathFilename := path.Join(a.HomeDir, groupname, username, WebhooksWorkDir, webhookID, ScriptName)
 
 	executeConfig := executeConfiguration{
 		privateKeyFilename:     a.PrivateKeyFilename,
