@@ -64,7 +64,7 @@ func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfigurati
 	userScriptFilename := string(contents)
 
 	// Go the correct folder and run the qsub command from there
-	command := fmt.Sprintf("cd ~/%s/%s/ && qsub -F %s %s", WebhooksWorkDir, conf.webhookID, conf.targetPayloadFilename, userScriptFilename)
+	command := fmt.Sprintf(`bash -l -c "cd ~/%s/%s/ && qsub -F %s %s"`, WebhooksWorkDir, conf.webhookID, conf.targetPayloadFilename, userScriptFilename)
 	fmt.Println(command)
 	err = c.Run(session, command)
 	if err != nil {
