@@ -89,7 +89,7 @@ $ cd ~/.webhooks/5126d168-e3f1-4c7f-b228-a57fbaf007c4
 $ ls -1
 
 payload
-script.sh
+script
 test.sh.e34986226
 test.sh.o34986226
 ```
