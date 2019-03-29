@@ -78,14 +78,14 @@ There should be a green tickmark.
 
 Login to a mentat machine of choice, for example `mentat005.dccn.nl`.
 
-Go to your webhook results folder `/home/dccngroup/dccnuser/.webhooks/5126d168-e3f1-4c7f-b228-a57fbaf007c4`.
+Go to your webhook results folder `/home/dccngroup/dccnuser/.webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4`.
 
 Run `qstat` to check if your submitted job is queued, running or completed.
 
 Once the script is finished you should have two text files in this result folder, for example:
 
 ```
-$ cd ~/.webhooks/5126d168-e3f1-4c7f-b228-a57fbaf007c4
+$ cd ~/.webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
 $ ls -1
 
 payload

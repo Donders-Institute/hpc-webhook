@@ -8,9 +8,9 @@ import (
 
 // Setup of user's workspace directories and files
 const (
-	WebhooksWorkDir = ".webhooks" // WebhooksWorkDir denotes the user's work directory
-	PayLoadName     = "payload"   // PayLoadName is the name of the payload file in user's work directory
-	ScriptName      = "script"    // ScriptName is the name of the script in the user's work directory
+	WebhooksWorkDir = ".webhook" // WebhooksWorkDir denotes the user's work directory
+	PayLoadName     = "payload"  // PayLoadName is the name of the payload file in user's work directory
+	ScriptName      = "script"   // ScriptName is the name of the script in the user's work directory
 )
 
 // API is used to store the database pointer
