@@ -1,6 +1,6 @@
 # webhook testing instructions
 
-We propose to use the following steps to try out webhook
+We propose to use the following steps to try out hpc-webhook
 ([https://github.com/Donders-Institute/hpc-webhook](https://github.com/Donders-Institute/hpc-webhook)).
 
 ## 1. Create and debug your bash script on mentat
