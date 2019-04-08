@@ -50,7 +50,21 @@ INFO[0000] webhook created successfully with URL: https://hpc-webhook.dccn.nl:44
 ```
 Copy this webhook payload URL, we need it later.
 
-## 3. Configuring the webhook client on github.com
+## 4. Test the webhook
+
+Using the webhook URL, you can trigger the script execution from anywhere on the internet. To test it, login to a mentat machine of choice, for example `mentat005.dccn.nl`. Then you can use `wget` or `curl` on the command line to send a POST request that triggers the webhook. 
+```
+curl -X POST https://hpc-webhook.dccn.nl:443/webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
+```
+
+This should result in
+```
+Webhook handled successfully
+```
+
+You can skip to step 6 to check that the job was correctly scheduled and executed.
+
+## 4. Configuring the webhook client on github.com
 
 Go to your owned Github repository, for example `https://github.com/rutgervandeelen/simple`.
 
@@ -65,7 +79,7 @@ https://hpc-webhook.dccn.nl:443/webhook/5126d168-e3f1-4c7f-b228-a57fbaf007c4
 
 Update it.
 
-## 4. Commit your software changes to github
+## 5. Commit your software changes to github
 
 Change your software and commit these changes to your github repository.
 
@@ -74,7 +88,7 @@ For example, change the README file and commit it.
 Check `Settings > Webhooks` and see if the delivery of the payload was succesful.
 There should be a green tickmark.
 
-## 5. Check the results on mentat
+## 6. Check the results on mentat
 
 Login to a mentat machine of choice, for example `mentat005.dccn.nl`.
 
