@@ -5,7 +5,8 @@
 
 High Performance Computing (HPC) webhook package to trigger qsub commands
 
-For more information:
-* [installation instructions](docs/install.md)
-* [design](docs/design.md)
-* [glossary](docs/glossary.md)
+For more information see the documentation:
+* uUage [instructions](docs/instructions.md)
+* Installation [instructions](docs/install.md)
+* [Design](docs/design.md)
+* [Glossary](docs/glossary.md)
