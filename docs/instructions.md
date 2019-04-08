@@ -1,4 +1,4 @@
-# webhook testing instructions
+# hpc-webhook testing instructions
 
 We propose to use the following steps to try out hpc-webhook
 ([https://github.com/Donders-Institute/hpc-webhook](https://github.com/Donders-Institute/hpc-webhook)).
