@@ -33,6 +33,9 @@ func (fc FakeConnector) CloseSession(session *ssh.Session) error {
 	return err
 }
 
+func (fc FakeConnector) CloseConnection(client *ssh.Client) {
+}
+
 func TestConnect(t *testing.T) {
 	fc := FakeConnector{
 		Description: "fake SSH connection",
@@ -54,6 +57,7 @@ func TestConnect(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
+	defer fc.CloseConnection(client)
 
 	session, err = fc.NewSession(client)
 	if err != nil {
