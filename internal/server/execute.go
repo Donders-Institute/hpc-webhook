@@ -95,6 +95,7 @@ func ExecuteScript(c Connector, conf executeConfiguration) error {
 	if err != nil {
 		return err
 	}
+	defer c.CloseConnection(client)
 
 	// Copy the payload to HPC webhooks folder
 	err = os.MkdirAll(conf.targetPayloadDir, os.ModePerm)

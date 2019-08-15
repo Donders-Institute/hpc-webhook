@@ -105,6 +105,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
+	defer fc.CloseConnection(client)
 
 	executeConfig := executeConfiguration{
 		privateKeyFilename:     privateKeyFilename,

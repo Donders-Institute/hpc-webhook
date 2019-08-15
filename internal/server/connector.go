@@ -11,6 +11,7 @@ type Connector interface {
 	Run(session *ssh.Session, command string) error
 	CombinedOutput(session *ssh.Session, command string) ([]byte, error)
 	CloseSession(session *ssh.Session) error
+	CloseConnection(client *ssh.Client)
 }
 
 // SSHConnector is used tp replace the standard SSH library functions
@@ -41,4 +42,9 @@ func (c SSHConnector) CombinedOutput(session *ssh.Session, command string) ([]by
 // CloseSession makes it possible to mock the closing of a session
 func (c SSHConnector) CloseSession(session *ssh.Session) error {
 	return session.Close()
+}
+
+// CloseConnection makes it possible to mock the closing of a session
+func (c SSHConnector) CloseConnection(client *ssh.Client) {
+	client.Conn.Close()
 }
