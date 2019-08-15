@@ -26,6 +26,7 @@ services:
       - ./configs/hpc-webhook-database.env
     volumes:
       - ./init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh:ro
+      - ./pgdata:/var/lib/postgresql/data
     networks:
       - hpc_webhook_net
     restart: always
