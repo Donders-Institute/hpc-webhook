@@ -18,6 +18,7 @@
 
 .vscode/
 
+pgdata/*
 data/*
 test/results/*
 hpc-webhook-database.env
