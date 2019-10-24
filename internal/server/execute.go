@@ -6,25 +6,27 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 )
 
 type executeConfiguration struct {
-	privateKeyFilename     string
-	payloadFilename        string
-	targetPayloadDir       string
-	targetPayloadFilename  string
-	userScriptPathFilename string
-	relayNodeName          string
-	remoteServer           string
-	dataDir                string
-	homeDir                string
-	webhookID              string
-	payload                []byte
-	username               string
-	groupname              string
-	password               string
+	privateKeyFilename       string
+	payloadFilename          string
+	targetPayloadDir         string
+	targetPayloadFilename    string
+	userScriptPathFilename   string
+	relayNodeName            string
+	connectionTimeoutSeconds int
+	remoteServer             string
+	dataDir                  string
+	homeDir                  string
+	webhookID                string
+	payload                  []byte
+	username                 string
+	groupname                string
+	password                 string
 }
 
 // CopyFile copies a source file to a destination file.
@@ -87,6 +89,7 @@ func ExecuteScript(c Connector, conf executeConfiguration) error {
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
+		Timeout: time.Duration(conf.connectionTimeoutSeconds) * time.Second,
 	}
 
 	// Start an SSH session on the relay node

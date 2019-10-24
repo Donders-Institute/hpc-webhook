@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/Donders-Institute/hpc-webhook/internal/server"
 	"github.com/gorilla/mux"
@@ -26,6 +27,10 @@ func main() {
 	relayNode := os.Getenv("RELAY_NODE")
 	relayNodeTestUser := os.Getenv("RELAY_NODE_TEST_USER")
 	relayNodeTestUserPassword := os.Getenv("RELAY_NODE_TEST_USER_PASSWORD")
+	connectionTimeoutSeconds, err := strconv.Atoi(os.Getenv("CONNECTION_TIMEOUT_SECONDS"))
+	if err != nil {
+		panic(err)
+	}
 
 	// Set the database variables
 	host := os.Getenv("POSTGRES_HOST")
@@ -60,6 +65,7 @@ func main() {
 		RelayNode:                 relayNode,
 		RelayNodeTestUser:         relayNodeTestUser,
 		RelayNodeTestUserPassword: relayNodeTestUserPassword,
+		ConnectionTimeoutSeconds:  connectionTimeoutSeconds,
 		HPCWebhookHost:            hpcWebhookHost,
 		HPCWebhookInternalPort:    hpcWebhookInternalPort,
 		HPCWebhookExternalPort:    hpcWebhookExternalPort,

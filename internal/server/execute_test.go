@@ -6,12 +6,14 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"golang.org/x/crypto/ssh"
 )
 
 func TestTriggerQsubCommand(t *testing.T) {
 	relayNodeName := "relaynode.dccn.nl"
+	connectionTimeoutSeconds := 30
 	remote := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
 	username := "dccnuser"
@@ -99,6 +101,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
+		Timeout: time.Duration(connectionTimeoutSeconds) * time.Second,
 	}
 
 	client, err := fc.NewClient(remote, clientConfig)
@@ -108,18 +111,19 @@ func TestTriggerQsubCommand(t *testing.T) {
 	defer fc.CloseConnection(client)
 
 	executeConfig := executeConfiguration{
-		privateKeyFilename:     privateKeyFilename,
-		payloadFilename:        payloadFilename,
-		targetPayloadDir:       targetPayloadDir,
-		targetPayloadFilename:  targetPayloadFilename,
-		userScriptPathFilename: userScriptPathFilename,
-		username:               username,
-		groupname:              groupname,
-		password:               password,
-		relayNodeName:          relayNodeName,
-		webhookID:              webhookID,
-		dataDir:                dataDir,
-		homeDir:                homeDir,
+		privateKeyFilename:       privateKeyFilename,
+		payloadFilename:          payloadFilename,
+		targetPayloadDir:         targetPayloadDir,
+		targetPayloadFilename:    targetPayloadFilename,
+		userScriptPathFilename:   userScriptPathFilename,
+		username:                 username,
+		groupname:                groupname,
+		password:                 password,
+		relayNodeName:            relayNodeName,
+		connectionTimeoutSeconds: connectionTimeoutSeconds,
+		webhookID:                webhookID,
+		dataDir:                  dataDir,
+		homeDir:                  homeDir,
 	}
 
 	err = triggerQsubCommand(fc, client, executeConfig)

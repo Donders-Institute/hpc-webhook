@@ -22,6 +22,7 @@ type API struct {
 	RelayNode                 string
 	RelayNodeTestUser         string
 	RelayNodeTestUserPassword string
+	ConnectionTimeoutSeconds  int
 	HPCWebhookHost            string
 	HPCWebhookInternalPort    string // Port for internal use
 	HPCWebhookExternalPort    string // Port for the outside world

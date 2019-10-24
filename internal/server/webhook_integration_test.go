@@ -56,7 +56,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"x-github-delivery": "someValue",
 			},
 			expectedStatus: 200,
-			expectedString: "Webhook handled successfully",
+			expectedString: "Payload delivered successfully",
 			expectedResult: true, // No error
 		},
 		{
@@ -71,7 +71,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: "Webhook handled successfully",
+			expectedString: "Payload delivered successfully",
 			expectedResult: true, // No error
 		},
 		{
@@ -86,7 +86,7 @@ func TestHandlerWebhook(t *testing.T) {
 				"Content-Type": "application/json; charset=utf-8",
 			},
 			expectedStatus: 200,
-			expectedString: "Webhook handled successfully",
+			expectedString: "Payload delivered successfully",
 			expectedResult: true, // No error
 		},
 		{
@@ -174,6 +174,7 @@ func TestHandlerWebhook(t *testing.T) {
 			RelayNode:                 "relaynode.dccn.nl",
 			RelayNodeTestUser:         c.username,
 			RelayNodeTestUserPassword: "somepassword",
+			ConnectionTimeoutSeconds:  30,
 			HPCWebhookHost:            "hpc-webhook.dccn.nl",
 			HPCWebhookInternalPort:    "5111",
 			HPCWebhookExternalPort:    "443",
