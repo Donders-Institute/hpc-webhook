@@ -147,7 +147,7 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	// Check method
 	if !strings.EqualFold(req.Method, "PUT") {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Printf("%s Error 405 - Method not allowed: invalid method: %s\n", time.Now().Format(time.RFC3339), req.Method)
 		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
 		return
 	}
@@ -207,7 +207,7 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 	// Check method
 	if !strings.EqualFold(req.Method, "GET") {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Printf("%s Error 405 - Method not allowed: invalid method: %s\n", time.Now().Format(time.RFC3339), req.Method)
 		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
 		return
 	}
@@ -254,7 +254,7 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 	// Check method
 	if !strings.EqualFold(req.Method, "GET") {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Printf("%s Error 405 - Method not allowed: invalid method: %s\n", time.Now().Format(time.RFC3339), req.Method)
 		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
 		return
 	}
@@ -300,7 +300,7 @@ func (a *API) ConfigurationDeleteHandler(w http.ResponseWriter, req *http.Reques
 	// Check method
 	if !strings.EqualFold(req.Method, "DELETE") {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Printf("Error 405 - Method not allowed: invalid method: %s", req.Method)
+		fmt.Printf("%s Error 405 - Method not allowed: invalid method: %s\n", time.Now().Format(time.RFC3339), req.Method)
 		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
 		return
 	}

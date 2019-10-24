@@ -88,9 +88,9 @@ func parseWebhookRequest(req *http.Request) (*Webhook, string, error) {
 func processWebhook(c Connector, conf executeConfiguration) {
 	err := ExecuteScript(c, conf)
 	if err != nil {
-		fmt.Printf("%s Error %s", time.Now().Format(time.RFC3339), err)
+		fmt.Printf("%s Error %s\n", time.Now().Format(time.RFC3339), err)
 	}
-	fmt.Printf("%s Success", time.Now().Format(time.RFC3339))
+	fmt.Printf("%s Success\n", time.Now().Format(time.RFC3339))
 }
 
 // WebhookHandler handles a HTTP POST request containing the webhook payload in its body
@@ -99,7 +99,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	if !strings.EqualFold(req.Method, "POST") {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		fmt.Fprint(w, "Error 405 - Method not allowed: invalid method: ", req.Method)
-		fmt.Printf("%s Error 405 - Method not allowed: invalid method: %s", time.Now().Format(time.RFC3339), req.Method)
+		fmt.Printf("%s Error 405 - Method not allowed: invalid method: %s\n", time.Now().Format(time.RFC3339), req.Method)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		fmt.Printf("%s Error %s", time.Now().Format(time.RFC3339), err)
+		fmt.Printf("%s Error %s\n", time.Now().Format(time.RFC3339), err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		fmt.Printf("%s Error %s", time.Now().Format(time.RFC3339), err)
+		fmt.Printf("%s Error %s\n", time.Now().Format(time.RFC3339), err)
 		return
 	}
 
@@ -127,7 +127,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		fmt.Printf("%s Error %s", time.Now().Format(time.RFC3339), err)
+		fmt.Printf("%s Error %s\n", time.Now().Format(time.RFC3339), err)
 		return
 	}
 
@@ -137,7 +137,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		fmt.Printf("%s Error %s", time.Now().Format(time.RFC3339), err)
+		fmt.Printf("%s Error %s\n", time.Now().Format(time.RFC3339), err)
 		return
 	}
 
@@ -146,7 +146,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
-		fmt.Printf("%s Error %s", time.Now().Format(time.RFC3339), err)
+		fmt.Printf("%s Error %s\n", time.Now().Format(time.RFC3339), err)
 		return
 	}
 
@@ -178,6 +178,6 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	// Succes
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Payload delivered successfully")
-	fmt.Printf("%s Payload delivered successfully", time.Now().Format(time.RFC3339))
+	fmt.Printf("%s Payload delivered successfully\n", time.Now().Format(time.RFC3339))
 	return
 }
