@@ -43,7 +43,6 @@ POSTGRES_PORT=5432
 POSTGRES_USER=someuser
 POSTGRES_PASSWORD=somepassword
 POSTGRES_DATABASE=somedatabasename
-PGDATA=/data/postgres
 ```
 
 ## Generate the server SSH keys
