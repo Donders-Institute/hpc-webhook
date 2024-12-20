@@ -2,43 +2,45 @@ version: "3.7"
 
 services:
   server:
-    image: dccn/hpc-webhook-server
-    container_name: hpc_webhook_server_container
+    image: ${DOCKER_REGISTRY:-dccn}/hpc-webhook-server:${DOCKER_IMAGE_TAG:-latest}
     build:
-      context: .
-      dockerfile: Dockerfile-server
-    env_file:
-      - ./configs/hpc-webhook-database.env
+      context: ./
+      target: server
+    environment:
+      WEBHOOK_BASEURL: ${WEBHOOK_BASEURL}
+      RELAY_ACCESS_NODE: ${RELAY_ACCESS_NODE}
+      RELAY_CONNECTION_TIMEOUT_SECONDS: ${RELAY_CONNECTION_TIMEOUT_SECONDS}
+      POSTGRES_HOST: ${POSTGRES_HOST:-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-webhook}
     secrets:
       - hpc_webhook_private_key
       - hpc_webhook_public_key
     ports:
-      - 5111:5111
+      - ${SERVER_PORT:-5111}:5111
     volumes:
-      - ./data:/data
-    networks:
-      - hpc_webhook_net
+      - ${SERVER_HOME_VOL:-/home}:/home
+      - ${SERVER_VOL:-./data}:/data
+    restart: always
     depends_on:
       - db
   db:
     image: postgres:11
-    env_file:
-      - ./configs/hpc-webhook-database.env
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST:-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-webhook}
     volumes:
-      - ./init/01-initialize-database.sh:/docker-entrypoint-initdb.d/01-initialize-database.sh:ro
-      - ./pgdata:/var/lib/postgresql/data
-    networks:
-      - hpc_webhook_net
+      - ${DB_INIT:-./init/01-initialize-database.sh}:/docker-entrypoint-initdb.d/01-initialize-database.sh:ro
+      - ${DB_VOL:-./pgdata}:/var/lib/postgresql/data
     restart: always
-
-networks:
-  hpc_webhook_net:
-
-volumes:
-  postgres:
 
 secrets:
   hpc_webhook_private_key:
-    file: ./configs/hpc-webhook
+    file: ${RELAY_SSH_KEY:-./configs/hpc-webhook}
   hpc_webhook_public_key:
-    file: ./configs/hpc-webhook.pub
+    file: ${RELAY_SSH_PUB:-./configs/hpc-webhook.pub}

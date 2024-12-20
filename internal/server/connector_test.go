@@ -65,10 +65,13 @@ func TestConnect(t *testing.T) {
 	}
 	defer fc.CloseSession(session)
 
-	command := "ls -1"
+	command := "ls -l"
 	err = fc.Run(session, command)
+	if err != nil {
+		t.Errorf("fail to run command %s: %s", command, err)
+	}
 
-	command = `ssh dccnuser@relaynode.dccn.nl "ls -1"`
+	command = `ssh dccnuser@relaynode.dccn.nl "ls -l"`
 	out, err = fc.CombinedOutput(session, command)
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())

@@ -185,7 +185,7 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	}
 
 	// Succes
-	webhookPayloadURL := fmt.Sprintf("https://%s:%s/webhook/%s", a.HPCWebhookHost, a.HPCWebhookExternalPort, configuration.Hash)
+	webhookPayloadURL := fmt.Sprintf("%s/webhook/%s", a.WebhookBaseURL, configuration.Hash)
 	configurationResponse := ConfigurationResponse{
 		Webhook: webhookPayloadURL,
 	}
@@ -198,7 +198,6 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	return
 }
 
 // ConfigurationInfoHandler handles a HTTP GET request
@@ -222,7 +221,7 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the item
-	list, err := getRow(a.DB, a.HPCWebhookHost, a.HPCWebhookExternalPort, configuration.Hash, configuration.Groupname, configuration.Username)
+	list, err := getRow(a.DB, a.WebhookBaseURL, configuration.Hash, configuration.Groupname, configuration.Username)
 	if err != nil || len(list) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -245,7 +244,6 @@ func (a *API) ConfigurationInfoHandler(w http.ResponseWriter, req *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 	fmt.Printf("%+v\n", string(js))
-	return
 }
 
 // ConfigurationListHandler handles a HTTP GET request
@@ -269,7 +267,7 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 	}
 
 	// Get the list of webhooks
-	list, err := getListRows(a.DB, a.HPCWebhookHost, a.HPCWebhookExternalPort, configuration.Groupname, configuration.Username)
+	list, err := getListRows(a.DB, a.WebhookBaseURL, configuration.Groupname, configuration.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Println(err)
@@ -291,7 +289,6 @@ func (a *API) ConfigurationListHandler(w http.ResponseWriter, req *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 	fmt.Printf("%+v\n", string(js))
-	return
 }
 
 // ConfigurationDeleteHandler handles a HTTP DELETE request
@@ -336,5 +333,4 @@ func (a *API) ConfigurationDeleteHandler(w http.ResponseWriter, req *http.Reques
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	return
 }

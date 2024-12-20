@@ -2,7 +2,7 @@ package server
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -19,7 +19,7 @@ func obtainWebhookPayloadBody(testDataFilename string) (*bytes.Buffer, error) {
 	}
 	defer file.Close()
 
-	body, err := ioutil.ReadAll(file)
+	body, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
@@ -169,17 +169,13 @@ func TestHandlerWebhook(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                   testConfig.dataDir,
-			HomeDir:                   testConfig.homeDir,
-			RelayNode:                 "relaynode.dccn.nl",
-			RelayNodeTestUser:         c.username,
-			RelayNodeTestUserPassword: "somepassword",
-			ConnectionTimeoutSeconds:  30,
-			HPCWebhookHost:            "hpc-webhook.dccn.nl",
-			HPCWebhookInternalPort:    "5111",
-			HPCWebhookExternalPort:    "443",
-			PrivateKeyFilename:        testConfig.privateKeyFilename,
-			PublicKeyFilename:         testConfig.publicKeyFilename,
+			DataDir:                  testConfig.dataDir,
+			HomeDir:                  testConfig.homeDir,
+			RelayNode:                "relaynode.dccn.nl",
+			ConnectionTimeoutSeconds: 30,
+			WebhookBaseURL:           "https://hpc-webhook.dccn.nl:443",
+			PrivateKeyFilename:       testConfig.privateKeyFilename,
+			PublicKeyFilename:        testConfig.publicKeyFilename,
 		}
 
 		app := &api
@@ -191,7 +187,7 @@ func TestHandlerWebhook(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error writing user script dir")
 		}
-		err = ioutil.WriteFile(userScriptPathFilename, []byte("test"), 0644)
+		err = os.WriteFile(userScriptPathFilename, []byte("test"), 0644)
 		if err != nil {
 			t.Errorf("Error writing script")
 		}

@@ -3,7 +3,7 @@ package server
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,37 +25,37 @@ type Webhook struct {
 func extractWebhookID(u *url.URL, WebhookPath string) (string, error) {
 	path := u.Path
 	if len(path) < len(WebhookPath) {
-		return "", fmt.Errorf("Invalid URL path '%s'", path)
+		return "", fmt.Errorf("invalid URL path '%s'", path)
 	}
 	if !strings.HasPrefix(path, WebhookPath) {
-		return "", fmt.Errorf("Invalid URL path '%s'", path)
+		return "", fmt.Errorf("invalid URL path '%s'", path)
 	}
 	webhookID := path[len(WebhookPath)+1:]
 	return webhookID, nil
 }
 
 // Check if the webhook id exists. Return the username
-func checkWebhookID(db *sql.DB, hpcWebhookHost string, hpcWebhookExternalPort string, webhookID string) (string, string, error) {
-	list, err := getRowHashOnly(db, hpcWebhookHost, hpcWebhookExternalPort, webhookID)
+func checkWebhookID(db *sql.DB, webhookBaseURL string, webhookID string) (string, string, error) {
+	list, err := getRowHashOnly(db, webhookBaseURL, webhookID)
 	if err != nil || len(list) == 0 {
-		return "", "", fmt.Errorf("Invalid webhook ID '%s'", webhookID)
+		return "", "", fmt.Errorf("invalid webhook ID '%s'", webhookID)
 	}
 	if len(list) > 1 {
-		return "", "", fmt.Errorf("Invalid database; found multiple webhook with webhook ID '%s'", webhookID)
+		return "", "", fmt.Errorf("invalid database; found multiple webhook with webhook ID '%s'", webhookID)
 	}
 	return list[0].Groupname, list[0].Username, nil
 }
 
 // Read the payload from the request body
 func parseWebhookPayload(req *http.Request) ([]byte, error) {
-	payload, err := ioutil.ReadAll(req.Body)
+	payload, err := io.ReadAll(req.Body)
 	return payload, err
 }
 
 // Write the payload to a file
-func writeWebhookPayloadToFile(payloadDir string, payload []byte, username string) error {
+func writeWebhookPayloadToFile(payloadDir string, payload []byte) error {
 	payloadFilename := path.Join(payloadDir, PayLoadName)
-	err := ioutil.WriteFile(payloadFilename, payload, 0600)
+	err := os.WriteFile(payloadFilename, payload, 0600)
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if webhookID exists
-	groupname, username, err := checkWebhookID(a.DB, a.HPCWebhookHost, a.HPCWebhookExternalPort, webhookID)
+	groupname, username, err := checkWebhookID(a.DB, a.WebhookBaseURL, webhookID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
@@ -142,7 +142,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Write the payload to file
-	err = writeWebhookPayloadToFile(payloadDir, payload, username)
+	err = writeWebhookPayloadToFile(payloadDir, payload)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Error 404 - Not found: ", err)
@@ -164,7 +164,6 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		userScriptPathFilename: userScriptPathFilename,
 		username:               username,
 		groupname:              groupname,
-		password:               a.RelayNodeTestUserPassword,
 		relayNodeName:          a.RelayNode,
 		dataDir:                a.DataDir,
 		homeDir:                a.HomeDir,
@@ -179,5 +178,4 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Payload delivered successfully")
 	fmt.Printf("%s Payload delivered successfully\n", time.Now().Format(time.RFC3339))
-	return
 }
