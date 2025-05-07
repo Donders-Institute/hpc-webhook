@@ -13,6 +13,31 @@ const (
 	ScriptName      = "script"   // ScriptName is the name of the script in the user's work directory
 )
 
+type Scheduler int
+
+const (
+	Slurm Scheduler = iota
+	Torque
+)
+
+func (s Scheduler) String() string {
+	switch s {
+	case Slurm:
+		return "slurm"
+	case Torque:
+		return "torque"
+	default:
+		return "unknown"
+	}
+}
+
+func MyScheduler(s string) Scheduler {
+	if strings.ToLower(s) == Slurm.String() {
+		return Slurm
+	}
+	return Torque
+}
+
 // API is used to store the database pointer
 type API struct {
 	DB                       *sql.DB
@@ -24,6 +49,7 @@ type API struct {
 	WebhookBaseURL           string
 	PrivateKeyFilename       string
 	PublicKeyFilename        string
+	Scheduler                Scheduler
 }
 
 // WebhookPath is the basic part of the webhook payload URL

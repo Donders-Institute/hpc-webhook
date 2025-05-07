@@ -169,6 +169,7 @@ func (a *API) WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		homeDir:                a.HomeDir,
 		webhookID:              webhookID,
 		payload:                payload,
+		scheduler:              a.Scheduler,
 	}
 
 	// Process the webhook in the background
