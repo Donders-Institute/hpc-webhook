@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"net/url"
 	"reflect"
 	"testing"
 
@@ -99,8 +99,8 @@ func TestGetRowHashOnly(t *testing.T) {
 		WithArgs(hash).
 		WillReturnRows(expectedRows)
 
-	hpcWebhookHost := "hpc-webhook.dccn.nl"
-	hpcWebhookExternalPort := "443"
+	hpcWebhookBaseURL := "https://hpc-webhook.dccn.nl:443"
+	webhookURL, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash)
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -109,11 +109,11 @@ func TestGetRowHashOnly(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash),
+			URL:         webhookURL,
 		},
 	}
 
-	list, err = getRowHashOnly(db, hpcWebhookHost, hpcWebhookExternalPort, hash)
+	list, err = getRowHashOnly(db, hpcWebhookBaseURL, hash)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}
@@ -149,8 +149,8 @@ func TestGetRow(t *testing.T) {
 		WithArgs(hash, expectedGroupname, expectedUsername).
 		WillReturnRows(expectedRows)
 
-	hpcWebhookHost := "hpc-webhook.dccn.nl"
-	hpcWebhookExternalPort := "443"
+	hpcWebhookBaseURL := "https://hpc-webhook.dccn.nl:443"
+	webhookURL, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash)
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -159,11 +159,11 @@ func TestGetRow(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash),
+			URL:         webhookURL,
 		},
 	}
 
-	list, err = getRow(db, hpcWebhookHost, hpcWebhookExternalPort, hash, expectedGroupname, expectedUsername)
+	list, err = getRow(db, hpcWebhookBaseURL, hash, expectedGroupname, expectedUsername)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}
@@ -206,8 +206,9 @@ func TestGetListRows(t *testing.T) {
 		WithArgs(expectedGroupname1, expectedUsername1).
 		WillReturnRows(expectedRows)
 
-	hpcWebhookHost := "hpc-webhook.dccn.nl"
-	hpcWebhookExternalPort := "443"
+	hpcWebhookBaseURL := "https://hpc-webhook.dccn.nl:443"
+	webhookURL1, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash1)
+	webhookURL2, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash2)
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -216,7 +217,7 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername1,
 			Description: expectedDescription1,
 			Created:     expectedCreated1,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash1),
+			URL:         webhookURL1,
 		},
 		{
 			ID:          2,
@@ -225,11 +226,11 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername2,
 			Description: expectedDescription2,
 			Created:     expectedCreated2,
-			URL:         fmt.Sprintf("https://%s:%s%s/%s", hpcWebhookHost, hpcWebhookExternalPort, WebhookPath, hash2),
+			URL:         webhookURL2,
 		},
 	}
 
-	list, err = getListRows(db, hpcWebhookHost, hpcWebhookExternalPort, expectedGroupname1, expectedUsername1)
+	list, err = getListRows(db, hpcWebhookBaseURL, expectedGroupname1, expectedUsername1)
 	if err != nil {
 		t.Errorf("error was not expected while getting row: %s", err)
 	}

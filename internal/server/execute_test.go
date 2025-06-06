@@ -1,7 +1,6 @@
 package server
 
 import (
-	"io/ioutil"
 	"net"
 	"os"
 	"path"
@@ -11,14 +10,13 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func TestTriggerQsubCommand(t *testing.T) {
+func TestJobSubmitRemote(t *testing.T) {
 	relayNodeName := "relaynode.dccn.nl"
 	connectionTimeoutSeconds := 30
 	remote := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
 	username := "dccnuser"
 	groupname := "dccngroup"
-	password := "somepassword"
 	dataDir := path.Join("..", "..", "test", "results", "executeScript", "data")
 	keyDir := path.Join("..", "..", "test", "results", "executeScript", "keys")
 	homeDir := path.Join("..", "..", "test", "results", "executeScript", "home")
@@ -60,11 +58,11 @@ func TestTriggerQsubCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing key dir")
 	}
-	err = ioutil.WriteFile(publicKeyFilename, []byte("test"), 0644)
+	err = os.WriteFile(publicKeyFilename, []byte("test"), 0644)
 	if err != nil {
 		t.Errorf("Error writing public key")
 	}
-	err = ioutil.WriteFile(privateKeyFilename, []byte("test"), 0600)
+	err = os.WriteFile(privateKeyFilename, []byte("test"), 0600)
 	if err != nil {
 		t.Errorf("Error writing private key")
 	}
@@ -80,7 +78,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing user script dir")
 	}
-	err = ioutil.WriteFile(userScriptPathFilename, []byte("test.sh"), 0644)
+	err = os.WriteFile(userScriptPathFilename, []byte("test.sh"), 0644)
 	if err != nil {
 		t.Errorf("Error writing script.sh")
 	}
@@ -90,7 +88,7 @@ func TestTriggerQsubCommand(t *testing.T) {
 	}
 
 	// Configure the SSH connection
-	privateKey, err := ioutil.ReadFile(privateKeyFilename)
+	privateKey, err := os.ReadFile(privateKeyFilename)
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
@@ -118,15 +116,15 @@ func TestTriggerQsubCommand(t *testing.T) {
 		userScriptPathFilename:   userScriptPathFilename,
 		username:                 username,
 		groupname:                groupname,
-		password:                 password,
 		relayNodeName:            relayNodeName,
 		connectionTimeoutSeconds: connectionTimeoutSeconds,
 		webhookID:                webhookID,
 		dataDir:                  dataDir,
 		homeDir:                  homeDir,
+		scheduler:                MyScheduler(os.Getenv("RELAY_JOB_SCHEDULER")),
 	}
 
-	err = triggerQsubCommand(fc, client, executeConfig)
+	err = jobSubmitRemote(fc, client, executeConfig)
 	if err != nil {
 		t.Errorf("Expected no error, but got '%+v'", err.Error())
 	}
@@ -134,11 +132,9 @@ func TestTriggerQsubCommand(t *testing.T) {
 
 func TestExecuteScript(t *testing.T) {
 	relayNodeName := "relaynode.dccn.nl"
-	remoteServer := net.JoinHostPort(relayNodeName, "22")
 	webhookID := "550e8400-e29b-41d4-a716-446655440001"
 	username := "dccnuser"
 	groupname := "dccngroup"
-	password := "somepassword"
 	dataDir := path.Join("..", "..", "test", "results", "executeScript", "data")
 	keyDir := path.Join("..", "..", "test", "results", "executeScript", "keys")
 	homeDir := path.Join("..", "..", "test", "results", "executeScript", "home")
@@ -181,11 +177,11 @@ func TestExecuteScript(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing key dir")
 	}
-	err = ioutil.WriteFile(publicKeyFilename, []byte("test"), 0644)
+	err = os.WriteFile(publicKeyFilename, []byte("test"), 0644)
 	if err != nil {
 		t.Errorf("Error writing public key")
 	}
-	err = ioutil.WriteFile(privateKeyFilename, []byte("test"), 0600)
+	err = os.WriteFile(privateKeyFilename, []byte("test"), 0600)
 	if err != nil {
 		t.Errorf("Error writing private key")
 	}
@@ -201,7 +197,7 @@ func TestExecuteScript(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing payload dir")
 	}
-	err = ioutil.WriteFile(path.Join(payloadDir, PayLoadName), payload, 0644)
+	err = os.WriteFile(path.Join(payloadDir, PayLoadName), payload, 0644)
 	if err != nil {
 		t.Errorf("Error writing payload")
 	}
@@ -211,7 +207,7 @@ func TestExecuteScript(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error writing user script dir")
 	}
-	err = ioutil.WriteFile(userScriptPathFilename, []byte("test.sh"), 0644)
+	err = os.WriteFile(userScriptPathFilename, []byte("test.sh"), 0644)
 	if err != nil {
 		t.Errorf("Error writing script.sh")
 	}
@@ -224,12 +220,11 @@ func TestExecuteScript(t *testing.T) {
 		userScriptPathFilename: userScriptPathFilename,
 		username:               username,
 		groupname:              groupname,
-		password:               password,
 		relayNodeName:          relayNodeName,
-		remoteServer:           remoteServer,
 		webhookID:              webhookID,
 		dataDir:                dataDir,
 		homeDir:                homeDir,
+		scheduler:              MyScheduler(os.Getenv("RELAY_JOB_SCHEDULER")),
 	}
 
 	// Execute the script

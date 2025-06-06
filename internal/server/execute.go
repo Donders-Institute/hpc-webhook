@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"time"
@@ -19,14 +18,13 @@ type executeConfiguration struct {
 	userScriptPathFilename   string
 	relayNodeName            string
 	connectionTimeoutSeconds int
-	remoteServer             string
 	dataDir                  string
 	homeDir                  string
 	webhookID                string
 	payload                  []byte
 	username                 string
 	groupname                string
-	password                 string
+	scheduler                Scheduler
 }
 
 // CopyFile copies a source file to a destination file.
@@ -51,7 +49,7 @@ func CopyFile(src string, dst string) error {
 	return out.Close()
 }
 
-func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfiguration) error {
+func jobSubmitRemote(c Connector, client *ssh.Client, conf executeConfiguration) error {
 	session, err := c.NewSession(client)
 	if err != nil {
 		return err
@@ -59,14 +57,35 @@ func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfigurati
 	defer c.CloseSession(session)
 
 	// Grab the path to the user script
-	contents, err := ioutil.ReadFile(conf.userScriptPathFilename)
+	contents, err := os.ReadFile(conf.userScriptPathFilename)
 	if err != nil {
 		return err
 	}
 	userScriptFilename := string(contents)
 
+	var command string
+	switch conf.scheduler {
+	case Slurm:
+		command = fmt.Sprintf(
+			`bash -l -c "cd ~/%s/%s/ && sbatch %s %s"`,
+			WebhooksWorkDir,
+			conf.webhookID,
+			userScriptFilename,
+			conf.targetPayloadFilename,
+		)
+	case Torque:
+		command = fmt.Sprintf(
+			`bash -l -c "cd ~/%s/%s/ && qsub -F %s %s"`,
+			WebhooksWorkDir,
+			conf.webhookID,
+			conf.targetPayloadFilename,
+			userScriptFilename,
+		)
+	default:
+		return fmt.Errorf("unknown scheduler")
+	}
+
 	// Go the correct folder and run the qsub command from there
-	command := fmt.Sprintf(`bash -l -c "cd ~/%s/%s/ && qsub -F %s %s"`, WebhooksWorkDir, conf.webhookID, conf.targetPayloadFilename, userScriptFilename)
 	fmt.Println(command)
 	err = c.Run(session, command)
 	if err != nil {
@@ -78,7 +97,7 @@ func triggerQsubCommand(c Connector, client *ssh.Client, conf executeConfigurati
 // ExecuteScript triggers a qsub command on the HPC cluster
 func ExecuteScript(c Connector, conf executeConfiguration) error {
 	// Configure the SSH connection
-	privateKey, err := ioutil.ReadFile(conf.privateKeyFilename)
+	privateKey, err := os.ReadFile(conf.privateKeyFilename)
 	if err != nil {
 		return err
 	}
@@ -93,8 +112,7 @@ func ExecuteScript(c Connector, conf executeConfiguration) error {
 	}
 
 	// Start an SSH session on the relay node
-	remoteServer := fmt.Sprintf("%s:22", conf.relayNodeName)
-	client, err := c.NewClient(remoteServer, clientConfig)
+	client, err := c.NewClient(fmt.Sprintf("%s:22", conf.relayNodeName), clientConfig)
 	if err != nil {
 		return err
 	}
@@ -110,8 +128,8 @@ func ExecuteScript(c Connector, conf executeConfiguration) error {
 		return err
 	}
 
-	// Trigger the qsub command
-	err = triggerQsubCommand(c, client, conf)
+	// Trigger the HPC job submit command on relay node via ssh
+	err = jobSubmitRemote(c, client, conf)
 	if err != nil {
 		return err
 	}

@@ -5,21 +5,12 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
 
 	"golang.org/x/crypto/ssh"
 )
-
-func checkFile(filename string) (bool, error) {
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		return false, fmt.Errorf("file '%s' does not exist", filename)
-	}
-	return true, nil
-}
 
 func generateKeyPair(savePrivateFileTo string, savePublicFileTo string) error {
 	bitSize := 4096
@@ -101,7 +92,7 @@ func generatePublicKey(privatekey *rsa.PublicKey) ([]byte, error) {
 
 // writePemToFile writes keys to a file
 func writeKeyToFile(keyBytes []byte, saveFileTo string) error {
-	err := ioutil.WriteFile(saveFileTo, keyBytes, 0600)
+	err := os.WriteFile(saveFileTo, keyBytes, 0600)
 	if err != nil {
 		return err
 	}
@@ -125,7 +116,7 @@ func addAuthorizedPublicKey(homeDir string, groupname string, username string, p
 	defer fp.Close()
 
 	// Append the public key to the
-	publicKeyBytes, err := ioutil.ReadFile(publicKeyFilename)
+	publicKeyBytes, err := os.ReadFile(publicKeyFilename)
 	if err != nil {
 		return err
 	}

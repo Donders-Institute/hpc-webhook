@@ -26,3 +26,4 @@ bin
 vendor
 configs/hpc-webhook
 configs/hpc-webhook.pub
+.env

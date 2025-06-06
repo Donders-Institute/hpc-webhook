@@ -6,28 +6,27 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/Donders-Institute/hpc-webhook/internal/server"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
+const (
+	homeDir            = "/home"
+	dataDir            = "/data"
+	privateKeyFilename = "/run/secrets/hpc_webhook_private_key"
+	publicKeyFilename  = "/run/secrets/hpc_webhook_public_key"
+)
+
 func main() {
 	// Set HPC webhook server variables
-	hpcWebhookHost := os.Getenv("HPC_WEBHOOK_HOST")
-	hpcWebhookInternalPort := os.Getenv("HPC_WEBHOOK_INTERNAL_PORT")
-	hpcWebhookExternalPort := os.Getenv("HPC_WEBHOOK_EXTERNAL_PORT")
-	address := fmt.Sprintf("%s:%s", hpcWebhookHost, hpcWebhookInternalPort)
-	homeDir := os.Getenv("HOME_DIR")
-	dataDir := os.Getenv("DATA_DIR")
-	privateKeyFilename := os.Getenv("PRIVATE_KEY_FILE")
-	publicKeyFilename := os.Getenv("PUBLIC_KEY_FILE")
+	webhookBaseURL := strings.TrimRight(os.Getenv("WEBHOOK_BASEURL"), "/")
 
 	// Set target computer variables
-	relayNode := os.Getenv("RELAY_NODE")
-	relayNodeTestUser := os.Getenv("RELAY_NODE_TEST_USER")
-	relayNodeTestUserPassword := os.Getenv("RELAY_NODE_TEST_USER_PASSWORD")
-	connectionTimeoutSeconds, err := strconv.Atoi(os.Getenv("CONNECTION_TIMEOUT_SECONDS"))
+	relayNode := os.Getenv("RELAY_ACCESS_NODE")
+	connectionTimeoutSeconds, err := strconv.Atoi(os.Getenv("RELAY_CONNECTION_TIMEOUT_SECONDS"))
 	if err != nil {
 		panic(err)
 	}
@@ -38,12 +37,6 @@ func main() {
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DATABASE")
-
-	// Override settings if we run the server in a Docker container
-	if server.RunsWithinContainer() {
-		host = "db"
-		address = fmt.Sprintf("0.0.0.0:%s", hpcWebhookInternalPort)
-	}
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -60,17 +53,14 @@ func main() {
 		Connector: server.SSHConnector{
 			Description: "SSH connection to relay node",
 		},
-		DataDir:                   dataDir,
-		HomeDir:                   homeDir,
-		RelayNode:                 relayNode,
-		RelayNodeTestUser:         relayNodeTestUser,
-		RelayNodeTestUserPassword: relayNodeTestUserPassword,
-		ConnectionTimeoutSeconds:  connectionTimeoutSeconds,
-		HPCWebhookHost:            hpcWebhookHost,
-		HPCWebhookInternalPort:    hpcWebhookInternalPort,
-		HPCWebhookExternalPort:    hpcWebhookExternalPort,
-		PrivateKeyFilename:        privateKeyFilename,
-		PublicKeyFilename:         publicKeyFilename,
+		DataDir:                  dataDir,
+		HomeDir:                  homeDir,
+		RelayNode:                relayNode,
+		ConnectionTimeoutSeconds: connectionTimeoutSeconds,
+		WebhookBaseURL:           webhookBaseURL,
+		PrivateKeyFilename:       privateKeyFilename,
+		PublicKeyFilename:        publicKeyFilename,
+		Scheduler:                server.MyScheduler(os.Getenv("RELAY_JOB_SCHEDULER")),
 	}
 
 	// Set the data dir and create it
@@ -92,5 +82,7 @@ func main() {
 	r.HandleFunc(server.ConfigurationListPath, app.ConfigurationListHandler).Methods("GET")
 	r.HandleFunc(server.ConfigurationDeletePath, app.ConfigurationDeleteHandler).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(address, r))
+	fmt.Printf("starting server on port 5111 ...")
+
+	log.Fatal(http.ListenAndServe("0.0.0.0:5111", r))
 }

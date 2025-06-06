@@ -2,7 +2,7 @@ package server
 
 import (
 	"database/sql"
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -13,21 +13,43 @@ const (
 	ScriptName      = "script"   // ScriptName is the name of the script in the user's work directory
 )
 
+type Scheduler int
+
+const (
+	Slurm Scheduler = iota
+	Torque
+)
+
+func (s Scheduler) String() string {
+	switch s {
+	case Slurm:
+		return "slurm"
+	case Torque:
+		return "torque"
+	default:
+		return "unknown"
+	}
+}
+
+func MyScheduler(s string) Scheduler {
+	if strings.ToLower(s) == Slurm.String() {
+		return Slurm
+	}
+	return Torque
+}
+
 // API is used to store the database pointer
 type API struct {
-	DB                        *sql.DB
-	Connector                 Connector
-	DataDir                   string
-	HomeDir                   string
-	RelayNode                 string
-	RelayNodeTestUser         string
-	RelayNodeTestUserPassword string
-	ConnectionTimeoutSeconds  int
-	HPCWebhookHost            string
-	HPCWebhookInternalPort    string // Port for internal use
-	HPCWebhookExternalPort    string // Port for the outside world
-	PrivateKeyFilename        string
-	PublicKeyFilename         string
+	DB                       *sql.DB
+	Connector                Connector
+	DataDir                  string
+	HomeDir                  string
+	RelayNode                string
+	ConnectionTimeoutSeconds int
+	WebhookBaseURL           string
+	PrivateKeyFilename       string
+	PublicKeyFilename        string
+	Scheduler                Scheduler
 }
 
 // WebhookPath is the basic part of the webhook payload URL
@@ -53,7 +75,7 @@ const ConfigurationDeletePath = "/configuration/{webhook}"
 
 // RunsWithinContainer checks if the program runs in a Docker container or not
 func RunsWithinContainer() bool {
-	file, err := ioutil.ReadFile("/proc/1/cgroup")
+	file, err := os.ReadFile("/proc/1/cgroup")
 	if err != nil {
 		return false
 	}

@@ -161,14 +161,12 @@ func TestConfigurationAddHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                testConfig.dataDir,
-			HomeDir:                testConfig.homeDir,
-			RelayNode:              "relaynode.dccn.nl",
-			HPCWebhookHost:         "hpc-webhook.dccn.nl",
-			HPCWebhookInternalPort: "5111",
-			HPCWebhookExternalPort: "443",
-			PrivateKeyFilename:     testConfig.publicKeyFilename,
-			PublicKeyFilename:      testConfig.privateKeyFilename,
+			DataDir:            testConfig.dataDir,
+			HomeDir:            testConfig.homeDir,
+			RelayNode:          "relaynode.dccn.nl",
+			WebhookBaseURL:     "https://hpc-webhook.dccn.nl:443",
+			PrivateKeyFilename: testConfig.publicKeyFilename,
+			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -332,14 +330,12 @@ func TestConfigurationInfoHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                testConfig.dataDir,
-			HomeDir:                testConfig.homeDir,
-			RelayNode:              "relaynode.dccn.nl",
-			HPCWebhookHost:         "hpc-webhook.dccn.nl",
-			HPCWebhookInternalPort: "5111",
-			HPCWebhookExternalPort: "443",
-			PrivateKeyFilename:     testConfig.publicKeyFilename,
-			PublicKeyFilename:      testConfig.privateKeyFilename,
+			DataDir:            testConfig.dataDir,
+			HomeDir:            testConfig.homeDir,
+			RelayNode:          "relaynode.dccn.nl",
+			WebhookBaseURL:     "https://hpc-webhook.dccn.nl:443",
+			PrivateKeyFilename: testConfig.publicKeyFilename,
+			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -497,14 +493,12 @@ func TestConfigurationListHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                testConfig.dataDir,
-			HomeDir:                testConfig.homeDir,
-			RelayNode:              "relaynode.dccn.nl",
-			HPCWebhookHost:         "hpc-webhook.dccn.nl",
-			HPCWebhookInternalPort: "5111",
-			HPCWebhookExternalPort: "443",
-			PrivateKeyFilename:     testConfig.publicKeyFilename,
-			PublicKeyFilename:      testConfig.privateKeyFilename,
+			DataDir:            testConfig.dataDir,
+			HomeDir:            testConfig.homeDir,
+			RelayNode:          "relaynode.dccn.nl",
+			WebhookBaseURL:     "https://hpc-webhook.dccn.nl:443",
+			PrivateKeyFilename: testConfig.publicKeyFilename,
+			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
 
 		app := &api
@@ -669,14 +663,12 @@ func TestConfigurationDeleteHandler(t *testing.T) {
 			Connector: FakeConnector{
 				Description: "fake SSH connection to relay node",
 			},
-			DataDir:                testConfig.dataDir,
-			HomeDir:                testConfig.homeDir,
-			RelayNode:              "relaynode.dccn.nl",
-			HPCWebhookHost:         "hpc-webhook.dccn.nl",
-			HPCWebhookInternalPort: "5111",
-			HPCWebhookExternalPort: "443",
-			PrivateKeyFilename:     testConfig.publicKeyFilename,
-			PublicKeyFilename:      testConfig.privateKeyFilename,
+			DataDir:            testConfig.dataDir,
+			HomeDir:            testConfig.homeDir,
+			RelayNode:          "relaynode.dccn.nl",
+			WebhookBaseURL:     "https://hpc-webhook.dccn.nl:443",
+			PrivateKeyFilename: testConfig.publicKeyFilename,
+			PublicKeyFilename:  testConfig.privateKeyFilename,
 		}
 
 		app := &api

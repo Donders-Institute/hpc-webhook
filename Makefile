@@ -1,32 +1,22 @@
-PREFIX ?= "/opt/project"
+ifndef GOPATH
+	GOPATH := $(HOME)/go
+endif
 
-GOOS ?= "linux"
+ifndef GOOS
+	GOOS := linux
+endif
+
+ifndef GO111MODULE
+	GO111MODULE := on
+endif
 
 all: build
 
-$(GOPATH)/bin/dep:
-	mkdir -p $(GOPATH)/bin
-	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | GOPATH=$(GOPATH) GOOS=$(GOOS) sh
+build:
+	GOPATH=$(GOPATH) GOOS=$(GOOS) go build -o bin/hpc-webhook-server cmd/server/server.go
 
-build_dep: $(GOPATH)/bin/dep
-	GOPATH=$(GOPATH) GOOS=$(GOOS) $(GOPATH)/bin/dep ensure
-
-update_dep: $(GOPATH)/bin/dep
-	GOPATH=$(GOPATH) GOOS=$(GOOS) $(GOPATH)/bin/dep ensure --update
-
-build: build_dep
-	GOPATH=$(GOPATH) GOOS=$(GOOS) go install github.com/Donders-Institute/hpc-webhook/...
-
-doc:
-	@GOPATH=$(GOPATH) GOOS=$(GOOS) godoc -http=:6060
-
-test: build_dep
+test:
 	@GOPATH=$(GOPATH) GOOS=$(GOOS) GOCACHE=off go test -v github.com/Donders-Institute/hpc-webhook/...
 
-install: build
-	@install -D $(GOPATH)/bin/* $(PREFIX)/bin
-
 clean:
-	@rm -rf $(GOPATH)/bin/cluster-*
-	@rm -rf $(GOPATH)/bin/trqhelpd
-	@rm -rf $(GOPATH)/pkg/*/Donders-Institute/hpc-webhook
+	@rm -rf bin
