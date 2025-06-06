@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/url"
 
 	// Postgres driver
 	_ "github.com/lib/pq"
@@ -105,7 +106,7 @@ func getRowHashOnly(db *sql.DB, webhookBaseURL string, hash string) ([]Item, err
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("%s/%s/%s", webhookBaseURL, WebhookPath, p.Hash)
+		p.URL, _ = url.JoinPath(webhookBaseURL, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {
@@ -132,7 +133,7 @@ func getRow(db *sql.DB, webhookBaseURL string, hash string, groupname string, us
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("%s/%s/%s", webhookBaseURL, WebhookPath, p.Hash)
+		p.URL, _ = url.JoinPath(webhookBaseURL, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {
@@ -159,7 +160,7 @@ func getListRows(db *sql.DB, webhookBaseURL string, groupname string, username s
 		if err := rows.Scan(&p.ID, &p.Hash, &p.Groupname, &p.Username, &p.Description, &p.Created); err != nil {
 			return nil, err
 		}
-		p.URL = fmt.Sprintf("%s/%s/%s", webhookBaseURL, WebhookPath, p.Hash)
+		p.URL, _ = url.JoinPath(webhookBaseURL, WebhookPath, p.Hash)
 		list = append(list, p)
 	}
 	if rows.Err() != nil {

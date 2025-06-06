@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -185,7 +186,12 @@ func (a *API) ConfigurationAddHandler(w http.ResponseWriter, req *http.Request) 
 	}
 
 	// Succes
-	webhookPayloadURL := fmt.Sprintf("%s/webhook/%s", a.WebhookBaseURL, configuration.Hash)
+	webhookPayloadURL, err := url.JoinPath(a.WebhookBaseURL, WebhookPath, configuration.Hash)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Error 404 - Not found: ", err)
+		return
+	}
 	configurationResponse := ConfigurationResponse{
 		Webhook: webhookPayloadURL,
 	}

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"net/url"
 	"reflect"
 	"testing"
 
@@ -100,6 +100,7 @@ func TestGetRowHashOnly(t *testing.T) {
 		WillReturnRows(expectedRows)
 
 	hpcWebhookBaseURL := "https://hpc-webhook.dccn.nl:443"
+	webhookURL, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash)
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -108,7 +109,7 @@ func TestGetRowHashOnly(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("%s/%s/%s", hpcWebhookBaseURL, WebhookPath, hash),
+			URL:         webhookURL,
 		},
 	}
 
@@ -149,6 +150,7 @@ func TestGetRow(t *testing.T) {
 		WillReturnRows(expectedRows)
 
 	hpcWebhookBaseURL := "https://hpc-webhook.dccn.nl:443"
+	webhookURL, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash)
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -157,7 +159,7 @@ func TestGetRow(t *testing.T) {
 			Username:    expectedUsername,
 			Description: expectedDescription,
 			Created:     expectedCreated,
-			URL:         fmt.Sprintf("%s/%s/%s", hpcWebhookBaseURL, WebhookPath, hash),
+			URL:         webhookURL,
 		},
 	}
 
@@ -205,6 +207,8 @@ func TestGetListRows(t *testing.T) {
 		WillReturnRows(expectedRows)
 
 	hpcWebhookBaseURL := "https://hpc-webhook.dccn.nl:443"
+	webhookURL1, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash1)
+	webhookURL2, _ := url.JoinPath(hpcWebhookBaseURL, WebhookPath, hash2)
 	listExpected := []Item{
 		{
 			ID:          1,
@@ -213,7 +217,7 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername1,
 			Description: expectedDescription1,
 			Created:     expectedCreated1,
-			URL:         fmt.Sprintf("%s/%s/%s", hpcWebhookBaseURL, WebhookPath, hash1),
+			URL:         webhookURL1,
 		},
 		{
 			ID:          2,
@@ -222,7 +226,7 @@ func TestGetListRows(t *testing.T) {
 			Username:    expectedUsername2,
 			Description: expectedDescription2,
 			Created:     expectedCreated2,
-			URL:         fmt.Sprintf("%s/%s/%s", hpcWebhookBaseURL, WebhookPath, hash2),
+			URL:         webhookURL2,
 		},
 	}
 
