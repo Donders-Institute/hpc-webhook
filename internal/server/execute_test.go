@@ -121,7 +121,7 @@ func TestJobSubmitRemote(t *testing.T) {
 		webhookID:                webhookID,
 		dataDir:                  dataDir,
 		homeDir:                  homeDir,
-		scheduler:                MyScheduler(os.Getenv("HPC_JOB_SCHEDULER")),
+		scheduler:                MyScheduler(os.Getenv("RELAY_JOB_SCHEDULER")),
 	}
 
 	err = jobSubmitRemote(fc, client, executeConfig)
@@ -224,7 +224,7 @@ func TestExecuteScript(t *testing.T) {
 		webhookID:              webhookID,
 		dataDir:                dataDir,
 		homeDir:                homeDir,
-		scheduler:              MyScheduler(os.Getenv("HPC_JOB_SCHEDULER")),
+		scheduler:              MyScheduler(os.Getenv("RELAY_JOB_SCHEDULER")),
 	}
 
 	// Execute the script

@@ -60,7 +60,7 @@ func main() {
 		WebhookBaseURL:           webhookBaseURL,
 		PrivateKeyFilename:       privateKeyFilename,
 		PublicKeyFilename:        publicKeyFilename,
-		Scheduler:                server.MyScheduler(os.Getenv("HPC_JOB_SCHEDULER")),
+		Scheduler:                server.MyScheduler(os.Getenv("RELAY_JOB_SCHEDULER")),
 	}
 
 	// Set the data dir and create it
