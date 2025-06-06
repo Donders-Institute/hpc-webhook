@@ -10,8 +10,10 @@ Login to a mentat machine of choice, for example `mentat005.dccn.nl`.
 Create your bash script to be run on the cluster, for example `test.sh`:
 ```
 #!/bin/bash
-#PBS -l walltime=00:01:30
-#PBS -l mem=10Mb
+#SBATCH --job-name=hpc-webhook
+#SBATCH --nodes=1
+#SBATCH --time=0-00:05:00
+#SBATCH --mem=5GB
 echo "script start..."
 hostname
 whoami
@@ -25,15 +27,15 @@ Place this script in a folder of choice.
 
 Try out your script, by submitting it:
 ```
-$ qsub test.sh
+$ sbatch test.sh
 ```
 
 Check the status of your cluster job with:
 ```
-$ qstat
+$ squeue --me
 ```
 Make sure your script ran succesfully.
-You should end up with two text files, one stdout (`.o`) and one stderr (`.e`).
+You should see the Slurm job output file (e.g. `slurm-{jobid}.out`).
 
 ## 2. Register a webhook on mentat005
 
@@ -104,6 +106,5 @@ $ ls -1
 
 payload
 script
-test.sh.e34986226
-test.sh.o34986226
+slurm-12345.out
 ```
