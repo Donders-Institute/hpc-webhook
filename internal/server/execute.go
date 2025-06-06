@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -61,7 +62,7 @@ func jobSubmitRemote(c Connector, client *ssh.Client, conf executeConfiguration)
 	if err != nil {
 		return err
 	}
-	userScriptFilename := string(contents)
+	userScriptFilename := strings.TrimSuffix(string(contents), "\n")
 
 	var command string
 	switch conf.scheduler {
